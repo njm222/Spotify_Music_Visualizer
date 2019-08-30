@@ -416,20 +416,6 @@ function setMode(key) {
     }
 }
 
-function changePoints(currShape, currPoints) {
-    currShape.material.size = currPoints;
-}
-
-function changeShapeType(currDetail, currShape, shapeType) {
-    scene.remove(shapeArr[currShape]);
-    if(shapeType > 3) {
-        shapeArr[currShape] = new THREE.Points(new THREE.OctahedronGeometry(10, currDetail), new THREE.PointsMaterial({size: 1, color: 0x000000}));
-    } else {
-        shapeArr[currShape] = new THREE.Mesh(cubeGeo, new THREE.MeshLambertMaterial( { color: 0x000000 } ));
-    }
-    scene.add(shapeArr[currShape]);
-}
-
 function rotateShape(shape) {
     spinf = currFreq[freqKey];
 
@@ -551,28 +537,21 @@ function getData() {
 
 function changeCameraRotation() {
     if(beatConfidence < 0.9) {
-        let rotateNoiseX = noise.noise3D(Date.now()/5000, Date.now()/5000, Date.now()/5000);
         let rotateNoiseY = noise.noise3D((Date.now()+500)/5000, (Date.now()+500)/5000, (Date.now()+500)/5000);
         let rotateNoiseZ = noise.noise3D((Date.now()+1500)/5000, (Date.now()+1500)/5000, (Date.now()+1500)/5000);
 
-        //console.log(rotateNoiseX + "\n" + rotateNoiseY + '\n' + rotateNoiseZ);
+        camera.rotation.z = (Math.acos(rotateNoiseZ)/2);
+        camera.rotation.y = (Math.asin(rotateNoiseY)/2);
 
-
-        camera.rotation.z = (Math.acos(rotateNoiseZ)/2)%(Math.PI/2);
-        if(rotateNoiseY > 0)
-            camera.rotation.y = (Math.sin(rotateNoiseY)/2)%(Math.PI/2);
-        if(rotateNoiseX > 0)
-            camera.rotation.x = (Math.sin(rotateNoiseX)/2)%(Math.PI/2);
     }
 }
 
 function changeCameraZoom() {
 
-    if(beatConfidence > 0.75) {
+    if (barConfidence > 0.65) {
+        camera.zoom = 2.5 - Math.acos(((barEnd-trackCounter)/1000)%Math.PI/3);
+    } else if(beatConfidence > 0.75) {
         camera.zoom = Math.acos((beatEnd - trackCounter)/1000);
-    } else if(tatumConfidence > (tatumAv + tatumVar)) {
-        camera.zoom = Math.sin((tatumEnd - trackCounter)/1000);
-        console.log('beat22222222222222');
     }
 
     /*if(beatConfidence > 0.95) {

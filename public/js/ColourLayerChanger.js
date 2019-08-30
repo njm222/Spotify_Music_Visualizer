@@ -231,6 +231,7 @@ function resetMode() {
     fib0 = 0;
     fib1 = 1;
     shapeIncrement = Math.ceil(Math.random() * 7);
+    noise = new SimplexNoise(Math.random());
 
     for(let i = 0; i < shapeMax; i++){
         changeColour(shapeArr[i], '0x0000');
