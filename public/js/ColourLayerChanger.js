@@ -94,10 +94,8 @@ function setModeKey() {
         if(trackCounter > sectionEnd){
             g_section++;
 
-            if (randomizer == true) {
-                modeKey.key = Math.floor(Math.random() * (10 - 1)) + 1;
-            }
-            console.log("layer mode: " + modeKey);
+            modeKey.key = Math.floor(Math.random() * (10 - 1)) + 1;
+            console.log("layer mode: " + modeKey.key);
         }
     }
 }
