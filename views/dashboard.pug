@@ -270,10 +270,10 @@ block script
 
         $('#main-visualizer').on('mousemove', function (event) {
             if (45 - event.clientY < 0) {
-                $('#visualizer-controls').css({top: 45 - event.clientY});
+                $('#visualizer-controls').css({display: "block", top: 45 - event.clientY});
             } else {
-                $('#visualizer-controls').css({top: 0});
+                $('#visualizer-controls').css({display: "block", top: 0});
             }
         }).on('mouseout', function () {
-            $('#visualizer-controls').css({top: -45});
+            $('#visualizer-controls').css({display: "none"});
         });
