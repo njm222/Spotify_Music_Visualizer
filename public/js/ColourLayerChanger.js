@@ -94,6 +94,13 @@ function setModeKey() {
         if(trackCounter > sectionEnd){
             g_section++;
 
+            bassArr = [];
+            snareArr = [];
+            kickArr = [];
+            bassArrCounter = 0;
+            kickArrCounter = 0;
+            snareArrCounter = 0;
+
             modeKey.key = Math.floor(Math.random() * (10 - 1)) + 1;
             console.log("layer mode: " + modeKey.key);
         }
@@ -122,6 +129,10 @@ function changeBar() {
         barEnd = (g_bars[g_bar]["start"] + g_bars[g_bar]["duration"]) * 1000;
         if (trackCounter > barEnd) {
             g_bar++;
+            bassArrCounter = 0;
+            kickArrCounter = 0;
+            snareArrCounter = 0;
+
             if(g_bar % 2 != 0) {
                 changedColour = true;
             }
@@ -135,6 +146,8 @@ function changeBar() {
                     cameraRandom = Math.floor(Math.random() * 2);
                     positionCamera(cameraRandom);
                     console.log("cameraRandom:   " + cameraRandom);
+
+
                 }
                 if(barConfidence > 0.8) {
                     spinr++;
@@ -305,7 +318,7 @@ function mode3() {
     shapeCounter = layerMarker[beatCounter];
 
     if(beatCounter > layerMarker[layerMarker.length-1]){
-        resetMode();
+        resetMode(modeKey.key);
     }
 }
 
@@ -353,13 +366,21 @@ function mode5() {
 }
 
 function mode6() {
+
     if(beatCounter > 1) {
-        if(shapeCounter < layerMarker[layerMarker.length-1]) {
-            shapeCounter++;
+        console.log("beat");
+
+        phongMaterial.wireframe = !phongMaterial.wireframe;
+
+        beatCounter = 0;
+    } else {
+        if(bassAv-(bassDeviation*bassFactor*1.5) > bassArr[bassArrCounter] || bassArr[bassArrCounter] > bassAv+(bassDeviation*bassFactor)) {
+            console.log("no beat");
+            removeShape();
+            addGenerativeSphere();
         }
-        for(let i = 0; i < shapeCounter; i++) {
-            changeColour(shapeArr[i], colour);
-        }
+        changeColour(shapeArr[0], colour);
+
     }
 }
 

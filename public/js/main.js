@@ -1,18 +1,48 @@
 //Constants
-
 const width = window.innerWidth;
 const height = window.innerHeight;
 
 // Audio Variables
 let currFreq = 0;
-let lowAvFreq = 0;
-let highAvFreq = 0;
-let totalFreq = 0;
 let avFreq = 0;
 let peak = 0;
 let rms = 0;
 let rmslow = 20;
 let rmshigh = 80;
+let lowerBass = 0;
+let upperBass = 4;
+let lowerKick = 1;
+let upperKick = 3;
+let lowerSnare = 2;
+let upperSnare = 4;
+let lowerMids = 4;
+let upperMids = 18;
+let lowerHighs = 32;
+let upperHighs = 200;
+
+let bassEnergy = 0;
+let kickEnergy = 0;
+let snareEnergy = 0;
+let midsEnergy = 0;
+let highsEnergy = 0;
+
+let bassArrCounter = 0;
+let bassArr = [];
+let bassAv = 0;
+let bassDeviation = 0;
+let bassFactor = 1.5;
+
+let kickArrCounter = 0;
+let kickArr = [];
+let kickAv = 0;
+let kickDeviation = 0;
+let kickFactor = 1.6;
+
+let snareArrCounter = 0;
+let snareArr = [];
+let snareAv = 0;
+let snareDeviation = 0;
+let snareFactor = 1.4;
 
 //Spotify features and analysis variables
 let g_danceability = 0;
@@ -90,6 +120,7 @@ let randomizer = false;
 let changedColour = true;
 let setLargeShape = false;
 
+let modeSwitch = false;
 let shapeArr = [];
 let shapeType;
 let shapeIncrement = 1;
@@ -112,15 +143,31 @@ let modeKey = {
 
 modeKey.registerListener(function (val) {
     console.log("modeKey changed to " + val);
-    resetMode();
 
     $('.visualizerMode').css('color', '#FFF');
     $('#mode_' + val).css('color', '#3AD36B');
     if(modeKey.key < 6) {
-        shapeCounter = 0; // reset shape
-        $('#shapeType').show();
+        if(modeSwitch) {
+            $('#shapeType').show();
+            removeShape();
+            addShape(shapeType);
+            setShapePosition();
+            modeSwitch = false;
+        }
+
+        resetMode();
     } else {
-        $('#shapeType').hide();
+
+        if(!modeSwitch) {
+            $('#shapeType').hide();
+            removeShape();
+
+            if(modeKey.key == 6) {
+                addGenerativeSphere();
+            }
+
+            modeSwitch = true;
+        }
     }
 });
 
@@ -143,7 +190,7 @@ let controls = new THREE.OrbitControls(camera);
 let colour = new THREE.Color("rgb(256,256,256)");
 let basicMaterial = new THREE.MeshBasicMaterial( { color: 0x000000 } );
 let lambertMaterial = new THREE.MeshLambertMaterial( { color: 0x000000 } );
-let phongMaterial = new THREE.MeshPhongMaterial( { color: 0x000000 } );
+let phongMaterial = new THREE.MeshPhongMaterial( { color: 0x000000, side: THREE.DoubleSide } );
 let depthMaterial = new THREE.MeshDepthMaterial( { wireframe: true } );
 
 //Geometry
@@ -153,11 +200,27 @@ let dodecaGeo = new THREE.DodecahedronGeometry(10, 0);
 let sphereGeo = new THREE.SphereGeometry(5, 32, 32);
 let tetraGeo = new THREE.TetrahedronGeometry(10, 0);
 
+//Generative Sphere constants
+let prevThetaS = 0;
+let prevThetaL = Math.PI/4;
+
 //Light
 let l1 = new THREE.PointLight(0xffffff);
 let spotLight = new THREE.SpotLight(0xffffff);
 
 let noise = new SimplexNoise(Math.random());
+
+//Generative Sphere
+
+function addGenerativeSphere() {
+    prevThetaS = Math.PI*Math.sin(bassAv);
+    prevThetaL =  kickEnergy % Math.PI;
+
+    shapeArr.push(new THREE.Mesh(new THREE.SphereBufferGeometry(50, Math.floor(bassEnergy)%32, Math.floor(kickEnergy)%32, 0, Math.PI*2, prevThetaS%(Math.PI/4), prevThetaL), phongMaterial));
+    shapeArr[0].rotation.set(Math.PI/2, 0, 0);
+    scene.add(shapeArr[0]);
+    console.log("added generative sphere");
+}
 
 //Cube Grid
 function addShape(shapeType) {
@@ -204,15 +267,14 @@ function changeShape(shapeType) {
 }
 
 function removeShape() {
-    for(let i = 0; i < shapeMax; i++) {
+    console.log("removing Shapes");
+    for(let i = 0; i < shapeArr.length; i++) {
         scene.remove(shapeArr[i]);
         shapeArr[i].geometry.dispose();
         shapeArr[i].material.dispose();
     }
     shapeArr = [];
 }
-
-//include a removeShape function
 
 function setShapePosition() {
     //variables
@@ -347,22 +409,22 @@ function setColour(key) {
 
     switch (key) {
         case 1:
-            colour = rgbToHex(avFreq, avFreq, Math.pow(lowAvFreq, 1.12));
+            colour = rgbToHex(avFreq, avFreq, Math.pow(bassAv, 1.12));
             break;
         case 2:
-            colour = rgbToHex(avFreq, Math.pow(lowAvFreq, 1.12), avFreq);
+            colour = rgbToHex(avFreq, Math.pow(bassAv, 1.12), avFreq);
             break;
         case 3:
-            colour = rgbToHex(Math.pow(lowAvFreq, 1.12), avFreq, avFreq);
+            colour = rgbToHex(Math.pow(bassAv, 1.12), avFreq, avFreq);
             break;
         case 4:
-            colour = rgbToHex(avFreq/2, avFreq/2, highAvFreq + colourModifier);
+            colour = rgbToHex(avFreq/2, avFreq/2, snareAv + colourModifier);
             break;
         case 5:
-            colour = rgbToHex(avFreq/2, highAvFreq + colourModifier, avFreq/2);
+            colour = rgbToHex(avFreq/2, snareAv + colourModifier, avFreq/2);
             break;
         case 6:
-            colour = rgbToHex(highAvFreq + colourModifier, avFreq/2, avFreq/2);
+            colour = rgbToHex(snareAv + colourModifier, avFreq/2, avFreq/2);
             break;
         case 7:
             colour = rgbToHex(rms, avFreq, peak);
@@ -400,19 +462,10 @@ function setMode(key) {
             mode5();
             break;
         case 6:
-            changeColourLayer6();
-            break;
-        case 7:
-            changeColourLayer7();
-            break;
-        case 8:
-            changeColourLayer8();
-            break;
-        case 9:
-            changeColourLayer001();
+            mode6();
             break;
         default:
-            changeColourLayer1();
+            mode6();
     }
 }
 
@@ -466,51 +519,95 @@ function rotateShape(shape) {
     }
 }
 
-function getData() {
+function resetData() {
+    bassEnergy = 0;
+    kickEnergy = 0;
+    snareEnergy = 0;
+    midsEnergy = 0;
+    highsEnergy = 0;
+    avFreq = 0;
     rms = 0;
     peak = 0;
+    bassAv = 0;
+    bassDeviation = 0;
+    kickAv = 0;
+    kickDeviation = 0;
+    snareAv = 0;
+    snareDeviation = 0;
+}
+
+function getBassData() {
+    for (let i = lowerBass; i < upperBass; i++) {
+        bassEnergy += frequencyData[i];
+    }
+    bassEnergy = bassEnergy/(upperBass-lowerBass);
+    bassArr[bassArrCounter++] = bassEnergy;
+}
+
+function getKickData() {
+    for (let i = lowerKick; i < upperKick; i++) {
+        kickEnergy += frequencyData[i];
+    }
+    kickEnergy = kickEnergy/(upperKick-lowerKick);
+    kickArr[kickArrCounter++] = kickEnergy;
+}
+
+function getSnareData() {
+    for (let i = lowerSnare; i < upperSnare; i++) {
+        snareEnergy += frequencyData[i];
+    }
+    snareEnergy = snareEnergy/(upperSnare-lowerSnare);
+    snareArr[snareArrCounter++] = snareEnergy;
+}
+
+function getDeviations() {
+    for(let i = 0; i < bassArr.length; i++) {
+        bassAv += bassArr[i];
+        bassDeviation += bassArr[i]*bassArr[i];
+
+        kickAv += kickArr[i];
+        kickDeviation += kickArr[i]*kickArr[i];
+
+        snareAv += snareArr[i];
+        snareDeviation += snareArr[i]*snareArr[i];
+    }
+    bassAv = bassAv/bassArr.length;
+    bassDeviation = Math.sqrt(bassDeviation / bassArr.length - bassAv * bassAv);
+
+    kickAv = kickAv/kickArr.length;
+    kickDeviation = Math.sqrt(kickDeviation / kickArr.length - kickAv * kickAv);
+
+    snareAv = snareAv/snareArr.length;
+    snareDeviation = Math.sqrt( snareDeviation / snareArr.length - snareAv * snareAv);
+}
+
+function getAvFreq() {
+    for (let i = 0; i < bufferLength; i++) {
+        avFreq += frequencyData[i];
+        rms += frequencyData[i]*frequencyData[i];
+        if(frequencyData[i] > peak){
+            peak = frequencyData[i];
+        }
+    }
+    avFreq = avFreq/bufferLength;
+    rms = Math.sqrt(rms/bufferLength);
+    
+}
+
+function getData() {
+    resetData();
     analyser.getByteFrequencyData(frequencyData);
-    //smooth evelope this data
     currFreq = frequencyData;
-    totalFreq = 0;
-    highAvFreq = 0;
 
-    for(let i = 0; i < (bufferLength/32); i++){
-        totalFreq += frequencyData[i];
-        lowAvFreq += frequencyData[i] * frequencyData[i];
-        rms += frequencyData[i] * frequencyData[i];
-        if(frequencyData[i] > peak){
-            peak = frequencyData[i];
-        }
-    }
+    getBassData();
+    getKickData();
+    getSnareData();
+    getDeviations();
+    
+    getAvFreq();
 
-    lowAvFreq = Math.sqrt(lowAvFreq/(bufferLength/32));
-
-    for(let i = (bufferLength/32); i < (bufferLength/32)*4; i++) {
-        totalFreq += frequencyData[i];
-        highAvFreq += frequencyData[i] * frequencyData[i];
-        rms += frequencyData[i] * frequencyData[i];
-        if(frequencyData[i] > peak){
-            peak = frequencyData[i];
-        }
-    }
-
-    highAvFreq = Math.sqrt(highAvFreq/((bufferLength/32)*3));
-
-    for(let i = (bufferLength/32)*4; i < bufferLength; i++) {
-        totalFreq += frequencyData[i];
-        rms += frequencyData[i] * frequencyData[i];
-        if(frequencyData[i] > peak){
-            peak = frequencyData[i];
-        }
-    }
-
-    avFreq = totalFreq/bufferLength; // Average Frequency
-    rms /= bufferLength;
-    rms = Math.sqrt(rms); // Volume
-
-    //console.log("low " + lowAvFreq);
-    //console.log("high " + highAvFreq);
+    //console.log("low " + bassAv);
+    //console.log("high " + snareAv);
     //console.log("av " + avFreq);
     //console.log("rms " + rms);
     //console.log(peak);
@@ -555,19 +652,19 @@ function changeCameraZoom() {
     }
 
     /*if(beatConfidence > 0.95) {
-        camera.zoom = 1 + Math.sin((rms + highAvFreq)/100) * ( Math.asin((beatEnd - trackCounter)/500))/!* * Math.sin((rms+highAvFreq)/75)*!/;
+        camera.zoom = 1 + Math.sin((rms + snareAv)/100) * ( Math.asin((beatEnd - trackCounter)/500))/!* * Math.sin((rms+snareAv)/75)*!/;
     } else if(beatConfidence > 0.9) {
-        camera.zoom = 1 + Math.sin(highAvFreq/100) * ( Math.acos((beatEnd - trackCounter)/500))/!* * Math.sin(highAvFreq/75)*!/;
+        camera.zoom = 1 + Math.sin(snareAv/100) * ( Math.acos((beatEnd - trackCounter)/500))/!* * Math.sin(snareAv/75)*!/;
     } else if(beatConfidence > 0.85) {
-        camera.zoom = 1 + Math.sin(highAvFreq/200) * ( Math.asin((beatEnd - trackCounter)/500))/!* * Math.sin(highAvFreq/150)*!/;
+        camera.zoom = 1 + Math.sin(snareAv/200) * ( Math.asin((beatEnd - trackCounter)/500))/!* * Math.sin(snareAv/150)*!/;
     } else if(beatConfidence > 0.8) {
-        camera.zoom = 1 + Math.sin((rms + highAvFreq)/200) * ( Math.acos((beatEnd - trackCounter)/500))/!* * Math.sin((rms+highAvFreq)/150)*!/;
+        camera.zoom = 1 + Math.sin((rms + snareAv)/200) * ( Math.acos((beatEnd - trackCounter)/500))/!* * Math.sin((rms+snareAv)/150)*!/;
     }*/
 
 }
 
 function scaleShape(shapeToScale) {
-    let sScale = Math.sqrt(lowAvFreq)/10;
+    let sScale = Math.sqrt(bassAv)/10;
     shapeToScale.scale.set(sScale,sScale,sScale);
 }
 
@@ -613,8 +710,10 @@ let run = function(){
         if(randomizeMode)
             setModeKey();
 
-        for(let i = 0; i < shapeArr.length; i++) {
-            rotateShape(shapeArr[i]);
+        if(modeKey.key < 6) {
+            for(let i = 0; i < shapeArr.length; i++) {
+                rotateShape(shapeArr[i]);
+            }
         }
 
         // Camera movement
