@@ -210,6 +210,7 @@ let spotLight = new THREE.SpotLight(0xffffff);
 
 let noise = new SimplexNoise(Math.random());
 
+<<<<<<< Updated upstream
 //Generative Sphere
 
 function addGenerativeSphere() {
@@ -220,6 +221,11 @@ function addGenerativeSphere() {
     shapeArr[0].rotation.set(Math.PI/2, 0, 0);
     scene.add(shapeArr[0]);
     console.log("added generative sphere");
+=======
+//2-D Plane
+function addPlane() {
+
+>>>>>>> Stashed changes
 }
 
 //Cube Grid
@@ -397,6 +403,36 @@ function rgbToHex(r,g,b) {
     return ("0x" + rgbToHexHelper(r) + rgbToHexHelper(g) + rgbToHexHelper(b));
 }
 
+
+function hslToHex(h, s, l) {
+    h /= 360;
+    s /= 255;
+    l /= 255;
+    let r, g, b;
+    if (s === 0) {
+        r = g = b = l; // achromatic
+    } else {
+        const hue2rgb = (p, q, t) => {
+            if (t < 0) t += 1;
+            if (t > 1) t -= 1;
+            if (t < 1 / 6) return p + (q - p) * 6 * t;
+            if (t < 1 / 2) return q;
+            if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+            return p;
+        };
+        const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+        const p = 2 * l - q;
+        r = hue2rgb(p, q, h + 1 / 3);
+        g = hue2rgb(p, q, h);
+        b = hue2rgb(p, q, h - 1 / 3);
+    }
+    const toHex = x => {
+        const hex = Math.round(x * 255).toString(16);
+        return hex.length === 1 ? '0' + hex : hex;
+    };
+    return `0x${toHex(r)}${toHex(g)}${toHex(b)}`;
+}
+
 function changeColour(currShape, currColour) {
     currShape.material.color.setHex(currColour);
 }
@@ -409,7 +445,11 @@ function setColour(key) {
 
     switch (key) {
         case 1:
+<<<<<<< Updated upstream
             colour = rgbToHex(avFreq, avFreq, Math.pow(bassAv, 1.12));
+=======
+            colour = hslToHex(lowAvFreq+colourModifier, highAvFreq, avFreq);
+>>>>>>> Stashed changes
             break;
         case 2:
             colour = rgbToHex(avFreq, Math.pow(bassAv, 1.12), avFreq);
@@ -444,7 +484,7 @@ function setColour(key) {
 
 }
 
-function setMode(key) {
+function doMode(key) {
     switch (key) {
         case 1:
             mode1();
@@ -462,7 +502,20 @@ function setMode(key) {
             mode5();
             break;
         case 6:
+<<<<<<< Updated upstream
             mode6();
+=======
+            changeColourLayer6();
+            break;
+        case 7:
+            changeColourLayer7();
+            break;
+        case 8:
+            mode8();
+            break;
+        case 9:
+            changeColourLayer001();
+>>>>>>> Stashed changes
             break;
         default:
             mode6();
@@ -638,7 +691,11 @@ function changeCameraRotation() {
         let rotateNoiseZ = noise.noise3D((Date.now()+1500)/5000, (Date.now()+1500)/5000, (Date.now()+1500)/5000);
 
         camera.rotation.z = (Math.acos(rotateNoiseZ)/2);
-        camera.rotation.y = (Math.asin(rotateNoiseY)/2);
+        if(spinr % 2 !== 0) {
+            camera.rotation.y = (Math.asin(rotateNoiseY)/2);
+        } else {
+            camera.rotation.y = (Math.atan(rotateNoiseY)/2);
+        }
 
     }
 }
@@ -705,27 +762,31 @@ let run = function(){
 
         changeFreqMode();
         // change these to event listeners
-        if(randomizeColour)
+        /*if(randomizeColour)
             setColourKey();
         if(randomizeMode)
-            setModeKey();
+            setModeKey();*/
 
+<<<<<<< Updated upstream
         if(modeKey.key < 6) {
             for(let i = 0; i < shapeArr.length; i++) {
                 rotateShape(shapeArr[i]);
             }
+=======
+        if(modeKey.key < 8) {
+            for(let i = 0; i < shapeArr.length; i++) {
+                rotateShape(shapeArr[i]);
+            }
+            // Camera movement
+            if(toggleZoom)
+                changeCameraZoom();
+            if(toggleRotate)
+                changeCameraRotation();
+>>>>>>> Stashed changes
         }
 
-        // Camera movement
-        if(toggleZoom)
-            changeCameraZoom();
-        if(toggleRotate)
-            changeCameraRotation();
-
-        // need a check for if shapeCounter == 0
-        // then 'reset' the layer (Maybe add a clear screen animation?)
-        setMode(modeKey.key);
         setColour(colourKey);
+        doMode(modeKey.key);
     }
 
     camera.updateProjectionMatrix();

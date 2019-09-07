@@ -94,6 +94,7 @@ function setModeKey() {
         if(trackCounter > sectionEnd){
             g_section++;
 
+<<<<<<< Updated upstream
             bassArr = [];
             snareArr = [];
             kickArr = [];
@@ -102,6 +103,10 @@ function setModeKey() {
             snareArrCounter = 0;
 
             modeKey.key = Math.floor(Math.random() * (10 - 1)) + 1;
+=======
+            modeKey.key = Math.floor(Math.random() * (10 - 1)) + 1;
+
+>>>>>>> Stashed changes
             console.log("layer mode: " + modeKey.key);
         }
     }
@@ -382,6 +387,12 @@ function mode6() {
         changeColour(shapeArr[0], colour);
 
     }
+}
+
+
+/** Perlin Noise Heightmap displacement*/
+function mode8() {
+
 }
 
 function changeColourLayer001() {

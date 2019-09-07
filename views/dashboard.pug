@@ -52,7 +52,7 @@ block script
         var currentTrack, currentArtist, currentTrackID;
 
         window.onSpotifyWebPlaybackSDKReady = () => {
-            const player = new window.Spotify.Player({
+            const player = new Spotify.Player({
                 name: 'Visualizer Player',
                 getOAuthToken: cb => { cb(access_token); }
             });
