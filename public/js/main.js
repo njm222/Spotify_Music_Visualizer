@@ -706,7 +706,6 @@ function changeCameraRotation() {
         } else {
             camera.rotation.y = (Math.atan(rotateNoiseY)/2);
         }
-
     }
 }
 

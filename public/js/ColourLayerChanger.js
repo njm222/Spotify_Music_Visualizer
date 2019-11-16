@@ -411,19 +411,20 @@ function mode7() {
     } else {
 
         let position = shapeArr[0].geometry.attributes.position;
+        let zHeight = g_energy*rms;
+
         for (let i = 0; i < position.count; i++) {
-            //position.setZ( i, frequencyData[(i+heightMapVersion)%(frequencyData.length)] );
-            position.setZ(i, noise.noise2D((i*(g_valence/4)) + heightMapVersion, (i*(g_tempo/1000)) + heightMapVersion)*rms*g_valence)
+            position.setZ(i, noise.noise2D((i*(g_valence/4)) + heightMapVersion, (i*(g_tempo/1000)) + heightMapVersion)*zHeight);
         }
         position.needsUpdate = true;
         shapeArr[0].geometry.verticesNeedUpdate = true;
         shapeArr[0].geometry.computeBoundingSphere();
     }
 
-    if(barCounter % g_time_signature === 0) {
-        heightMapVersion -= g_tempo*0.0001;
+    if(barCounter % (g_time_signature/2) === 0) {
+        heightMapVersion -= g_tempo*0.0005;
     } else {
-        heightMapVersion += g_tempo*0.0001;
+        heightMapVersion += g_tempo*0.0005;
     }
     changeColour(shapeArr[0], colour);
 }
