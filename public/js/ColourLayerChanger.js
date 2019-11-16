@@ -94,7 +94,6 @@ function setModeKey() {
         if(trackCounter > sectionEnd){
             g_section++;
 
-<<<<<<< Updated upstream
             bassArr = [];
             snareArr = [];
             kickArr = [];
@@ -103,10 +102,6 @@ function setModeKey() {
             snareArrCounter = 0;
 
             modeKey.key = Math.floor(Math.random() * (10 - 1)) + 1;
-=======
-            modeKey.key = Math.floor(Math.random() * (10 - 1)) + 1;
-
->>>>>>> Stashed changes
             console.log("layer mode: " + modeKey.key);
         }
     }
@@ -147,7 +142,7 @@ function changeBar() {
             }
 
             if(barConfidence > 0.5) {
-                if(/*(modeKey.key == (6 || 7 || 8) ||*/  barCounter % 2 == 0) {
+                if(modeKey.key !== 7 && barCounter % 2 == 0) {
                     cameraRandom = Math.floor(Math.random() * 2);
                     positionCamera(cameraRandom);
                     console.log("cameraRandom:   " + cameraRandom);
@@ -373,26 +368,58 @@ function mode5() {
 function mode6() {
 
     if(beatCounter > 1) {
+
         console.log("beat");
 
         phongMaterial.wireframe = !phongMaterial.wireframe;
 
         beatCounter = 0;
-    } else {
+
+    } else if(barCounter >= 1) {
         if(bassAv-(bassDeviation*bassFactor*1.5) > bassArr[bassArrCounter] || bassArr[bassArrCounter] > bassAv+(bassDeviation*bassFactor)) {
-            console.log("no beat");
+            console.log("bar");
             removeShape();
             addGenerativeSphere();
         }
-        changeColour(shapeArr[0], colour);
-
+        barCounter = 0;
+    } else {
+        if(bassAv-(bassDeviation*bassFactor*1.5) > bassArr[bassArrCounter] || bassArr[bassArrCounter] > bassAv+(bassDeviation*bassFactor)) {
+            prevWidth = shapeArr[0].geometry.widthSegments;
+            prevHeight = shapeArr[0].geometry.heightSegments;
+            removeShape();
+            addGenerativeSphereSimple(); // keep width and height the same
+        }
     }
+
+    changeColour(shapeArr[0], colour);
 }
 
 
 /** Perlin Noise Heightmap displacement*/
-function mode8() {
+function mode7() {
 
+    if(tatumCounter > 1) {
+        tatumCounter = 0;
+        //heightMapVersion = Math.floor(Math.random()*shapeArr[0].geometry.attributes.position.count/3);
+        shapeArr[0].material.wireframe = !shapeArr[0].material.wireframe
+    }
+
+    if(beatCounter > 1) {
+        beatCounter = 0;
+    } else {
+
+        let position = shapeArr[0].geometry.attributes.position;
+        for (let i = 0; i < position.count; i++) {
+            //position.setZ( i, frequencyData[(i+heightMapVersion)%(frequencyData.length)] );
+            position.setZ(i, noise.noise2D((i*(g_valence/10)) + heightMapVersion, (i/g_tempo) + heightMapVersion)*100)
+        }
+        position.needsUpdate = true;
+        shapeArr[0].geometry.verticesNeedUpdate = true;
+        shapeArr[0].geometry.computeBoundingSphere();
+    }
+
+    heightMapVersion += 0.001;
+    changeColour(shapeArr[0], colour);
 }
 
 function changeColourLayer001() {

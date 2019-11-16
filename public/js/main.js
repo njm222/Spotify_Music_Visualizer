@@ -95,12 +95,6 @@ let tatumEnd = 0;
 let tatumCounter = 0;
 let tatumConfidence = 0;
 
-let toggleZoom = true;
-let toggleRotate = true;
-
-let randomizeColour = true;
-let randomizeMode = true;
-
 // Rotation Variables
 let spinr, spinf = 0;
 const spin2 = 0.03;
@@ -118,7 +112,7 @@ let bc = 0.5;
 
 let randomizer = false;
 let changedColour = true;
-let setLargeShape = false;
+let heightMapVersion = 3;
 
 let modeSwitch = false;
 let shapeArr = [];
@@ -146,8 +140,8 @@ modeKey.registerListener(function (val) {
 
     $('.visualizerMode').css('color', '#FFF');
     $('#mode_' + val).css('color', '#3AD36B');
-    if(modeKey.key < 6) {
-        if(modeSwitch) {
+    if (modeKey.key < 6) {
+        if (modeSwitch) {
             $('#shapeType').show();
             removeShape();
             addShape(shapeType);
@@ -157,19 +151,28 @@ modeKey.registerListener(function (val) {
 
         resetMode();
     } else {
+        removeShape();
 
-        if(!modeSwitch) {
+        if (modeKey.key == 6) {
+            addGenerativeSphere();
+        }
+        if (modeKey.key == 7) {
+            addOcean();
+            heightMapVersion = 0;
+        }
+
+        if (!modeSwitch) {
             $('#shapeType').hide();
-            removeShape();
-
-            if(modeKey.key == 6) {
-                addGenerativeSphere();
-            }
-
             modeSwitch = true;
         }
     }
 });
+
+let toggleZoom = false;
+let toggleRotate = false;
+
+let randomizeColour = false;
+let randomizeMode = false;
 
 let points = 1;
 let detail = 1;
@@ -188,9 +191,9 @@ let controls = new THREE.OrbitControls(camera);
 
 //Material
 let colour = new THREE.Color("rgb(256,256,256)");
-let basicMaterial = new THREE.MeshBasicMaterial( { color: 0x000000 } );
+let basicMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, side: THREE.DoubleSide } );
 let lambertMaterial = new THREE.MeshLambertMaterial( { color: 0x000000 } );
-let phongMaterial = new THREE.MeshPhongMaterial( { color: 0x000000, side: THREE.DoubleSide } );
+let phongMaterial = new THREE.MeshPhongMaterial( { color: 0x000000, side: THREE.DoubleSide, shading: THREE.FlatShading} );
 let depthMaterial = new THREE.MeshDepthMaterial( { wireframe: true } );
 
 //Geometry
@@ -200,9 +203,14 @@ let dodecaGeo = new THREE.DodecahedronGeometry(10, 0);
 let sphereGeo = new THREE.SphereGeometry(5, 32, 32);
 let tetraGeo = new THREE.TetrahedronGeometry(10, 0);
 
-//Generative Sphere constants
+//Generative Sphere variables
 let prevThetaS = 0;
 let prevThetaL = Math.PI/4;
+let prevWidth = 32;
+let prevHeight = 32;
+
+//Perlin Terrain variables
+let planeGeo = new THREE.PlaneBufferGeometry(window.innerWidth, window.innerWidth, 128, 128);
 
 //Light
 let l1 = new THREE.PointLight(0xffffff);
@@ -210,22 +218,36 @@ let spotLight = new THREE.SpotLight(0xffffff);
 
 let noise = new SimplexNoise(Math.random());
 
-<<<<<<< Updated upstream
-//Generative Sphere
+function addGenerativeSphereSimple() {
+    prevThetaS = 1+Math.sin(snareAv)*g_valence % (2*Math.PI);
+    //prevThetaL = kickEnergy % Math.PI;
+
+    shapeArr.push(new THREE.Mesh(new THREE.SphereBufferGeometry(50, prevWidth, prevHeight % 32, 0, Math.PI * 2, prevThetaS % (Math.PI / 4), prevThetaL), phongMaterial));
+    shapeArr[0].rotation.set(Math.PI / 2, 0, 0);
+    scene.add(shapeArr[0]);
+    console.log(prevThetaS);
+}
 
 function addGenerativeSphere() {
-    prevThetaS = Math.PI*Math.sin(bassAv);
-    prevThetaL =  kickEnergy % Math.PI;
+    prevThetaS = Math.PI * Math.sin(bassAv);
+    //prevThetaL = kickEnergy % Math.PI;
 
-    shapeArr.push(new THREE.Mesh(new THREE.SphereBufferGeometry(50, Math.floor(bassEnergy)%32, Math.floor(kickEnergy)%32, 0, Math.PI*2, prevThetaS%(Math.PI/4), prevThetaL), phongMaterial));
-    shapeArr[0].rotation.set(Math.PI/2, 0, 0);
+    shapeArr.push(new THREE.Mesh(new THREE.SphereBufferGeometry(50, Math.floor(bassEnergy) % 32, Math.floor(kickEnergy) % 32, 0, Math.PI * 2, prevThetaS % (Math.PI / 4), prevThetaL), phongMaterial));
+    shapeArr[0].rotation.set(Math.PI / 2, 0, 0);
     scene.add(shapeArr[0]);
     console.log("added generative sphere");
-=======
-//2-D Plane
-function addPlane() {
+}
 
->>>>>>> Stashed changes
+function addOcean() {
+
+    shapeArr.push(new THREE.Mesh(planeGeo, phongMaterial));
+    shapeArr[0].rotation.set(-Math.PI/4, 0, 0);
+    shapeArr[0].position.set(0, -100, -300);
+    scene.add(shapeArr[0]);
+    console.log("added ocean");
+
+    //Deform Ocean
+
 }
 
 //Cube Grid
@@ -273,7 +295,6 @@ function changeShape(shapeType) {
 }
 
 function removeShape() {
-    console.log("removing Shapes");
     for(let i = 0; i < shapeArr.length; i++) {
         scene.remove(shapeArr[i]);
         shapeArr[i].geometry.dispose();
@@ -445,11 +466,7 @@ function setColour(key) {
 
     switch (key) {
         case 1:
-<<<<<<< Updated upstream
             colour = rgbToHex(avFreq, avFreq, Math.pow(bassAv, 1.12));
-=======
-            colour = hslToHex(lowAvFreq+colourModifier, highAvFreq, avFreq);
->>>>>>> Stashed changes
             break;
         case 2:
             colour = rgbToHex(avFreq, Math.pow(bassAv, 1.12), avFreq);
@@ -502,23 +519,13 @@ function doMode(key) {
             mode5();
             break;
         case 6:
-<<<<<<< Updated upstream
             mode6();
-=======
-            changeColourLayer6();
             break;
         case 7:
-            changeColourLayer7();
-            break;
-        case 8:
-            mode8();
-            break;
-        case 9:
-            changeColourLayer001();
->>>>>>> Stashed changes
+            mode7();
             break;
         default:
-            mode6();
+            mode7();
     }
 }
 
@@ -762,27 +769,20 @@ let run = function(){
 
         changeFreqMode();
         // change these to event listeners
-        /*if(randomizeColour)
+        if(randomizeColour)
             setColourKey();
         if(randomizeMode)
-            setModeKey();*/
+            setModeKey();
 
-<<<<<<< Updated upstream
         if(modeKey.key < 6) {
             for(let i = 0; i < shapeArr.length; i++) {
                 rotateShape(shapeArr[i]);
             }
-=======
-        if(modeKey.key < 8) {
-            for(let i = 0; i < shapeArr.length; i++) {
-                rotateShape(shapeArr[i]);
-            }
             // Camera movement
-            if(toggleZoom)
-                changeCameraZoom();
             if(toggleRotate)
                 changeCameraRotation();
->>>>>>> Stashed changes
+            if(toggleZoom)
+                changeCameraZoom();
         }
 
         setColour(colourKey);

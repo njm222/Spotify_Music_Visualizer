@@ -18,29 +18,27 @@ block content
 block visualizer-content
     div(id='main-visualizer')
         div(id='visualizer-controls')
-            a(id='toDashboard' class='btn') Dashboard
-            div(id='trackInfo')
-            a(id='openModeControls' class='btn') Modes
-            a(id='closeModeControls' class='btn') Modes
-            div(id='visualizerModeControls')
-                div() Camera Controls
-                    div(class='input-group-text') Rotate
-                        input(type='checkbox' checked='true' aria-label='toggleRotate' id='cameraRotate')
-                    div(class='input-group-text') Zoom
-                        input(type='checkbox' checked='true' aria-label='toggleZoom' id='cameraZoom')
-                    div(class='input-group-text') Random Colour
-                        input(type='checkbox' checked='true' aria-label='toggleColourRandom' id='randomizeColour')
-                    div(class='input-group-text') Random Mode
-                        input(type='checkbox' checked='true' aria-label='toggleModeRandom' id='randomizeMode')
-                - for(var i = 1; i < 9; i++)
-                    - var modeID = 'mode_' + i;
-                    a(id=modeID class='btn visualizerMode') #{i}
-                div(id='shapeType' class='dropdown')
-                    button(class='btn btn-secondary dropdown-toggle' type='button' id='shapeDropdown' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false') Change Shape
-                    div(class='dropdown-menu' aria-labelledby='dropdownMenuButton')
-                        - for(var i = 0; i < 5; i++)
-                            - var shapeType = 'changeShape(' + i + ')'
-                            a(class='dropdown-item' onclick=shapeType) Shape #{i}
+            div(class='visualizer-controls-container')
+                a(id='toDashboard' class='btn') Dashboard
+                div(id='trackInfo' class='btn')
+                a(id='openModeControls' class='btn') Modes
+                a(id='closeModeControls' class='btn') Modes
+                div(id='visualizerModeControls')
+                    div(class='cameraControls')
+                        a(class='btn' id='cameraRotate') Rotate
+                        a(class='btn' id='cameraZoom') Zoom
+                        a(class='btn' id='randomizeColour') Random Colour
+                        a(class='btn' id='randomizeMode') Random Mode
+                    div(class='mode-container')
+                        - for(var i = 1; i < 9; i++)
+                            - var modeID = 'mode_' + i;
+                            a(id=modeID class='btn visualizerMode') #{i}
+                    div(id='shapeType' class='dropdown')
+                        button(class='btn btn-primary dropdown-toggle' type='button' id='shapeDropdown' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false') Change Shape
+                        div(class='dropdown-menu' aria-labelledby='dropdownMenuButton')
+                            - for(var i = 0; i < 5; i++)
+                                - var shapeType = 'changeShape(' + i + ')'
+                                a(class='dropdown-item' onclick=shapeType) Shape #{i}
 
 block script
     script(src='/js/ColourLayerChanger.js')
@@ -232,18 +230,38 @@ block script
 
         document.getElementById('cameraRotate').addEventListener('click', function (ev) {
             toggleRotate = !toggleRotate;
+            if (toggleRotate) {
+                $('#cameraRotate').css({color: "#3AD36B"})
+            } else {
+                $('#cameraRotate').css({color: "#FFF"})
+            }
         });
 
         document.getElementById('cameraZoom').addEventListener('click', function (ev) {
             toggleZoom = !toggleZoom;
+            if (toggleZoom) {
+                $('#cameraZoom').css({color: "#3AD36B"})
+            } else {
+                $('#cameraZoom').css({color: "#FFF"})
+            }
         });
 
         document.getElementById('randomizeColour').addEventListener('click', function (ev) {
             randomizeColour = !randomizeColour;
+            if (randomizeColour) {
+                $('#randomizeColour').css({color: "#3AD36B"})
+            } else {
+                $('#randomizeColour').css({color: "#FFF"})
+            }
         });
 
         document.getElementById('randomizeMode').addEventListener('click', function (ev) {
             randomizeMode = !randomizeMode;
+            if (randomizeMode) {
+                $('#randomizeMode').css({color: "#3AD36B"})
+            } else {
+                $('#randomizeMode').css({color: "#FFF"})
+            }
         });
 
         document.getElementById('toVisualizer').addEventListener('click', function (ev) {
@@ -257,20 +275,20 @@ block script
         });
 
         document.getElementById('openModeControls').addEventListener('click', function (ev) {
-            $('#visualizerModeControls').show();
-            $('#closeModeControls').show();
+            $('#visualizerModeControls').css({display: "flex", 'align-self': "center"});
+            $('#closeModeControls').css({display: "flex", 'align-self': "center"});
             $('#openModeControls').hide();
         });
         document.getElementById('closeModeControls').addEventListener('click', function (ev) {
-            $('#visualizerModeControls').hide();
-            $('#closeModeControls').hide();
+            $('#visualizerModeControls').css({display: "none"});
+            $('#closeModeControls').css({display: "none"});
             $('#openModeControls').show();
 
         });
 
         $('#main-visualizer').on('mousemove', function (event) {
-            if (45 - event.clientY < 0) {
-                $('#visualizer-controls').css({display: "block", top: 45 - event.clientY});
+            if (200 - event.clientY < 0) {
+                $('#visualizer-controls').css({display: "block", top: 200 - event.clientY});
             } else {
                 $('#visualizer-controls').css({display: "block", top: 0});
             }

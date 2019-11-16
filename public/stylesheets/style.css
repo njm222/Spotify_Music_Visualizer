@@ -27,7 +27,6 @@ a:hover, a:focus {
   text-decoration: none;
 }
 
-#visualizer-controls a,
 #visualizer-controls a {
   color: #FFF;
   text-decoration: none;
@@ -35,7 +34,7 @@ a:hover, a:focus {
 
 #visualizer-controls a:hover,
 #visualizer-controls a:focus {
-  color: #D31E1E;
+  color: #D31E1E !important;
   text-decoration: none;
 }
 
@@ -90,6 +89,13 @@ a:hover, a:focus {
   border-color: #44644B;
 }
 
+.btn-primary:not(:disabled):not(.disabled).active,
+.btn-primary:not(:disabled):not(.disabled):active,
+.show>.btn-primary.dropdown-toggle {
+  background-color: #2ED566;
+  border-color: #2ED566;
+}
+
 .dropdown-item:hover {
   background-color: #272727;
 }
@@ -108,8 +114,33 @@ a:hover, a:focus {
   width: 100%;
 }
 
-.input-group-text {
-  max-width: 25%;
+.visualizer-controls-container {
+  display: flex;
+  padding: 1em;
+  align-items: center;
+}
+
+#trackInfo {
+  color: #FFF;
+  font-weight: bold;
+}
+
+.cameraControls {
+  display: flex;
+  justify-content: space-around;
+  align-self: center;
+}
+
+.mode-container {
+  display: flex;
+  flex-wrap: wrap;
+  align-self: center;
+  justify-content: center;
+  max-width: 170px;
+}
+
+#visualizerModeControls .dropdown {
+  align-self: center;
 }
 
 .text-overflow {
@@ -123,11 +154,13 @@ a:hover, a:focus {
   color: #b3b3b3;
   background-color: #272727;
 }
+
 #visualizer-container {
   position: absolute;
   top: -45px;
   width: 100%;
 }
+
 .random-icon {
   background-image: url('images/random-line-off.svg');
   background-repeat: no-repeat;
@@ -135,14 +168,17 @@ a:hover, a:focus {
   width: 50px;
   height: 50px;
 }
+
 .random-icon.on {
   background-image: url('images/random-line-on.svg');
   background-repeat: no-repeat;
   background-size: contain;
 }
+
 #randomizerToggle:hover {
   background-color: transparent;
 }
+
 #main-container {
   text-align: center;
 }
