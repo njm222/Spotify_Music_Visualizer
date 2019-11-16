@@ -401,7 +401,9 @@ function mode7() {
     if(tatumCounter > 1) {
         tatumCounter = 0;
         //heightMapVersion = Math.floor(Math.random()*shapeArr[0].geometry.attributes.position.count/3);
-        shapeArr[0].material.wireframe = !shapeArr[0].material.wireframe
+        if(snareEnergy > snareAv + (snareDeviation*snareFactor)) {
+            shapeArr[0].material.wireframe = !shapeArr[0].material.wireframe
+        }
     }
 
     if(beatCounter > 1) {
@@ -411,14 +413,18 @@ function mode7() {
         let position = shapeArr[0].geometry.attributes.position;
         for (let i = 0; i < position.count; i++) {
             //position.setZ( i, frequencyData[(i+heightMapVersion)%(frequencyData.length)] );
-            position.setZ(i, noise.noise2D((i*(g_valence/10)) + heightMapVersion, (i/g_tempo) + heightMapVersion)*100)
+            position.setZ(i, noise.noise2D((i*(g_valence/4)) + heightMapVersion, (i*(g_tempo/1000)) + heightMapVersion)*rms*g_valence)
         }
         position.needsUpdate = true;
         shapeArr[0].geometry.verticesNeedUpdate = true;
         shapeArr[0].geometry.computeBoundingSphere();
     }
 
-    heightMapVersion += 0.001;
+    if(barCounter % g_time_signature === 0) {
+        heightMapVersion -= g_tempo*0.0001;
+    } else {
+        heightMapVersion += g_tempo*0.0001;
+    }
     changeColour(shapeArr[0], colour);
 }
 

@@ -161,9 +161,9 @@ block script
                         analyser.smoothingTimeConstant = 0.94;
                     }
 
-                    console.log("smoothing: " + analyser.smoothingTimeConstant);
                     zoomIntensity = 300 - response.tempo;
                     g_tempo = response.tempo;
+                    g_time_signature = response.time_signature;
                 }
             });
         }

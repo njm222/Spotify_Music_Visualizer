@@ -49,6 +49,7 @@ let g_danceability = 0;
 let g_energy = 0;
 let g_valence = 0;
 let g_tempo = 0;
+let g_time_signature = 0;
 let g_section = 0;
 let g_sections = 0;
 let g_bar = 0;
@@ -157,8 +158,10 @@ modeKey.registerListener(function (val) {
             addGenerativeSphere();
         }
         if (modeKey.key == 7) {
+            positionCamera(0);
             addOcean();
             heightMapVersion = 0;
+            noise = new SimplexNoise(Math.random());
         }
 
         if (!modeSwitch) {
@@ -193,7 +196,7 @@ let controls = new THREE.OrbitControls(camera);
 let colour = new THREE.Color("rgb(256,256,256)");
 let basicMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, side: THREE.DoubleSide } );
 let lambertMaterial = new THREE.MeshLambertMaterial( { color: 0x000000 } );
-let phongMaterial = new THREE.MeshPhongMaterial( { color: 0x000000, side: THREE.DoubleSide, shading: THREE.FlatShading} );
+let phongMaterial = new THREE.MeshPhongMaterial( { color: 0x000000, side: THREE.DoubleSide, shading: THREE.FlatShading, shininess: 2} );
 let depthMaterial = new THREE.MeshDepthMaterial( { wireframe: true } );
 
 //Geometry
@@ -242,7 +245,7 @@ function addOcean() {
 
     shapeArr.push(new THREE.Mesh(planeGeo, phongMaterial));
     shapeArr[0].rotation.set(-Math.PI/4, 0, 0);
-    shapeArr[0].position.set(0, -100, -300);
+    shapeArr[0].position.set(0, -50, -250);
     scene.add(shapeArr[0]);
     console.log("added ocean");
 
