@@ -97,11 +97,15 @@ function setModeKey() {
             bassArr = [];
             snareArr = [];
             kickArr = [];
+            midsArr = [];
+            highsArr = [];
             bassArrCounter = 0;
             kickArrCounter = 0;
             snareArrCounter = 0;
+            midsArrCounter = 0;
+            highsArrCounter = 0;
 
-            modeKey.key = Math.floor(Math.random() * (10 - 1)) + 1;
+            modeKey.key = Math.floor(Math.random() * (8 - 1)) + 1;
             console.log("layer mode: " + modeKey.key);
         }
     }
@@ -169,9 +173,9 @@ function changeBeat() {
             if (g_beats[g_beat]) {
                 beatConfidence = g_beats[g_beat]["confidence"];
             }
-            if (beatConfidence > (beatAv-beatVar)) {
+            if (beatConfidence > (beatAv-(beatVar))) {
                 beatCounter++;
-                //console.log("beatCounter: " + beatCounter);
+                console.log("beat");
                 if(beatConfidence > 0.9) {
                     spinr++;
                 }
@@ -225,8 +229,9 @@ function changeTatum() {
             if(g_tatums[g_tatum]) {
                 tatumConfidence = g_tatums[g_tatum]["confidence"];
             }
-
-            tatumCounter++;
+            if (tatumConfidence > (tatumAv-(tatumVar))) {
+                tatumCounter++;
+            }
 
         }
     }
@@ -352,7 +357,7 @@ function mode5() {
             beatCounter = 0;
         }
         for(let i = 0; i < shapeCounter; i++) {
-            if(i % 2 == 0) {
+            if(i % 2 === 0) {
                 changeColour(shapeArr[i], 0x0000);
             } else {
                 changeColour(shapeArr[i], colour);
@@ -371,7 +376,9 @@ function mode6() {
 
         console.log("beat");
 
-        phongMaterial.wireframe = !phongMaterial.wireframe;
+        shapeArr[0].material.wireframe = !shapeArr[0].material.wireframe;
+        shapeArr[0].material.flatShading = !shapeArr[0].material.wireframe;
+        shapeArr[0].material.needsUpdate = true;
 
         beatCounter = 0;
 
@@ -391,41 +398,61 @@ function mode6() {
         }
     }
 
+    //prevThetaS = Math.PI/4 * Math.sin(trackCounter/250);
+
     changeColour(shapeArr[0], colour);
 }
 
-
+let noiseFreq = 64;
+let pow7 = 1.3;
 /** Perlin Noise Heightmap displacement*/
 function mode7() {
 
     if(tatumCounter > 1) {
-        tatumCounter = 0;
         //heightMapVersion = Math.floor(Math.random()*shapeArr[0].geometry.attributes.position.count/3);
-        if(snareEnergy > snareAv + (snareDeviation*snareFactor)) {
-            shapeArr[0].material.wireframe = !shapeArr[0].material.wireframe
+        if(snareEnergy > snareAv - (snareDeviation*snareFactor)) {
+            shapeArr[0].material.wireframe = !shapeArr[0].material.wireframe;
+            shapeArr[0].material.flatShading = !shapeArr[0].material.wireframe;
+            shapeArr[0].material.needsUpdate = true;
         }
+        tatumCounter = 0;
     }
 
     if(beatCounter > 1) {
+        noiseFreq = (bassAv*Math.abs(Math.sin(beatEnd - trackCounter)));
+    } else if (beatCounter > 2) {
+
+    } else if (beatCounter > 3) {
         beatCounter = 0;
+    }
+
+    noiseFreq = (bassAv*Math.abs(Math.sin(beatEnd - trackCounter)));
+    console.log(noiseFreq);
+
+    let position = shapeArr[0].geometry.attributes.position;
+    let zHeight = g_energy*rms;
+
+    if(barCounter % g_time_signature === 0) {
+        heightMapVersion -= Math.abs(Math.sin(beatEnd - trackCounter)) + snareEnergy*g_tempo*0.0001;
     } else {
+        heightMapVersion += Math.abs(Math.sin(beatEnd - trackCounter)) + snareEnergy*g_tempo*0.0001;
+    }
 
-        let position = shapeArr[0].geometry.attributes.position;
-        let zHeight = g_energy*rms;
-
-        for (let i = 0; i < position.count; i++) {
-            position.setZ(i, noise.noise2D((i*(g_valence/4)) + heightMapVersion, (i*(g_tempo/1000)) + heightMapVersion)*zHeight);
+    for (let i = 0; i < position.count; i++) {
+        //position.setZ(i, noise.noise2D((i*(g_valence/4)) + heightMapVersion, (i*(g_tempo/1000)) + heightMapVersion)*zHeight);
+        //position.setZ(i, noise.noise2D(((i%256) + heightMapVersion) / noiseFreq, (Math.floor(i/256) - heightMapVersion) / noiseFreq)*zHeight);
+        let z = Math.pow(noise.noise2D(((i%513) - heightMapVersion) / noiseFreq, (Math.floor(i/513) - heightMapVersion) / noiseFreq)*zHeight, pow7);
+        if(z > 0) {
+            position.setZ(i, z);
+            //mountain
+        } else {
+            position.setZ(i, Math.random());
+            //water
         }
-        position.needsUpdate = true;
-        shapeArr[0].geometry.verticesNeedUpdate = true;
-        shapeArr[0].geometry.computeBoundingSphere();
     }
-
-    if(barCounter % (g_time_signature/2) === 0) {
-        heightMapVersion -= g_tempo*0.0005;
-    } else {
-        heightMapVersion += g_tempo*0.0005;
-    }
+    position.needsUpdate = true;
+    shapeArr[0].geometry.verticesNeedUpdate = true;
+    shapeArr[0].geometry.computeBoundingSphere();
     changeColour(shapeArr[0], colour);
 }
 

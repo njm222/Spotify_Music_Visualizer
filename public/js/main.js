@@ -18,7 +18,7 @@ let upperSnare = 4;
 let lowerMids = 4;
 let upperMids = 18;
 let lowerHighs = 32;
-let upperHighs = 200;
+let upperHighs = 128;
 
 let bassEnergy = 0;
 let kickEnergy = 0;
@@ -43,6 +43,18 @@ let snareArr = [];
 let snareAv = 0;
 let snareDeviation = 0;
 let snareFactor = 1.4;
+
+let midsArrCounter = 0;
+let midsArr = [];
+let midsAv = 0;
+let midsDeviation = 0;
+let midsFactor = 1.2;
+
+let highsArrCounter = 0;
+let highsArr = [];
+let highsAv = 0;
+let highsDeviation = 0;
+let highsFactor = 1.2;
 
 //Spotify features and analysis variables
 let g_danceability = 0;
@@ -196,7 +208,7 @@ let controls = new THREE.OrbitControls(camera);
 let colour = new THREE.Color("rgb(256,256,256)");
 let basicMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, side: THREE.DoubleSide } );
 let lambertMaterial = new THREE.MeshLambertMaterial( { color: 0x000000 } );
-let phongMaterial = new THREE.MeshPhongMaterial( { color: 0x000000, side: THREE.DoubleSide, shading: THREE.FlatShading, shininess: 2} );
+let phongMaterial = new THREE.MeshPhongMaterial( { color: 0x000000, side: THREE.DoubleSide, shading: THREE.FlatShading} );
 let depthMaterial = new THREE.MeshDepthMaterial( { wireframe: true } );
 
 //Geometry
@@ -213,7 +225,7 @@ let prevWidth = 32;
 let prevHeight = 32;
 
 //Perlin Terrain variables
-let planeGeo = new THREE.PlaneBufferGeometry(window.innerWidth, window.innerWidth, 128, 128);
+let planeGeo = new THREE.PlaneBufferGeometry(window.innerWidth, window.innerWidth, 512, 512);
 
 //Light
 let l1 = new THREE.PointLight(0xffffff);
@@ -244,8 +256,8 @@ function addGenerativeSphere() {
 function addOcean() {
 
     shapeArr.push(new THREE.Mesh(planeGeo, phongMaterial));
-    shapeArr[0].rotation.set(-Math.PI/4, 0, 0);
-    shapeArr[0].position.set(0, -50, -250);
+    shapeArr[0].rotation.set(-Math.PI/4, 0, Math.PI/2);
+    shapeArr[0].position.set(0, 0, -250);
     scene.add(shapeArr[0]);
     console.log("added ocean");
 
@@ -597,6 +609,10 @@ function resetData() {
     kickDeviation = 0;
     snareAv = 0;
     snareDeviation = 0;
+    midsAv = 0;
+    midsDeviation = 0;
+    highsAv = 0;
+    highsDeviation = 0;
 }
 
 function getBassData() {
@@ -623,6 +639,22 @@ function getSnareData() {
     snareArr[snareArrCounter++] = snareEnergy;
 }
 
+function getMidsData() {
+    for (let i = lowerMids; i < upperMids; i++) {
+        midsEnergy += frequencyData[i];
+    }
+    midsEnergy = midsEnergy/(upperMids-lowerMids);
+    midsArr[midsArrCounter++] = midsEnergy;
+}
+
+function getHighsData() {
+    for (let i = lowerHighs; i < upperHighs; i++) {
+        highsEnergy += frequencyData[i];
+    }
+    highsEnergy = highsEnergy/(upperHighs-lowerHighs);
+    highsArr[highsArrCounter++] = highsEnergy;
+}
+
 function getDeviations() {
     for(let i = 0; i < bassArr.length; i++) {
         bassAv += bassArr[i];
@@ -633,7 +665,14 @@ function getDeviations() {
 
         snareAv += snareArr[i];
         snareDeviation += snareArr[i]*snareArr[i];
+
+        midsAv += midsArr[i];
+        midsDeviation += midsArr[i]*midsArr[i];
+
+        highsAv += highsArr[i];
+        highsDeviation += highsArr[i]*highsArr[i];
     }
+
     bassAv = bassAv/bassArr.length;
     bassDeviation = Math.sqrt(bassDeviation / bassArr.length - bassAv * bassAv);
 
@@ -642,6 +681,12 @@ function getDeviations() {
 
     snareAv = snareAv/snareArr.length;
     snareDeviation = Math.sqrt( snareDeviation / snareArr.length - snareAv * snareAv);
+
+    midsAv = midsAv/midsArr.length;
+    midsDeviation = Math.sqrt( midsDeviation / midsArr.length - midsAv * midsAv);
+
+    highsAv = highsAv/highsArr.length;
+    highsDeviation = Math.sqrt( highsDeviation / highsArr.length - highsAv * highsAv);
 }
 
 function getAvFreq() {
@@ -665,6 +710,8 @@ function getData() {
     getBassData();
     getKickData();
     getSnareData();
+    getMidsData();
+    getHighsData();
     getDeviations();
     
     getAvFreq();
@@ -675,7 +722,7 @@ function getData() {
     //console.log("rms " + rms);
     //console.log(peak);
 
-    spotLight.intensity = rms/15;
+    spotLight.intensity = rms/30;
 
     if(rms < rmslow) {
         analyser.minDecibels -= 1;

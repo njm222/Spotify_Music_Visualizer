@@ -47,7 +47,7 @@ if (navigator.mediaDevices.getUserMedia) {
                     }
                     //create analyser
                     analyser = context.createAnalyser();
-                    analyser.fftSize = 64;
+                    analyser.fftSize = 256;
                     /*analyser.maxDecibels = 0;
                     analyser.maxDecibels = 0;*/
                     analyser.smoothingTimeConstant = .75;
