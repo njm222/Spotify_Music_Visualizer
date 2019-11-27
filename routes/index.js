@@ -41,7 +41,6 @@ router.get('/dashboard', function(req, res, next) {
     if(req.cookies.spotifyTokens) {
         res.render('dashboard', {
             title: 'Dashboard',
-            basicAuth: (new Buffer(client_id + ':' + client_secret).toString('base64')),
             access_token: req.cookies.spotifyTokens.access_token,
             refresh_token: req.cookies.spotifyTokens.refreshToken,
             product: req.cookies.userData.product,
