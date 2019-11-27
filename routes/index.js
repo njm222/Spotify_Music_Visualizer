@@ -148,11 +148,12 @@ router.get('/callback', function(req, res, next) {
 
         // use the access token to access the Spotify Web API
         request.get(options, function(error, response, body) {
-
-            res.cookie('userData', body, {maxAge: 86400000}); // expires in one day
-
-            // here is where the res.cookie should be
-          res.redirect('/dashboard');
+            if(!error) {
+                res.cookie('userData', body, {maxAge: 86400000}); // expires in one day
+                res.redirect('/dashboard');
+            } else {
+                res.redirect('/login');
+            }
         });
       } else {
         res.redirect('/#' +

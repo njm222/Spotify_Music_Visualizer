@@ -273,11 +273,23 @@ block script
         document.getElementById('toVisualizer').addEventListener('click', function (ev) {
             $('#main-container').hide();
             $('#main-visualizer').show();
+
+            window.history.pushState("visualizer", "Visualizer", "/visualizer");
+            gtag('config', 'UA-133459521-1', {
+                'page_title': 'Visualizer',
+                'page_path': '/Visualizer'
+            });
         });
 
         document.getElementById('toDashboard').addEventListener('click', function (ev) {
             $('#main-container').show();
             $('#main-visualizer').hide();
+
+            window.history.pushState("dashboard", "Dashboard", "/dashboard");
+            gtag('config', 'UA-133459521-1', {
+                'page_title': 'Dashboard',
+                'page_path': '/Dashboard'
+            });
         });
 
         document.getElementById('openModeControls').addEventListener('click', function (ev) {

@@ -2,6 +2,18 @@ doctype html
 html
     head
         title= title
+        script(async, src='https://www.googletagmanager.com/gtag/js?id=UA-133459521-1')
+        script(type='text/javascript').
+            window.dataLayer = window.dataLayer || [];
+            function gtag() {
+                dataLayer.push(arguments);
+            }
+            gtag('js', new Date());
+
+            gtag('config', 'UA-133459521-1', {
+                'page_title': '#{title}',
+                'page_path': '/#{title}'
+            });
         link(rel='stylesheet', href='https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css')
         link(rel='stylesheet', href='/stylesheets/style.css')
         script(src='https://sdk.scdn.co/spotify-player.js')
