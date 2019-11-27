@@ -244,8 +244,9 @@ function addGenerativeSphereSimple() {
 }
 
 function addGenerativeSphere() {
-    prevThetaS = Math.PI * Math.sin(bassAv);
+    //prevThetaS = Math.PI * Math.sin(bassAv);
     //prevThetaL = kickEnergy % Math.PI;
+    prevThetaS = Math.PI/4 * Math.sin(trackCounter/250);
 
     shapeArr.push(new THREE.Mesh(new THREE.SphereBufferGeometry(50, Math.floor(bassEnergy) % 32, Math.floor(kickEnergy) % 32, 0, Math.PI * 2, prevThetaS % (Math.PI / 4), prevThetaL), phongMaterial));
     shapeArr[0].rotation.set(Math.PI / 2, 0, 0);

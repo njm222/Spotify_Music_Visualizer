@@ -45,7 +45,9 @@ block script
     script(src='/js/main.js')
     script(src='/js/KeyboardInput.js')
     script(await type='text/javascript').
+        var basicAuth = "!{basicAuth}";
         var access_token = "!{access_token}";
+        var refresh_token = "!{refresh_token}";
         var spotifyLink = "!{external_urls}";
         var currentTrack, currentArtist, currentTrackID;
 
@@ -55,7 +57,7 @@ block script
                 getOAuthToken: cb => { cb(access_token); }
             });
 
-            player.on('initialization_error', e => console.error(e));
+            player.on('initialization_error', e => {console.error(e)});
             player.on('authentication_error', e => console.error(e));
             player.on('account_error', e => console.error(e));
             player.on('playback_error', e => console.error(e));
@@ -65,11 +67,12 @@ block script
                 playRandomTrack(data.device_id);
             });
 
-            player.on('player_state_changed', state => {
+            player.on('player_state_changed', function (state) {
                 trackCounter = state.position;
                 isPaused = state.paused;
 
                 if (trackCounter < 10) {
+                    getPlayerTrack();
                     g_section = 0;
                     g_bar = 0;
                     g_beat = 0;
@@ -82,7 +85,6 @@ block script
                     analyser.maxDecibels = -25;
                 }
                 trackEnd = state.duration;
-                getPlayerTrack();
             });
 
             player.connect();
@@ -109,6 +111,11 @@ block script
                         currentTrackID = response.item.id;
                         getFeatures(currentTrackID);
                         getAnalysis(currentTrackID);
+                    }
+                },
+                error: function (error) {
+                    if(error.status === 401) {
+                        window.location.replace('/refreshToken');
                     }
                 }
             });

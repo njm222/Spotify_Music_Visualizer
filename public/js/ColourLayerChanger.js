@@ -94,17 +94,6 @@ function setModeKey() {
         if(trackCounter > sectionEnd){
             g_section++;
 
-            bassArr = [];
-            snareArr = [];
-            kickArr = [];
-            midsArr = [];
-            highsArr = [];
-            bassArrCounter = 0;
-            kickArrCounter = 0;
-            snareArrCounter = 0;
-            midsArrCounter = 0;
-            highsArrCounter = 0;
-
             modeKey.key = Math.floor(Math.random() * (8 - 1)) + 1;
             console.log("layer mode: " + modeKey.key);
         }
@@ -136,6 +125,8 @@ function changeBar() {
             bassArrCounter = 0;
             kickArrCounter = 0;
             snareArrCounter = 0;
+            midsArrCounter = 0;
+            highsArrCounter = 0;
 
             if(g_bar % 2 != 0) {
                 changedColour = true;
@@ -398,8 +389,6 @@ function mode6() {
         }
     }
 
-    //prevThetaS = Math.PI/4 * Math.sin(trackCounter/250);
-
     changeColour(shapeArr[0], colour);
 }
 
@@ -418,16 +407,13 @@ function mode7() {
         tatumCounter = 0;
     }
 
-    if(beatCounter > 1) {
-        noiseFreq = (bassAv*Math.abs(Math.sin(beatEnd - trackCounter)));
+    if(beatCounter === 1) {
+        noiseFreq = kickAv*(.5+Math.cos((beatEnd - trackCounter)/2000))/2;
+    } else if (beatCounter === 2) {
+        noiseFreq = snareAv*(.5+Math.sin((beatEnd - trackCounter)/2000))/2;
     } else if (beatCounter > 2) {
-
-    } else if (beatCounter > 3) {
         beatCounter = 0;
     }
-
-    noiseFreq = (bassAv*Math.abs(Math.sin(beatEnd - trackCounter)));
-    console.log(noiseFreq);
 
     let position = shapeArr[0].geometry.attributes.position;
     let zHeight = g_energy*rms;

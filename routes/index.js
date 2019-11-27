@@ -28,9 +28,6 @@ var generateRandomString = function(length) {
   return text;
 };
 
-
-/** Ad res.cookies to save user data and the access_key ect */
-
 /* GET home page. */
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Home' } );
@@ -44,8 +41,9 @@ router.get('/dashboard', function(req, res, next) {
     if(req.cookies.spotifyTokens) {
         res.render('dashboard', {
             title: 'Dashboard',
+            basicAuth: (new Buffer(client_id + ':' + client_secret).toString('base64')),
             access_token: req.cookies.spotifyTokens.access_token,
-            refresh_token: req.cookies.spotifyTokens.refresh_token,
+            refresh_token: req.cookies.spotifyTokens.refreshToken,
             product: req.cookies.userData.product,
             display_name: req.cookies.userData.display_name,
             external_urls: req.cookies.userData.external_urls
@@ -73,7 +71,31 @@ router.get('/login', function (req, res, next) {
         scope: scope,
         redirect_uri: redirect_uri,
         state: state
-      }));
+      })
+  );
+});
+
+router.get('/refreshToken', function (req, res, next) {
+    var refreshOptions = {
+        url: 'https://accounts.spotify.com/api/token',
+        form: {
+            grant_type: 'refresh_token',
+            refresh_token: req.cookies.spotifyTokens.refreshToken,
+        },
+        headers: {
+            'Authorization': 'Basic ' + (new Buffer(client_id + ':' + client_secret).toString('base64'))
+        },
+        json: true
+    };
+
+    request.post(refreshOptions, function(error, response, body) {
+        if (!error && response.statusCode === 200) {
+            res.cookie('spotifyTokens', {access_token: body.access_token});
+            res.redirect('/dashboard');
+        } else {
+            res.redirect('/login');
+        }
+    });
 });
 
 router.get('/callback', function(req, res, next) {
