@@ -17,7 +17,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import { deleteCookie } from '../services/cookie-utils'
+import { deleteCookie } from '@/services/cookie-utils'
 
 @Component
 export default class UserInfo extends Vue {

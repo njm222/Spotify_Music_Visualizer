@@ -4,7 +4,8 @@ const cors = require('cors');
 const querystring = require('query-string');
 const app = express();
 app.use(express.static(__dirname + '/public'))
-  .use(cors());
+  .use(cors("http://localhost:8080"));
+app.use(express.json());
 
 const client_id = '95d690a7b1ce48da9ba8fe7042a953d3';
 const client_secret = '9bcb3d57b4294fa987b40fc9461deb9a';
@@ -48,7 +49,6 @@ app.get('/callback' , function (req, res) {
       const refresh_token = body.refresh_token;
       res.cookie('accessToken', access_token);
       res.cookie('refreshToken', refresh_token);
-      //pass the tokens to the browser as a query params to make requests from there
       res.redirect(frontend_server);
     } else {
       res.redirect(server_address +
@@ -57,6 +57,28 @@ app.get('/callback' , function (req, res) {
         }));
     }
   })
+});
+
+app.post('/refreshToken', function (req, res) {
+  const refreshToken = req.body.refreshToken;
+  const authOptions = {
+    url: 'https://accounts.spotify.com/api/token',
+    headers: { 'Authorization': 'Basic ' + (new Buffer(client_id + ':' + client_secret).toString('base64')) },
+    form: {
+      grant_type: 'refresh_token',
+      refresh_token: refreshToken
+    },
+    json: true
+  };
+
+  request.post(authOptions, function(error, response, body) {
+    if (!error && response.statusCode === 200) {
+      const access_token = body.access_token;
+      res.send({
+        'access_token': access_token
+      });
+    }
+  });
 });
 
 app.listen(server_port, () =>{
