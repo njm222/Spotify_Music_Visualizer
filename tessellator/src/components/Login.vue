@@ -1,10 +1,8 @@
 <template>
   <div>
     <template v-if="this.user">
-      <div :key="this.accessToken">
-        <h1>Hello, {{this.user.display_name}}</h1>
-        <router-link to="/dashboard">Go to Dashboard</router-link>
-      </div>
+      <h1>Hello, {{this.user.display_name}}</h1>
+      <router-link to="/dashboard">Go to Dashboard</router-link>
     </template>
     <template v-else>
       <div>
