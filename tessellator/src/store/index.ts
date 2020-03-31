@@ -10,7 +10,8 @@ export default new Vuex.Store({
     refreshToken: null,
     user: null,
     authUser: null,
-    onlineUsers: null
+    onlineUsers: null,
+    lastOnlineUsers: null
   },
   mutations: {
     mutateAccessToken (state, payload) {
@@ -27,6 +28,9 @@ export default new Vuex.Store({
     },
     mutateOnlineUsers (state, payload) {
       state.onlineUsers = payload
+    },
+    mutateLastOnlineUsers (state, payload) {
+      state.lastOnlineUsers = payload
     }
   },
   getters: {
@@ -44,6 +48,9 @@ export default new Vuex.Store({
     },
     getOnlineUsers (state) {
       return state.onlineUsers
+    },
+    getLastOnlineUsers (state) {
+      return state.lastOnlineUsers
     }
   },
   actions: {

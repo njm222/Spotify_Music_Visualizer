@@ -6,6 +6,12 @@
                 {{item.user}}
             </div>
         </div>
+        <h1>Last Online Users</h1>
+        <div>
+            <div v-for='(item) in lastOnlineUsers' :key='item.user'>
+                {{item.user}}
+            </div>
+        </div>
     </div>
 </template>
 
@@ -19,11 +25,16 @@ export default class OnlineUsers extends Vue {
     return this.$store.state.onlineUsers
   }
 
+  get lastOnlineUsers () {
+    return this.$store.state.lastOnlineUsers
+  }
+
   created () {
     this.$nextTick(function () {
       // Code that will run only after the
       // entire view has been rendered
       this.loadOnline()
+      this.loadLastOnline()
     })
   }
 
@@ -34,7 +45,7 @@ export default class OnlineUsers extends Vue {
         const temp = { user: user.child('connections').val() }
         onlineU.set(temp.user, temp)
       })
-      if (onlineU.length === 0) {
+      if (onlineU.size === 0) {
         this.loadLastOnline()
       }
       this.$store.commit('mutateOnlineUsers', onlineU.values())
@@ -43,6 +54,15 @@ export default class OnlineUsers extends Vue {
 
   loadLastOnline () {
     console.log('empty')
+    const lastOnlineU = new Map<number, any>()
+    firebaseRef.firebase.database().ref('users/').on('value', (snapshot: any) => {
+      snapshot.forEach((user: any) => {
+        console.log(user)
+        const temp = { user: user.child('lastOnline').val() }
+        lastOnlineU.set(temp.user, temp)
+      })
+      this.$store.commit('mutateLastOnlineUsers', lastOnlineU.values())
+    })
   }
 }
 </script>
