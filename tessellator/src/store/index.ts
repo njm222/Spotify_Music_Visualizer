@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import { authUser } from '@/services/firebase-utils'
 
 Vue.use(Vuex)
 
@@ -7,7 +8,9 @@ export default new Vuex.Store({
   state: {
     accessToken: null,
     refreshToken: null,
-    user: null
+    user: null,
+    authUser: null,
+    onlineUsers: null
   },
   mutations: {
     mutateAccessToken (state, payload) {
@@ -18,6 +21,12 @@ export default new Vuex.Store({
     },
     mutateUser (state, payload) {
       state.user = payload
+    },
+    mutateAuthUser (state, payload) {
+      state.authUser = payload
+    },
+    mutateOnlineUsers (state, payload) {
+      state.onlineUsers = payload
     }
   },
   getters: {
@@ -29,9 +38,18 @@ export default new Vuex.Store({
     },
     getUser (state) {
       return state.user
+    },
+    getAuthUser (state) {
+      return state.authUser
+    },
+    getOnlineUsers (state) {
+      return state.onlineUsers
     }
   },
   actions: {
+    async actionAuthUser (context, payload) {
+      context.commit('mutateAuthUser', await authUser(payload))
+    }
   },
   modules: {
   }

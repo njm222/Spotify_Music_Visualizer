@@ -15,8 +15,9 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
-import { getCookie, setCookie } from '../services/cookie-utils'
+import { Component, Vue, Watch } from 'vue-property-decorator'
+import { getCookie, setCookie } from '@/services/cookie-utils'
+import { authUser, addUser } from '@/services/firebase-utils'
 
 @Component
 export default class Login extends Vue {
@@ -38,7 +39,9 @@ export default class Login extends Vue {
     }).then((response) => {
       console.log(response)
       this.$store.commit('mutateUser', response.data)
-      console.log(this.$store.state.user)
+      this.$store.dispatch('actionAuthUser', response.data.id).then((res) => {
+        console.log(this.$store.getters.authUser)
+      })
     }).catch((error) => {
       console.log(error)
       Vue.axios.post('http://localhost:8081/refreshToken', {
@@ -48,6 +51,14 @@ export default class Login extends Vue {
         this.$store.commit('mutateAccessToken', getCookie('accessToken'))
       }).catch(console.log)
     })
+  }
+
+  @Watch('user')
+  onUserChanged (value: any, oldValue: object) {
+    if (JSON.stringify(value) !== null && JSON.stringify(oldValue) !== JSON.stringify(value)) {
+      console.log(false)
+      addUser(value)
+    }
   }
 }
 </script>

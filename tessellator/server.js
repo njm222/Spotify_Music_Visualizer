@@ -2,6 +2,7 @@ const express = require('express');
 const request = require('request'); // "Request" library
 const cors = require('cors');
 const querystring = require('query-string');
+const fbAdmin = require('firebase-admin');
 const app = express();
 app.use(express.static(__dirname + '/public'))
   .use(cors("http://localhost:8080"));
@@ -14,6 +15,10 @@ const server_address = 'http://localhost:8081'; // by default it should be http:
 const server_port = '8081';
 const frontend_server = 'http://localhost:8080'; // your Vue server port (8080 or 8081 by default)
 const scope = 'user-read-private user-read-email user-read-birthdate user-top-read user-read-recently-played user-modify-playback-state user-read-playback-state user-read-currently-playing streaming';
+
+app.listen(server_port, () =>{
+  console.log("Server is listening on port: " + server_port);
+});
 
 app.get('/login', function (req, res) {
   // redirect to Spotify login page
@@ -63,7 +68,7 @@ app.post('/refreshToken', function (req, res) {
   const refreshToken = req.body.refreshToken;
   const authOptions = {
     url: 'https://accounts.spotify.com/api/token',
-    headers: { 'Authorization': 'Basic ' + (new Buffer(client_id + ':' + client_secret).toString('base64')) },
+    headers: { 'Authorization': 'Basic ' + (new Buffer.from(client_id + ':' + client_secret).toString('base64')) },
     form: {
       grant_type: 'refresh_token',
       refresh_token: refreshToken
@@ -81,6 +86,33 @@ app.post('/refreshToken', function (req, res) {
   });
 });
 
-app.listen(server_port, () =>{
-  console.log("Server is listening on port: " + server_port);
+/** Firebase */
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBARk3BcjSSYFGe3LkDQAu1H-6VMxrolNM",
+  authDomain: "tessellator-space.firebaseapp.com",
+  databaseURL: "https://tessellator-space.firebaseio.com",
+  projectId: "tessellator-space",
+  storageBucket: "tessellator-space.appspot.com",
+  messagingSenderId: "1095910844942",
+  appId: "1:1095910844942:web:1a329d270ba9ed1c05aa5f"
+};
+
+const serviceAccount = require("./keys/serviceAccountKey.json");
+
+fbAdmin.initializeApp({
+  credential: fbAdmin.credential.cert(serviceAccount),
+  databaseURL: "https://tessellator-space.firebaseio.com"
+});
+
+app.post('/authUser', function (req, res) {
+  const userID = req.body.uid;
+  fbAdmin.auth().createCustomToken(userID)
+      .then(function(customToken) {
+        // Send token back to client
+        res.send(customToken);
+      })
+      .catch(function(error) {
+        console.log('Error creating custom token:', error);
+      })
 });
