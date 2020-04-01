@@ -2,6 +2,8 @@
   <div>
     <template v-if="this.accessToken">
       <h1>Player</h1>
+      <p>Track: {{this.playerTrack}}</p>
+      <p>Artist: {{this.playerArtist}}</p>
     </template>
   </div>
 </template>
@@ -13,6 +15,14 @@ import { Component, Vue } from 'vue-property-decorator'
 export default class Player extends Vue {
   get accessToken () {
     return this.$store.state.accessToken
+  }
+
+  get playerTrack () {
+    return this.$store.state.playerTrack
+  }
+
+  get playerArtist () {
+    return this.$store.state.playerArtist
   }
 
   created (): void {
@@ -38,7 +48,17 @@ export default class Player extends Vue {
       console.log('Ready with deviceID ', data.device_id)
       this.playRandomTrack(data.device_id)
     })
-    player.addListener('player_state_changed', console.log)
+    player.addListener('player_state_changed', data => {
+      console.log('player state changed')
+      console.log(data)
+      const track = data.track_window.current_track.name
+      const artist = data.track_window.current_track.artists[0].name
+
+      console.log(track)
+      console.log(artist)
+      this.$store.commit('mutatePlayerTrack', track)
+      this.$store.commit('mutatePlayerArtist', artist)
+    })
   }
 
   sdkInit (): void {
@@ -61,7 +81,10 @@ export default class Player extends Vue {
       uris: [track]
     }, {
       headers: { Authorization: 'Bearer ' + this.$store.state.accessToken }
-    }).then(console.log).catch(console.log)
+    }).then(res => {
+      console.log('in PLAY')
+      console.log(res)
+    }).catch(console.log)
   }
 
   private playRandomTrack (device_id: string) {
