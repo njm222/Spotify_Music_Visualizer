@@ -3,6 +3,7 @@
     <img alt="Vue logo" src="../assets/logo.png">
     <Login :key="this.$store.state.accessToken"/>
     <OnlineUsers v-if="this.$store.state.user"/>
+    <Player v-if="this.$store.state.authUser"/>
   </div>
 </template>
 
@@ -10,12 +11,14 @@
 // @ is an alias to /src
 import Login from '@/components/Login.vue'
 import OnlineUsers from '@/components/OnlineUsers.vue'
+import Player from '@/components/Player.vue'
 
 export default {
   name: 'Home',
   components: {
     Login,
-    OnlineUsers
+    OnlineUsers,
+    Player
   }
 }
 </script>

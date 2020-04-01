@@ -12,7 +12,9 @@
     "sourceMap": true,
     "baseUrl": ".",
     "types": [
-      "webpack-env"
+      "webpack-env",
+      "spotify-web-playback-sdk",
+      "spotify-web-api-node"
     ],
     "paths": {
       "@/*": [

@@ -39,9 +39,7 @@ export default class Login extends Vue {
     }).then((response) => {
       console.log(response)
       this.$store.commit('mutateUser', response.data)
-      this.$store.dispatch('actionAuthUser', response.data).then((res) => {
-        console.log(this.$store.getters.authUser)
-      })
+      this.$store.dispatch('actionAuthUser', response.data)
     }).catch((error) => {
       console.log(error)
       Vue.axios.post('http://localhost:8081/refreshToken', {

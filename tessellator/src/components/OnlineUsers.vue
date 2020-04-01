@@ -8,7 +8,7 @@
         </div>
         <div v-else>
             <h1>Last Online Users</h1>
-            <div v-for='(item) in lastOnlineUsers.values()' :key='item.user'>
+            <div v-for='(item) in lastOnlineUsers' :key='item.user'>
                 <a v-bind:href='item.spotifyLink' target='_blank'>
                     {{item.user}} was last online {{Math.floor((Date.now() - item.lastOnline)/60000)}} mins ago
                 </a>
@@ -69,7 +69,7 @@ export default class OnlineUsers extends Vue {
         const userData = { user: user.key, lastOnline: user.child('lastOnline').val(), spotifyLink: user.child('spotifyLink').val() }
         lastOnlineU.set(userData.user, userData)
       })
-      this.$store.commit('mutateLastOnlineUsers', lastOnlineU)
+      this.$store.commit('mutateLastOnlineUsers', lastOnlineU.values())
     })
   }
 }

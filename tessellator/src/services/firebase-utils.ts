@@ -47,17 +47,16 @@ function handleUserPresense (auth: any, spotifyUrl: string) {
   })
 }
 
-export function authUser (userID: string, spotifyUrl: string) {
-  Axios.post('http://localhost:8081/authUser', { uid: userID }).then((res) => {
-    console.log(`Sent user id: ${userID} to server`)
-    firebase.auth().signInWithCustomToken(res.data).then((res) => {
-      handleUserPresense(res, spotifyUrl)
-    }).catch(function (error) {
-      // Handle Errors here.
-      const errorCode = error.code
-      const errorMessage = error.message
-      alert(errorMessage)
-      // ...
+export function authUser (userID: string, spotifyUrl: string): Promise<boolean> {
+  return new Promise((resolve, reject) => {
+    Axios.post('http://localhost:8081/authUser', { uid: userID }).then((res) => {
+      console.log(`Sent user id: ${userID} to server`)
+      firebase.auth().signInWithCustomToken(res.data).then((res) => {
+        handleUserPresense(res, spotifyUrl)
+        resolve(true)
+      }).catch(function (error) {
+        reject(error)
+      })
     })
   })
 }
