@@ -39,7 +39,7 @@ export default class Login extends Vue {
     }).then((response) => {
       console.log(response)
       this.$store.commit('mutateUser', response.data)
-      this.$store.dispatch('actionAuthUser', response.data.id).then((res) => {
+      this.$store.dispatch('actionAuthUser', response.data).then((res) => {
         console.log(this.$store.getters.authUser)
       })
     }).catch((error) => {

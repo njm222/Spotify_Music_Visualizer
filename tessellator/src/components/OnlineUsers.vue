@@ -1,15 +1,17 @@
 <template>
     <div>
-        <h1>Online Users</h1>
-        <div>
-            <div v-for='(item, i) in onlineUsers' :key='i'>
-                {{item.user}}
+        <div v-if='onlineUsers && onlineUsers.size !== 0'>
+            <h1>Online Users ({{onlineUsers.size}})</h1>
+            <div v-for='(item, i) in onlineUsers.values()' :key='i'>
+                <a v-bind:href='item.spotifyLink' target='_blank'>{{item.user}}</a>
             </div>
         </div>
-        <h1>Last Online Users</h1>
-        <div>
-            <div v-for='(item) in lastOnlineUsers' :key='item.user'>
-                {{item.user}}
+        <div v-else>
+            <h1>Last Online Users</h1>
+            <div v-for='(item) in lastOnlineUsers.values()' :key='item.user'>
+                <a v-bind:href='item.spotifyLink' target='_blank'>
+                    {{item.user}} was last online {{Math.floor((Date.now() - item.lastOnline)/60000)}} mins ago
+                </a>
             </div>
         </div>
     </div>
@@ -41,27 +43,33 @@ export default class OnlineUsers extends Vue {
   loadOnline () {
     const onlineU = new Map<number, any>()
     firebaseRef.firebase.database().ref('users/').on('value', (snapshot: any) => {
+      onlineU.clear()
       snapshot.forEach((user: any) => {
-        const temp = { user: user.child('connections').val() }
-        onlineU.set(temp.user, temp)
+        const userData = { user: user.child('connections').val(), spotifyLink: user.child('spotifyLink').val() }
+        if (userData.user) {
+          onlineU.set(userData.spotifyLink, userData)
+        } else {
+          onlineU.delete(userData.spotifyLink)
+        }
       })
       if (onlineU.size === 0) {
+        this.$store.commit('mutateOnlineUsers', null)
         this.loadLastOnline()
+      } else {
+        this.$store.commit('mutateOnlineUsers', onlineU)
       }
-      this.$store.commit('mutateOnlineUsers', onlineU.values())
     })
   }
 
   loadLastOnline () {
-    console.log('empty')
     const lastOnlineU = new Map<number, any>()
-    firebaseRef.firebase.database().ref('users/').on('value', (snapshot: any) => {
+    firebaseRef.firebase.database().ref('users/').orderByChild('lastOnline').on('value', (snapshot: any) => {
+      lastOnlineU.clear()
       snapshot.forEach((user: any) => {
-        console.log(user)
-        const temp = { user: user.child('lastOnline').val() }
-        lastOnlineU.set(temp.user, temp)
+        const userData = { user: user.key, lastOnline: user.child('lastOnline').val(), spotifyLink: user.child('spotifyLink').val() }
+        lastOnlineU.set(userData.user, userData)
       })
-      this.$store.commit('mutateLastOnlineUsers', lastOnlineU.values())
+      this.$store.commit('mutateLastOnlineUsers', lastOnlineU)
     })
   }
 }

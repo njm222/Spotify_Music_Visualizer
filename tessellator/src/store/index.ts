@@ -55,7 +55,7 @@ export default new Vuex.Store({
   },
   actions: {
     async actionAuthUser (context, payload) {
-      context.commit('mutateAuthUser', await authUser(payload))
+      context.commit('mutateAuthUser', await authUser(payload.id, payload.external_urls.spotify))
     }
   },
   modules: {

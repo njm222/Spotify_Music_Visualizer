@@ -16,12 +16,16 @@ firebase.initializeApp(firebaseConfig)
 
 export const firebaseRef = { firebase }
 
-function handleUserPresense (auth: any) {
+function handleUserPresense (auth: any, spotifyUrl: string) {
   const userID = auth.user.uid
   const myConnectionsRef = firebase.database().ref(`users/${userID}/connections`)
 
   // stores the timestamp of my last disconnect (the last time I was seen online)
   const lastOnlineRef = firebase.database().ref(`users/${userID}/lastOnline`)
+
+  const spotifyLinkRef = firebase.database().ref(`users/${userID}/spotifyLink`)
+
+  spotifyLinkRef.set(spotifyUrl)
 
   const connectedRef = firebase.database().ref('.info/connected')
   connectedRef.on('value', function (snap) {
@@ -43,11 +47,11 @@ function handleUserPresense (auth: any) {
   })
 }
 
-export function authUser (userID: string) {
+export function authUser (userID: string, spotifyUrl: string) {
   Axios.post('http://localhost:8081/authUser', { uid: userID }).then((res) => {
     console.log(`Sent user id: ${userID} to server`)
-    firebase.auth().signInWithCustomToken(res.data).then(async (res) => {
-      handleUserPresense(res)
+    firebase.auth().signInWithCustomToken(res.data).then((res) => {
+      handleUserPresense(res, spotifyUrl)
     }).catch(function (error) {
       // Handle Errors here.
       const errorCode = error.code
