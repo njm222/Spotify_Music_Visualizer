@@ -42,12 +42,7 @@ export default class Login extends Vue {
       this.$store.dispatch('actionAuthUser', response.data)
     }).catch((error) => {
       console.log(error)
-      Vue.axios.post('http://localhost:8081/refreshToken', {
-        refreshToken: this.$store.state.refreshToken
-      }).then((response) => {
-        setCookie('accessToken', response.data.access_token)
-        this.$store.commit('mutateAccessToken', getCookie('accessToken'))
-      }).catch(console.log)
+      this.refreshAccessToken()
     })
   }
 
@@ -57,6 +52,15 @@ export default class Login extends Vue {
       console.log(false)
       addUser(value)
     }
+  }
+
+  private refreshAccessToken () {
+    Vue.axios.post('http://localhost:8081/refreshToken', {
+      refreshToken: this.$store.state.refreshToken
+    }).then((response) => {
+      setCookie('accessToken', response.data.access_token)
+      this.$store.commit('mutateAccessToken', getCookie('accessToken'))
+    }).catch(console.log)
   }
 }
 </script>

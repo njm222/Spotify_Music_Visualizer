@@ -12,8 +12,7 @@ export default new Vuex.Store({
     authUser: null,
     onlineUsers: null,
     lastOnlineUsers: null,
-    playerTrack: null,
-    playerArtist: null
+    playerInfo: null
   },
   mutations: {
     mutateAccessToken (state, payload) {
@@ -34,11 +33,8 @@ export default new Vuex.Store({
     mutateLastOnlineUsers (state, payload) {
       state.lastOnlineUsers = payload
     },
-    mutatePlayerTrack (state, payload) {
-      state.playerTrack = payload
-    },
-    mutatePlayerArtist (state, payload) {
-      state.playerArtist = payload
+    mutatePlayerInfo (state, payload) {
+      state.playerInfo = payload
     }
   },
   getters: {
@@ -60,11 +56,8 @@ export default new Vuex.Store({
     getLastOnlineUsers (state) {
       return state.lastOnlineUsers
     },
-    getPlayerTrack (state) {
-      return state.playerTrack
-    },
-    getPlayerArtist (state) {
-      return state.playerArtist
+    getPlayerInfo (state) {
+      return state.playerInfo
     }
   },
   actions: {

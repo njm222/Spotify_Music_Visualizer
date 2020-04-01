@@ -2,14 +2,19 @@
   <div>
     <template v-if="this.accessToken">
       <h1>Player</h1>
-      <p>Track: {{this.playerTrack}}</p>
-      <p>Artist: {{this.playerArtist}}</p>
+      <div v-if="this.playerInfo">
+        <a v-bind:href='this.playerInfo.spotifyLink' target='_blank'>
+          <p>Track: {{this.playerInfo.track}}</p>
+          <p>Artist: {{this.playerInfo.artist}}</p>
+        </a>
+      </div>
     </template>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
+import { getCookie, setCookie } from '@/services/cookie-utils'
 
 @Component
 export default class Player extends Vue {
@@ -17,15 +22,11 @@ export default class Player extends Vue {
     return this.$store.state.accessToken
   }
 
-  get playerTrack () {
-    return this.$store.state.playerTrack
+  get playerInfo () {
+    return this.$store.state.playerInfo
   }
 
-  get playerArtist () {
-    return this.$store.state.playerArtist
-  }
-
-  created (): void {
+  mounted (): void {
     if (!document.getElementById('spotify-sdk')) {
       const sdk = document.createElement('script')
       sdk.setAttribute(
@@ -50,28 +51,32 @@ export default class Player extends Vue {
     })
     player.addListener('player_state_changed', data => {
       console.log('player state changed')
-      console.log(data)
-      const track = data.track_window.current_track.name
-      const artist = data.track_window.current_track.artists[0].name
-
-      console.log(track)
-      console.log(artist)
-      this.$store.commit('mutatePlayerTrack', track)
-      this.$store.commit('mutatePlayerArtist', artist)
+      if (data && data.position === 0) {
+        console.log(data)
+        this.getPlayerTrack()
+      }
     })
   }
 
   sdkInit (): void {
     console.log('sdkInit')
     window.onSpotifyWebPlaybackSDKReady = () => {
-      const token = this.$store.state.accessToken
       const player = new window.Spotify.Player({
         name: 'Visualizer Player',
-        getOAuthToken: cb => { cb(token) }
+        getOAuthToken: cb => { cb(this.$store.state.accessToken) }
       })
       this.addPlayerListeners(player)
       player.connect()
     }
+  }
+
+  private refreshAccessToken () {
+    Vue.axios.post('http://localhost:8081/refreshToken', {
+      refreshToken: this.$store.state.refreshToken
+    }).then(response => {
+      setCookie('accessToken', response.data.access_token)
+      this.$store.commit('mutateAccessToken', getCookie('accessToken'))
+    })
   }
 
   private play (device_id: string, track: string): void {
@@ -82,9 +87,11 @@ export default class Player extends Vue {
     }, {
       headers: { Authorization: 'Bearer ' + this.$store.state.accessToken }
     }).then(res => {
-      console.log('in PLAY')
       console.log(res)
-    }).catch(console.log)
+    }).catch((error) => {
+      console.log(error)
+      this.refreshAccessToken()
+    })
   }
 
   private playRandomTrack (device_id: string) {
@@ -93,6 +100,27 @@ export default class Player extends Vue {
     }).then(response => {
       const randomTrack = response.data.items[Math.floor(Math.random() * 20)].uri
       this.play(device_id, randomTrack)
+    })
+  }
+
+  private getPlayerTrack () {
+    Vue.axios.get('https://api.spotify.com/v1/me/player', {
+      headers: { Authorization: 'Bearer ' + this.$store.state.accessToken }
+    }).then(response => {
+      if (response.data) {
+        console.log('has new track DATA')
+        console.log(response.data)
+        const track = response.data.item.name
+        const artist = response.data.item.artists[0].name
+        const link = response.data.item.external_urls.spotify
+        const playerInfo = { track: track, artist: artist, spotifyLink: link }
+        this.$store.commit('mutatePlayerInfo', playerInfo)
+        // send firebase Data as lastPlayed under /users/{uid}
+        // send firestore aka server
+      }
+    }).catch(error => {
+      console.log(error)
+      this.refreshAccessToken()
     })
   }
 }
