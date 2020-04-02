@@ -3,15 +3,15 @@
         <div v-if='onlineUsers && onlineUsers.size !== 0'>
             <h1>Online Users ({{onlineUsers.size}})</h1>
             <div v-for='(item, i) in onlineUsers.values()' :key='i'>
-                <a v-bind:href='item.spotifyLink' target='_blank'>{{item.user}}</a>
+              <OnlineItem :onlineUser="item"></OnlineItem>
+              <LastPlayedItem :trackDetails="item.lastPlayed"></LastPlayedItem>
             </div>
         </div>
-        <div v-else>
+        <div v-else-if="lastOnlineUsers">
             <h1>Last Online Users</h1>
-            <div v-for='(item) in lastOnlineUsers' :key='item.user'>
-                <a v-bind:href='item.spotifyLink' target='_blank'>
-                    {{item.user}} was last online {{Math.floor((Date.now() - item.lastOnline)/60000)}} mins ago
-                </a>
+            <div v-for='(item, i) in lastOnlineUsers.values()' :key="item.user + i">
+              <LastOnlineItem :lastOnlineUser="item"></LastOnlineItem>
+              <LastPlayedItem :trackDetails="item.lastPlayed"></LastPlayedItem>
             </div>
         </div>
     </div>
@@ -20,8 +20,13 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import { firebaseRef } from '@/services/firebase-utils'
+import LastPlayedItem from '@/components/LastPlayedItem.vue'
+import LastOnlineItem from '@/components/LastOnlineItem.vue'
+import OnlineItem from '@/components/OnlineItem.vue'
 
-@Component
+@Component({
+  components: { LastPlayedItem, LastOnlineItem, OnlineItem }
+})
 export default class OnlineUsers extends Vue {
   get onlineUsers () {
     return this.$store.state.onlineUsers
@@ -45,11 +50,15 @@ export default class OnlineUsers extends Vue {
     firebaseRef.firebase.database().ref('users/').on('value', (snapshot: any) => {
       onlineU.clear()
       snapshot.forEach((user: any) => {
-        const userData = { user: user.child('connections').val(), spotifyLink: user.child('spotifyLink').val() }
-        if (userData.user) {
-          onlineU.set(userData.spotifyLink, userData)
+        const onlineUserData = {
+          user: user.child('connections').val(),
+          spotifyLink: user.child('spotifyLink').val(),
+          lastPlayed: user.child('lastPlayed').val()
+        }
+        if (onlineUserData.user) {
+          onlineU.set(onlineUserData.spotifyLink, onlineUserData)
         } else {
-          onlineU.delete(userData.spotifyLink)
+          onlineU.delete(onlineUserData.spotifyLink)
         }
       })
       if (onlineU.size === 0) {
@@ -66,10 +75,15 @@ export default class OnlineUsers extends Vue {
     firebaseRef.firebase.database().ref('users/').orderByChild('lastOnline').on('value', (snapshot: any) => {
       lastOnlineU.clear()
       snapshot.forEach((user: any) => {
-        const userData = { user: user.key, lastOnline: user.child('lastOnline').val(), spotifyLink: user.child('spotifyLink').val() }
-        lastOnlineU.set(userData.user, userData)
+        const lastOnlineUserData = {
+          user: user.key,
+          spotifyLink: user.child('spotifyLink').val(),
+          lastPlayed: user.child('lastPlayed').val(),
+          lastOnline: user.child('lastOnline').val()
+        }
+        lastOnlineU.set(lastOnlineUserData.user, lastOnlineUserData)
       })
-      this.$store.commit('mutateLastOnlineUsers', lastOnlineU.values())
+      this.$store.commit('mutateLastOnlineUsers', lastOnlineU)
     })
   }
 }

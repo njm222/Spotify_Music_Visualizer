@@ -17,7 +17,7 @@
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator'
 import { getCookie, setCookie } from '@/services/cookie-utils'
-import { authUser, addUser } from '@/services/firebase-utils'
+import { addUser } from '@/services/firebase-utils'
 
 @Component
 export default class Login extends Vue {

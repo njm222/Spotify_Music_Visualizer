@@ -68,3 +68,7 @@ export function addUser (value: any) {
     console.log(error)
   })
 }
+
+export function sendPlayerData (value: any) {
+  console.log(value)
+}

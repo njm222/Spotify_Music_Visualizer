@@ -1,12 +1,9 @@
 <template>
   <div>
-    <template v-if="this.accessToken">
-      <h1>Player</h1>
-      <div v-if="this.playerInfo">
-        <a v-bind:href='this.playerInfo.spotifyLink' target='_blank'>
-          <p>Track: {{this.playerInfo.track}}</p>
-          <p>Artist: {{this.playerInfo.artist}}</p>
-        </a>
+    <template v-if="this.accessToken && this.playerInfo">
+      <div>
+        <h1>Player</h1>
+        <TrackItem :trackDetails="this.playerInfo.item"></TrackItem>
       </div>
     </template>
   </div>
@@ -15,8 +12,12 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import { getCookie, setCookie } from '@/services/cookie-utils'
+import { firebaseRef } from '@/services/firebase-utils'
+import TrackItem from '@/components/TrackItem.vue'
 
-@Component
+@Component({
+  components: { TrackItem }
+})
 export default class Player extends Vue {
   get accessToken () {
     return this.$store.state.accessToken
@@ -24,6 +25,10 @@ export default class Player extends Vue {
 
   get playerInfo () {
     return this.$store.state.playerInfo
+  }
+
+  get user () {
+    return this.$store.state.user
   }
 
   mounted (): void {
@@ -41,10 +46,22 @@ export default class Player extends Vue {
   }
 
   addPlayerListeners (player: Spotify.SpotifyPlayer): void {
-    player.addListener('initialization_error', console.log)
-    player.addListener('authentication_error', console.log)
-    player.addListener('account_error', console.log)
-    player.addListener('playback_error', console.log)
+    player.addListener('initialization_error', data => {
+      console.log('initialization_error')
+      console.log(data)
+    })
+    player.addListener('authentication_error', data => {
+      console.log('authentication_error')
+      console.log(data)
+    })
+    player.addListener('account_error', data => {
+      console.log('account_error')
+      console.log(data)
+    })
+    player.addListener('playback_error', data => {
+      console.log('playback_error')
+      console.log(data)
+    })
     player.addListener('ready', data => {
       console.log('Ready with deviceID ', data.device_id)
       this.playRandomTrack(data.device_id)
@@ -110,18 +127,21 @@ export default class Player extends Vue {
       if (response.data) {
         console.log('has new track DATA')
         console.log(response.data)
-        const track = response.data.item.name
-        const artist = response.data.item.artists[0].name
-        const link = response.data.item.external_urls.spotify
-        const playerInfo = { track: track, artist: artist, spotifyLink: link }
-        this.$store.commit('mutatePlayerInfo', playerInfo)
+        this.$store.commit('mutatePlayerInfo', response.data)
         // send firebase Data as lastPlayed under /users/{uid}
+        this.sendTrackData(response.data.item)
         // send firestore aka server
       }
     }).catch(error => {
       console.log(error)
       this.refreshAccessToken()
     })
+  }
+
+  private sendTrackData (trackInfo: SpotifyApi.TrackLinkObject) {
+    const userID: string = this.$store.state.user.id
+    const ref = firebaseRef.firebase.database().ref(`users/${userID}/lastPlayed`)
+    ref.set(trackInfo)
   }
 }
 </script>
