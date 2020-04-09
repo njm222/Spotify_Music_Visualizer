@@ -15,7 +15,7 @@ const redirect_uri = 'http://localhost:8081/callback';
 const server_address = 'http://localhost:8081'; // by default it should be http://localhost:8080 or 8081 by default
 const server_port = '8081';
 const frontend_server = 'http://localhost:8080'; // your Vue server port (8080 or 8081 by default)
-const scope = 'user-read-private user-read-email user-read-birthdate user-top-read user-read-recently-played user-modify-playback-state user-read-playback-state user-read-currently-playing streaming';
+const scope = 'user-read-private user-read-email user-read-birthdate user-top-read user-read-recently-played user-modify-playback-state user-read-playback-state user-read-currently-playing streaming user-library-modify user-library-read';
 
 app.listen(server_port, () =>{
   console.log("Server is listening on port: " + server_port);
