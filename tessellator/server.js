@@ -3,6 +3,7 @@ const request = require('request'); // "Request" library
 const cors = require('cors');
 const querystring = require('query-string');
 const fbAdmin = require('firebase-admin');
+const FieldValue = fbAdmin.firestore.FieldValue;
 const app = express();
 app.use(express.static(__dirname + '/public'))
   .use(cors("http://localhost:8080"));
@@ -106,13 +107,61 @@ fbAdmin.initializeApp({
 });
 
 app.post('/authUser', function (req, res) {
-  const userID = req.body.uid;
+  const userID = req.body.id;
   fbAdmin.auth().createCustomToken(userID)
-      .then(function(customToken) {
-        // Send token back to client
-        res.send(customToken);
-      })
-      .catch(function(error) {
-        console.log('Error creating custom token:', error);
-      })
+    .then(function(customToken) {
+      // Send token back to client
+      res.send(customToken);
+    })
+    .catch(function(error) {
+      console.log('Error creating custom token:', error);
+    })
 });
+
+app.post('/addUser', function (req, res) {
+  const userData = req.body.userData;
+  fbAdmin.firestore().collection('users').doc(userData.id).set({
+    userData: userData
+  }, { merge: true }).then(ref => {
+    console.log('Added document with ID: ', ref)
+  }).catch((error) => {
+    console.log(error)
+  })
+})
+
+app.post('/addTrackPlayed', function (req, res) {
+  const trackData = req.body.trackData;
+  const userID = req.body.userID;
+  const trackRef = fbAdmin.firestore().collection('topUserTracks').doc(trackData.id);
+  trackRef.set({
+    count: FieldValue.increment(1),
+    trackData: trackData
+  }, { merge: true });
+  trackRef.collection('users').doc(userID).set({
+    count: FieldValue.increment(1)
+  }, { merge: true });
+})
+
+app.post('/addArtistsPlayed', function (req, res) {
+  const artistsData = req.body.artistsData;
+  const userID = req.body.userID;
+  
+  artistsData.forEach(artist => {
+    const artistRef = fbAdmin.firestore().collection('topUserArtists').doc(artist.id);
+    artistRef.set({
+      count: FieldValue.increment(1),
+      artistData: artist
+    }, { merge: true });
+    artistRef.collection('users').doc(userID).set({
+      count: FieldValue.increment(1)
+    }, { merge: true });
+  })
+})
+
+/** Move below to a separate firestore-utils */
+
+function incrementCounter(docRef, numShards) {
+  const shardId = Math.floor(Math.random() * numShards);
+  const shardRef = docRef.collection('topUserTracks').doc(shardId.toString());
+  return shardRef.set({ count: FieldValue.increment(1) }, { merge: true });
+}

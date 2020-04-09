@@ -47,12 +47,12 @@ function handleUserPresense (auth: any, spotifyUrl: string) {
   })
 }
 
-export function authUser (userID: string, spotifyUrl: string): Promise<boolean> {
+export function authUser (userData: SpotifyApi.UserProfileResponse): Promise<boolean> {
   return new Promise((resolve, reject) => {
-    Axios.post('http://localhost:8081/authUser', { uid: userID }).then((res) => {
-      console.log(`Sent user id: ${userID} to server`)
+    Axios.post('http://localhost:8081/authUser', userData).then((res) => {
+      console.log(`Sent user id: ${userData.id} to server`)
       firebase.auth().signInWithCustomToken(res.data).then((res) => {
-        handleUserPresense(res, spotifyUrl)
+        handleUserPresense(res, userData.external_urls.spotify)
         resolve(true)
       }).catch(function (error) {
         reject(error)
@@ -61,14 +61,34 @@ export function authUser (userID: string, spotifyUrl: string): Promise<boolean> 
   })
 }
 
-export function addUser (value: any) {
-  firebase.firestore().collection('users').doc(value.id).set(value).then(ref => {
-    console.log('Added document with ID: ', ref)
-  }).catch((error) => {
+export function addUser (UserData: SpotifyApi.UserProfileResponse) {
+  Axios.post('http://localhost:8081/addUser', {
+    userData: UserData
+  }).then((res) => {
+    console.log(res)
+  }).catch(function (error) {
     console.log(error)
   })
 }
 
-export function sendPlayerData (value: any) {
-  console.log(value)
+export function addTrackPlayed (trackData: SpotifyApi.TrackObjectFull, userID: string) {
+  Axios.post('http://localhost:8081/addTrackPlayed', {
+    trackData: trackData,
+    userID: userID
+  }).then((res) => {
+    console.log(res)
+  }).catch(function (error) {
+    console.log(error)
+  })
+}
+
+export function addArtistsPlayed (trackData: SpotifyApi.TrackObjectFull, userID: string) {
+  Axios.post('http://localhost:8081/addArtistsPlayed', {
+    artistsData: trackData.artists,
+    userID: userID
+  }).then((res) => {
+    console.log(res)
+  }).catch(function (error) {
+    console.log(error)
+  })
 }

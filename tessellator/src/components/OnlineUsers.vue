@@ -2,9 +2,11 @@
     <div>
         <div v-if='onlineUsers && onlineUsers.size !== 0'>
             <h1>Online Users ({{onlineUsers.size}})</h1>
-            <div v-for='(item, i) in onlineUsers.values()' :key='i'>
+            <div v-for='(item) in onlineUsers.values()' :key='item.user'>
               <OnlineItem :onlineUser="item"></OnlineItem>
               <LastPlayedItem :trackDetails="item.lastPlayed"></LastPlayedItem>
+              {{item.user}}
+              <UserPlaylists :userID="item.user"></UserPlaylists>
             </div>
         </div>
         <div v-else-if="lastOnlineUsers">
@@ -12,6 +14,7 @@
             <div v-for='(item, i) in lastOnlineUsers.values()' :key="item.user + i">
               <LastOnlineItem :lastOnlineUser="item"></LastOnlineItem>
               <LastPlayedItem :trackDetails="item.lastPlayed"></LastPlayedItem>
+              <UserPlaylists :userID="item.user"></UserPlaylists>
             </div>
         </div>
     </div>
@@ -23,17 +26,26 @@ import { firebaseRef } from '@/services/firebase-utils'
 import LastPlayedItem from '@/components/LastPlayedItem.vue'
 import LastOnlineItem from '@/components/LastOnlineItem.vue'
 import OnlineItem from '@/components/OnlineItem.vue'
+import UserPlaylists from '@/components/UserPlaylists.vue'
 
 @Component({
-  components: { LastPlayedItem, LastOnlineItem, OnlineItem }
+  components: { LastPlayedItem, LastOnlineItem, OnlineItem, UserPlaylists }
 })
 export default class OnlineUsers extends Vue {
   get onlineUsers () {
-    return this.$store.state.onlineUsers
+    return this.$store.getters.getOnlineUsers
   }
 
   get lastOnlineUsers () {
-    return this.$store.state.lastOnlineUsers
+    return this.$store.getters.getLastOnlineUsers
+  }
+
+  get usersPlaylists () {
+    return this.$store.getters.getUsersPlaylists
+  }
+
+  get toggleUsersPlaylists () {
+    return this.$store.state.toggleUsersPlaylists
   }
 
   created () {
@@ -42,6 +54,33 @@ export default class OnlineUsers extends Vue {
       // entire view has been rendered
       this.loadOnline()
       this.loadLastOnline()
+    })
+  }
+
+  hideUserPlaylists (userID: string) {
+    console.log(`hiding ${userID}'s playlists`)
+    this.$store.commit('mutateUsersPlaylists', { key: userID, value: false })
+  }
+
+  private getOnlineUserPlaylists (userID: string) {
+    console.log(`getting ${userID}'s playlists`)
+    console.log(userID)
+    Vue.axios.get(`https://api.spotify.com/v1/users/${userID}/playlists`, {
+      headers: {
+        Authorization: 'Bearer ' + this.$store.state.accessToken
+      }
+    }).then((response) => {
+      console.log(response.data.items)
+      const payload = {
+        key: userID,
+        value: response.data.items
+      }
+      // this.$store.commit('mutateUsersPlaylists', payload)
+      this.$nextTick().then(() => {
+        this.$store.commit('mutateUsersPlaylists', payload)
+      })
+    }).catch((error) => {
+      console.log(error)
     })
   }
 
@@ -56,9 +95,9 @@ export default class OnlineUsers extends Vue {
           lastPlayed: user.child('lastPlayed').val()
         }
         if (onlineUserData.user) {
-          onlineU.set(onlineUserData.spotifyLink, onlineUserData)
+          onlineU.set(onlineUserData.user, onlineUserData)
         } else {
-          onlineU.delete(onlineUserData.spotifyLink)
+          onlineU.delete(onlineUserData.user)
         }
       })
       if (onlineU.size === 0) {
@@ -67,6 +106,7 @@ export default class OnlineUsers extends Vue {
       } else {
         this.$store.commit('mutateOnlineUsers', onlineU)
       }
+      console.log(onlineU)
     })
   }
 

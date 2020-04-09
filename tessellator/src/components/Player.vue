@@ -3,7 +3,8 @@
     <template v-if="this.accessToken && this.playerInfo">
       <div>
         <h1>Player</h1>
-        <TrackItem :trackDetails="this.playerInfo.item"></TrackItem>
+        <TrackItem :trackDetails="this.playerInfo.track_window.current_track"></TrackItem>
+        <PlayerControls></PlayerControls>
       </div>
     </template>
   </div>
@@ -12,11 +13,12 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import { getCookie, setCookie } from '@/services/cookie-utils'
-import { firebaseRef } from '@/services/firebase-utils'
+import { addTrackPlayed, addArtistsPlayed, firebaseRef } from '@/services/firebase-utils'
 import TrackItem from '@/components/TrackItem.vue'
+import PlayerControls from '@/components/PlayerControls.vue'
 
 @Component({
-  components: { TrackItem }
+  components: { TrackItem, PlayerControls }
 })
 export default class Player extends Vue {
   get accessToken () {
@@ -64,10 +66,13 @@ export default class Player extends Vue {
     })
     player.addListener('ready', data => {
       console.log('Ready with deviceID ', data.device_id)
+      this.$store.commit('mutateDeviceID', data.device_id)
       this.playRandomTrack(data.device_id)
     })
     player.addListener('player_state_changed', data => {
       console.log('player state changed')
+      console.log(data)
+      this.$store.commit('mutatePlayerInfo', data)
       if (data && data.position === 0) {
         console.log(data)
         this.getPlayerTrack()
@@ -127,10 +132,11 @@ export default class Player extends Vue {
       if (response.data) {
         console.log('has new track DATA')
         console.log(response.data)
-        this.$store.commit('mutatePlayerInfo', response.data)
         // send firebase Data as lastPlayed under /users/{uid}
         this.sendTrackData(response.data.item)
         // send firestore aka server
+        addTrackPlayed(response.data.item, this.$store.state.user.id)
+        addArtistsPlayed(response.data.item, this.$store.state.user.id)
       }
     }).catch(error => {
       console.log(error)

@@ -12,7 +12,13 @@ export default new Vuex.Store({
     authUser: null,
     onlineUsers: null,
     lastOnlineUsers: null,
-    playerInfo: null
+    deviceID: null,
+    playerInfo: null,
+    topTracks: null,
+    topArtists: null,
+    userPlaylists: null,
+    usersPlaylists: new Map(),
+    toggleUsersPlaylists: new Map()
   },
   mutations: {
     mutateAccessToken (state, payload) {
@@ -33,8 +39,28 @@ export default new Vuex.Store({
     mutateLastOnlineUsers (state, payload) {
       state.lastOnlineUsers = payload
     },
+    mutateDeviceID (state, payload) {
+      state.deviceID = payload
+    },
     mutatePlayerInfo (state, payload) {
       state.playerInfo = payload
+    },
+    mutateTopTracks (state, payload) {
+      state.topTracks = payload
+    },
+    mutateTopArtists (state, payload) {
+      state.topArtists = payload
+    },
+    mutateUserPlaylists (state, payload) {
+      state.userPlaylists = payload
+    },
+    mutateUsersPlaylists (state, payload) {
+      const uPlaylists = state.usersPlaylists.set(payload.key, payload.value)
+      state.usersPlaylists = new Map()
+      state.usersPlaylists = uPlaylists
+    },
+    mutateToggleUsersPlaylists (state, payload) {
+      state.toggleUsersPlaylists.set(payload.key, payload.value)
     }
   },
   getters: {
@@ -56,13 +82,28 @@ export default new Vuex.Store({
     getLastOnlineUsers (state) {
       return state.lastOnlineUsers
     },
+    getDeviceID (state) {
+      return state.deviceID
+    },
     getPlayerInfo (state) {
       return state.playerInfo
+    },
+    getTopTracks (state) {
+      return state.topTracks
+    },
+    getTopArtists (state) {
+      return state.topArtists
+    },
+    getUsersPlaylists (state) {
+      return state.usersPlaylists
+    },
+    getToggleUsersPlaylists (state) {
+      return state.toggleUsersPlaylists
     }
   },
   actions: {
     async actionAuthUser (context, payload) {
-      context.commit('mutateAuthUser', await authUser(payload.id, payload.external_urls.spotify))
+      context.commit('mutateAuthUser', await authUser(payload))
     }
   },
   modules: {

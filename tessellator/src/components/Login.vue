@@ -46,14 +46,6 @@ export default class Login extends Vue {
     })
   }
 
-  @Watch('user')
-  onUserChanged (value: any, oldValue: object) {
-    if (JSON.stringify(value) !== null && JSON.stringify(oldValue) !== JSON.stringify(value)) {
-      console.log(false)
-      addUser(value)
-    }
-  }
-
   private refreshAccessToken () {
     Vue.axios.post('http://localhost:8081/refreshToken', {
       refreshToken: this.$store.state.refreshToken
@@ -61,6 +53,14 @@ export default class Login extends Vue {
       setCookie('accessToken', response.data.access_token)
       this.$store.commit('mutateAccessToken', getCookie('accessToken'))
     }).catch(console.log)
+  }
+
+  @Watch('user')
+  onUserChanged (value: any, oldValue: object) {
+    if (JSON.stringify(value) !== null && JSON.stringify(oldValue) !== JSON.stringify(value)) {
+      console.log(false)
+      addUser(value)
+    }
   }
 }
 </script>

@@ -1,10 +1,10 @@
 <template>
   <div v-if='trackDetails'>
-    <a v-bind:href='trackDetails.external_urls.spotify' target='_blank'>
+    <a v-bind:href='trackDetails.uri' target='_blank'>
       {{ trackDetails.name }}
     </a>
     by
-    <a v-bind:href='trackDetails.artists[0].external_urls.spotify' target='_blank'>
+    <a v-bind:href='trackDetails.artists[0].uri' target='_blank'>
       {{trackDetails.artists[0].name}}
     </a>
   </div>
