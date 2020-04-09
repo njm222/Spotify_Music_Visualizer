@@ -1,7 +1,7 @@
 <template>
   <div>
     <div>
-      trackPos: {{millisToMinutesAndSeconds(this.$data.trackPosition)}}
+      trackPos: {{millisToMinutesAndSeconds(trackPosition)}}
     </div>
     <div>
       duration: {{millisToMinutesAndSeconds(playerInfo.duration)}}
@@ -27,43 +27,38 @@ export default class SeekTrack extends Vue {
   @Prop({ required: true })
   playerInfo!: Spotify.PlaybackState
 
+  private timerRef!: number;
+
   data () {
     return {
       position: 0,
-      trackPosition: 0,
+      timer: null,
       dragging: false,
       sliderWidth: 0,
       offset: null
     }
   }
 
-  mounted () {
-    console.log('+++ mounted +++')
+  created () {
+    console.log('+++ created +++')
     this.$nextTick(() => {
       this.$data.sliderWidth = (this.$refs.sliderRef as HTMLElement).clientWidth
       this.$data.offset = (this.$refs.sliderRef as HTMLElement).getBoundingClientRect().left
-      this.$data.trackPosition = this.playerInfo.position
       this.bindListener()
       this.trackTimer()
     })
+  }
+
+  destroyed () {
+    this.stopTrackTimer()
   }
 
   get accessToken () {
     return this.$store.state.accessToken
   }
 
-  trackTimer () {
-    /** Need to add to if statement */
-    if (this.playerInfo.paused) {
-      setTimeout(() => {
-        this.trackTimer()
-      }, 100)
-    } else {
-      setTimeout(() => {
-        this.setTrackPosition(this.$data.trackPosition += 100)
-        this.trackTimer()
-      }, 100)
-    }
+  get trackPosition () {
+    return this.$store.state.trackPosition
   }
 
   millisToMinutesAndSeconds (millis: number) {
@@ -81,15 +76,12 @@ export default class SeekTrack extends Vue {
     this.$data.position = pos - 1
   }
 
-  private setTrackPosition (trackPos: number) {
-    this.$data.trackPosition = trackPos
-  }
-
   barClick (ev: any) {
     const pos = this.getPosition(ev)
     const trackPos = this.getTrackPosition(ev)
     this.setPosition(pos)
     this.seekPlayerPosition(this.accessToken, trackPos)
+    this.$store.commit('mutateTrackPosition', trackPos)
   }
 
   dragStart () {
@@ -105,7 +97,7 @@ export default class SeekTrack extends Vue {
     const trackPos = this.getTrackPosition(ev)
     if (pos > 0 && pos < this.$data.sliderWidth) {
       this.setPosition(pos)
-      this.setTrackPosition(trackPos)
+      this.$store.commit('mutateTrackPosition', trackPos)
     }
   }
 
@@ -113,7 +105,7 @@ export default class SeekTrack extends Vue {
     if (!this.$data.dragging) {
       return
     }
-    this.seekPlayerPosition(this.accessToken, this.$data.trackPosition)
+    this.seekPlayerPosition(this.accessToken, this.trackPosition)
     this.$data.dragging = false
   }
 
@@ -136,6 +128,22 @@ export default class SeekTrack extends Vue {
     })
   }
 
+  private stopTrackTimer () {
+    clearInterval(this.timerRef)
+  }
+
+  trackTimer () {
+    /** Need to add to if statement */
+    if (this.playerInfo.paused) {
+
+    } else {
+      this.$store.commit('mutateTrackPosition', this.trackPosition + 100)
+    }
+    this.timerRef = setTimeout(() => {
+      this.trackTimer()
+    }, 100)
+  }
+
   @Watch('trackPosition')
   onTrackPositionChanged (value: number, oldValue: number) {
     if (value >= 0) {
@@ -146,7 +154,7 @@ export default class SeekTrack extends Vue {
   @Watch('playerInfo')
   onPlayerInfoChanged (value: Spotify.PlaybackState, oldValue: Spotify.PlaybackState) {
     if (value) {
-      this.$data.trackPosition = value.position
+      this.$store.commit('mutateTrackPosition', this.trackPosition)
     }
   }
 }

@@ -29,8 +29,6 @@ export default class SaveTrack extends Vue {
   }
 
   mounted () {
-    console.log('mounted')
-    this.$data.hasLikedTrack = false
     this.checkTrack(this.accessToken)
   }
 

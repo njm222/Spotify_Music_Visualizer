@@ -14,6 +14,7 @@ export default new Vuex.Store({
     lastOnlineUsers: null,
     deviceID: null,
     playerInfo: null,
+    trackPosition: null,
     topTracks: null,
     topArtists: null,
     userPlaylists: null,
@@ -44,6 +45,9 @@ export default new Vuex.Store({
     },
     mutatePlayerInfo (state, payload) {
       state.playerInfo = payload
+    },
+    mutateTrackPosition (state, payload) {
+      state.trackPosition = payload
     },
     mutateTopTracks (state, payload) {
       state.topTracks = payload
