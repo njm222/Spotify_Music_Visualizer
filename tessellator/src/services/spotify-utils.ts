@@ -1,5 +1,32 @@
 import Axios from 'axios'
 
+export class SpotifyAnalysis {
+  trackFeatures: SpotifyApi.AudioFeaturesResponse | undefined;
+  trackAnalysis: SpotifyApi.AudioAnalysisResponse | undefined;
+
+  getTrackFeatures (accessToken: string, trackID: string) {
+    console.log('=== track features ====')
+    Axios.get(`https://api.spotify.com/v1/audio-features/${trackID}`, {
+      headers: { Authorization: 'Bearer ' + accessToken }
+    }).then(res => {
+      this.trackFeatures = res.data
+    }).catch((error) => {
+      console.log(error)
+    })
+  }
+
+  getTrackAnalysis (accessToken: string, trackID: string) {
+    console.log('=== track Analysis ====')
+    Axios.get(`https://api.spotify.com/v1/audio-analysis/${trackID}`, {
+      headers: { Authorization: 'Bearer ' + accessToken }
+    }).then(res => {
+      this.trackAnalysis = res.data
+    }).catch((error) => {
+      console.log(error)
+    })
+  }
+}
+
 export class SpotifyPlayer {
   pausePlayer (accessToken: string) {
     console.log('=== pausing player ====')

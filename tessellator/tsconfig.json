@@ -14,7 +14,8 @@
     "types": [
       "webpack-env",
       "spotify-web-playback-sdk",
-      "spotify-web-api-node"
+      "spotify-web-api-node",
+      "three"
     ],
     "paths": {
       "@/*": [

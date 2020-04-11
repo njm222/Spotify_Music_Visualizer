@@ -11,11 +11,13 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Vue, Watch } from 'vue-property-decorator'
 import { getCookie, setCookie } from '@/services/cookie-utils'
 import { addTrackPlayed, addArtistsPlayed, firebaseRef } from '@/services/firebase-utils'
 import TrackItem from '@/components/TrackItem.vue'
 import PlayerControls from '@/components/PlayerControls.vue'
+import { SpotifyAnalysis } from '@/services/spotify-utils'
+import visualizerUtils from '@/services/visualizer-utils'
 
 @Component({
   components: { TrackItem, PlayerControls }
@@ -137,6 +139,9 @@ export default class Player extends Vue {
         // send firestore aka server
         addTrackPlayed(response.data.item, this.$store.state.user.id)
         addArtistsPlayed(response.data.item, this.$store.state.user.id)
+        // Get Audio Analysis from Spotify
+        const features = SpotifyAnalysis.prototype.getTrackAnalysis(this.accessToken, this.$store.state.playerInfo.track_window.current_track.id)
+        const analysis = SpotifyAnalysis.prototype.getTrackFeatures(this.accessToken, this.$store.state.playerInfo.track_window.current_track.id)
       }
     }).catch(error => {
       console.log(error)

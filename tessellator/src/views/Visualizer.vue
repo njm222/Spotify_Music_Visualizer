@@ -9,6 +9,7 @@
 <script>
 import Player from '@/components/Player'
 import VisualizerCanvas from '@/components/VisualizerCanvas'
+import LiveAudio from '@/services/liveAudio-utils'
 
 export default {
   name: 'Visualizer',
