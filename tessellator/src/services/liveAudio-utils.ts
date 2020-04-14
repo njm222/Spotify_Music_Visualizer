@@ -170,6 +170,8 @@ export default class LiveAudio {
     this.getSnareData()
     this.getMidsData()
     this.getHighsData()
+    this.getDeviations()
+
     this.getAvFreq()
   }
 
@@ -238,5 +240,39 @@ export default class LiveAudio {
     if (this.highsObject.highsArrCounter >= 32) {
       this.highsObject.highsArrCounter = 0
     }
+  }
+
+  private getDeviations () {
+    for (let i = 0; i < this.bassObject.bassArr.length; i++) {
+      this.bassObject.bassAv += this.bassObject.bassArr[i]
+      this.bassObject.bassDeviation += this.bassObject.bassArr[i] * this.bassObject.bassArr[i]
+
+      this.kickObject.kickAv += this.kickObject.kickArr[i]
+      this.kickObject.kickDeviation += this.kickObject.kickArr[i] * this.kickObject.kickArr[i]
+
+      this.snareObject.snareAv += this.snareObject.snareArr[i]
+      this.snareObject.snareDeviation += this.snareObject.snareArr[i] * this.snareObject.snareArr[i]
+
+      this.midsObject.midsAv += this.midsObject.midsArr[i]
+      this.midsObject.midsDeviation += this.midsObject.midsArr[i] * this.midsObject.midsArr[i]
+
+      this.highsObject.highsAv += this.highsObject.highsArr[i]
+      this.highsObject.highsDeviation += this.highsObject.highsArr[i] * this.highsObject.highsArr[i]
+    }
+
+    this.bassObject.bassAv = this.bassObject.bassAv / this.bassObject.bassArr.length
+    this.bassObject.bassDeviation = Math.sqrt(this.bassObject.bassDeviation / this.bassObject.bassArr.length - this.bassObject.bassAv * this.bassObject.bassAv)
+
+    this.kickObject.kickAv = this.kickObject.kickAv / this.kickObject.kickArr.length
+    this.kickObject.kickDeviation = Math.sqrt(this.kickObject.kickDeviation / this.kickObject.kickArr.length - this.kickObject.kickAv * this.kickObject.kickAv)
+
+    this.snareObject.snareAv = this.snareObject.snareAv / this.snareObject.snareArr.length
+    this.snareObject.snareDeviation = Math.sqrt(this.snareObject.snareDeviation / this.snareObject.snareArr.length - this.snareObject.snareAv * this.snareObject.snareAv)
+
+    this.midsObject.midsAv = this.midsObject.midsAv / this.midsObject.midsArr.length
+    this.midsObject.midsDeviation = Math.sqrt(this.midsObject.midsDeviation / this.midsObject.midsArr.length - this.midsObject.midsAv * this.midsObject.midsAv)
+
+    this.highsObject.highsAv = this.highsObject.highsAv / this.highsObject.highsArr.length
+    this.highsObject.highsDeviation = Math.sqrt(this.highsObject.highsDeviation / this.highsObject.highsArr.length - this.highsObject.highsAv * this.highsObject.highsAv)
   }
 }

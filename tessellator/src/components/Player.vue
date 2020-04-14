@@ -17,12 +17,20 @@ import { addTrackPlayed, addArtistsPlayed, firebaseRef } from '@/services/fireba
 import TrackItem from '@/components/TrackItem.vue'
 import PlayerControls from '@/components/PlayerControls.vue'
 import { SpotifyAnalysis } from '@/services/spotify-utils'
-import visualizerUtils from '@/services/visualizer-utils'
+import VisualizerUtils from '@/services/visualizer-utils'
 
 @Component({
   components: { TrackItem, PlayerControls }
 })
 export default class Player extends Vue {
+  get VisualzierUtils () {
+    return this.$store.state.visualizerUtils
+  }
+
+  get SpotifyAnalysisUtils () {
+    return this.$store.state.spotifyAnalysisUtils
+  }
+
   get accessToken () {
     return this.$store.state.accessToken
   }
@@ -33,6 +41,15 @@ export default class Player extends Vue {
 
   get user () {
     return this.$store.state.user
+  }
+
+  created (): void {
+    if (!this.VisualzierUtils) {
+      this.$store.commit('mutateVisualizerUtils', new VisualizerUtils())
+    }
+    if (!this.SpotifyAnalysisUtils) {
+      this.$store.commit('mutateSpotifyAnalysisUtils', new SpotifyAnalysis())
+    }
   }
 
   mounted (): void {
@@ -140,8 +157,11 @@ export default class Player extends Vue {
         addTrackPlayed(response.data.item, this.$store.state.user.id)
         addArtistsPlayed(response.data.item, this.$store.state.user.id)
         // Get Audio Analysis from Spotify
-        const features = SpotifyAnalysis.prototype.getTrackAnalysis(this.accessToken, this.$store.state.playerInfo.track_window.current_track.id)
-        const analysis = SpotifyAnalysis.prototype.getTrackFeatures(this.accessToken, this.$store.state.playerInfo.track_window.current_track.id)
+        if (this.VisualzierUtils && this.SpotifyAnalysisUtils) {
+          this.SpotifyAnalysisUtils.getTrackFeaturesAnalysis(this.VisualzierUtils, this.accessToken, this.$store.state.playerInfo.track_window.current_track.id)
+        } else {
+          console.log('vis Utils doesnt exist')
+        }
       }
     }).catch(error => {
       console.log(error)

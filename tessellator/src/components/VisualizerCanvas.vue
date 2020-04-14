@@ -6,16 +6,16 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch } from 'vue-property-decorator'
-import VisualizerUtils from '@/services/visualizer-utils'
-import { SpotifyAnalysis } from '@/services/spotify-utils'
+import { Component, Vue } from 'vue-property-decorator'
 
 @Component
 export default class VisualizerCanvas extends Vue {
-  private visualizer: VisualizerUtils
+  get VisualzierUtils () {
+    return this.$store.state.visualizerUtils
+  }
 
-  get trackID () {
-    return this.$store.state.playerInfo.track_window.current_track.id
+  get SpotifyAnalysisUtils () {
+    return this.$store.state.spotifyAnalysisUtils
   }
 
   get accessToken () {
@@ -23,18 +23,13 @@ export default class VisualizerCanvas extends Vue {
   }
 
   mounted () {
-    this.setupCanvas()
+    this.setupVisualizer()
   }
 
-  constructor () {
-    super()
-    this.visualizer = new VisualizerUtils()
-  }
-
-  private setupCanvas () {
+  private setupVisualizer () {
     const el = this.$refs.sceneRef as Element
     this.$nextTick(() => {
-      this.visualizer.setupCanvas(el)
+      this.VisualzierUtils.setupCanvas(el, this.SpotifyAnalysisUtils)
     })
   }
 }

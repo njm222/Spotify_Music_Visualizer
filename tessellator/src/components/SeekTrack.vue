@@ -61,6 +61,10 @@ export default class SeekTrack extends Vue {
     return this.$store.state.trackPosition
   }
 
+  get SpotifyAnalysisUtils () {
+    return this.$store.state.spotifyAnalysisUtils
+  }
+
   millisToMinutesAndSeconds (millis: number) {
     const minutes = Math.floor(millis / 60000)
     const seconds = ((millis % 60000) / 1000).toFixed(0)
@@ -148,13 +152,15 @@ export default class SeekTrack extends Vue {
   onTrackPositionChanged (value: number, oldValue: number) {
     if (value >= 0) {
       this.setPosition(Math.floor(value / this.playerInfo.duration * this.$data.sliderWidth))
+      // change spotify Analysis here
+      this.SpotifyAnalysisUtils.changeAnalysis(value)
     }
   }
 
   @Watch('playerInfo')
   onPlayerInfoChanged (value: Spotify.PlaybackState, oldValue: Spotify.PlaybackState) {
     if (value) {
-      this.$store.commit('mutateTrackPosition', this.trackPosition)
+      this.$store.commit('mutateTrackPosition', value.position)
     }
   }
 }

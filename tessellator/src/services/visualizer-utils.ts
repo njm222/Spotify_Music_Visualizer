@@ -1,6 +1,5 @@
 import * as THREE from 'three'
 import LiveAudio from '@/services/liveAudio-utils'
-import { SpotifyAnalysis } from '@/services/spotify-utils'
 
 export default class VisualizerUtils {
   public camera: THREE.PerspectiveCamera;
@@ -11,10 +10,13 @@ export default class VisualizerUtils {
   public layerMarker: number[];
   private liveAudio: LiveAudio;
   private colourKey: number;
+  private modeKey: number;
   private shapeColour: string;
   private freqKey: number;
+  private spinConstants: number[];
   private currentTrackFeatures: SpotifyApi.AudioFeaturesResponse | undefined
   private currentTrackAnalysis: SpotifyApi.AudioAnalysisResponse | undefined
+  private updatedTrackData: boolean[];
 
   constructor () {
     this.liveAudio = new LiveAudio()
@@ -25,17 +27,35 @@ export default class VisualizerUtils {
     this.shapeArr = []
     this.layerMarker = []
     this.colourKey = 1
+    this.modeKey = 1
     this.shapeColour = '#FFF'
     this.freqKey = 4
+    this.spinConstants = [0.03, 0.015, 0.075, 0.0025, 0.001]
+    this.updatedTrackData = [false, false]
   }
 
-  setTrackFeaturesAnalysis () {
-    this.currentTrackFeatures = SpotifyAnalysis.prototype.trackFeatures
-    this.currentTrackAnalysis = SpotifyAnalysis.prototype.trackAnalysis
+  setUpdatedTrackFeaturesFalse (bool: boolean) {
+    this.updatedTrackData[0] = bool
   }
 
-  setupCanvas (el: Element) {
+  setUpdatedTrackFeatures (bool: boolean, value: SpotifyApi.AudioFeaturesResponse) {
+    this.updatedTrackData[0] = bool
+    this.currentTrackFeatures = value
+  }
+
+  setUpdatedTrackAnalysisFalse (bool: boolean) {
+    this.updatedTrackData[1] = bool
+  }
+
+  setUpdatedTrackAnalysis (bool: boolean, value: SpotifyApi.AudioAnalysisResponse) {
+    this.updatedTrackData[1] = bool
+    this.currentTrackAnalysis = value
+  }
+
+  setupCanvas (el: Element, SpotifyAnalysisUtils: any) {
+    this.camera = new THREE.PerspectiveCamera(75, el.clientWidth / el.clientHeight, 0.1, 1000)
     this.renderer.setSize(el.clientWidth, el.clientHeight)
+    this.camera.aspect = el.clientWidth / el.clientHeight
     el.appendChild(this.renderer.domElement)
 
     this.canvasResizeListener(el)
@@ -45,30 +65,118 @@ export default class VisualizerUtils {
     this.setShapePosition()
     this.camera.position.z = 90
 
-    this.setColourKey(Math.floor(Math.random() * 13))
-    this.changeFreqMode()
+    // this.setColourKey(Math.floor(Math.random() * 13))
+    this.setColourKey(5)
 
     console.log(`colourKey: ${this.colourKey}`)
 
     const animate = () => {
-      // Audio
-      this.liveAudio.getData()
       requestAnimationFrame(animate)
+      if (this.updatedTrackData[0] && this.updatedTrackData[1]) {
+        // Live Audio
+        this.liveAudio.getData()
 
-      // Colour
-      this.setColour(this.colourKey)
+        // Random Freq
+        this.changeFreqMode(SpotifyAnalysisUtils)
 
-      console.log(SpotifyAnalysis.prototype.trackFeatures)
-      console.log(SpotifyAnalysis.prototype.trackAnalysis)
+        // Colour
+        this.setColour(this.colourKey)
 
-      for (let i = 0; i < this.shapeMax; i++) {
+        // Rotate Shape
+        for (let i = 0; i < this.shapeMax; i++) {
+          this.rotateShape(this.shapeArr[i])
+        }
+
+        // Mode
+        this.doMode(this.modeKey, SpotifyAnalysisUtils)
+
+        this.renderer.render(this.scene, this.camera)
+      } else {
+        console.log('pausing visualizer')
+      }
+    }
+    animate()
+  }
+
+  doMode (key: number, SpotifyAnalysisUtils: any) {
+    switch (key) {
+      case 1:
+        this.mode1(SpotifyAnalysisUtils)
+        break
+      case 2:
+        this.mode2(SpotifyAnalysisUtils)
+        break
+      /* case 3:
+          mode3()
+          break
+        case 4:
+          mode4()
+          break
+        case 5:
+          mode5()
+          break
+        case 6:
+          mode6()
+          break
+        case 7:
+          mode7()
+          break
+        case 8:
+          mode8()
+          break */
+      default:
+        // modeKey.key = 1
+        this.mode1(SpotifyAnalysisUtils)
+    }
+  }
+
+  private mode1 (SpotifyAnalysisUtils: any) {
+    if (SpotifyAnalysisUtils.barCounter > 3) {
+      for (let i = this.layerMarker[SpotifyAnalysisUtils.beatCounter - 4]; i < this.layerMarker[SpotifyAnalysisUtils.beatCounter - 3]; i++) {
+        this.changeColour(this.shapeArr[i], '0x0000')
+      }
+      for (let i = this.layerMarker[SpotifyAnalysisUtils.beatCounter - 2]; i < this.layerMarker[SpotifyAnalysisUtils.beatCounter]; i++) {
         this.changeColour(this.shapeArr[i], this.shapeColour)
       }
-
-      this.renderer.render(this.scene, this.camera)
+    } else {
+      if (SpotifyAnalysisUtils.beatCounter !== 0) {
+        for (let i = this.layerMarker[SpotifyAnalysisUtils.beatCounter - 1]; i < this.layerMarker[SpotifyAnalysisUtils.beatCounter]; i++) {
+          this.changeColour(this.shapeArr[i], this.shapeColour)
+        }
+      }
+      this.changeColour(this.shapeArr[0], this.shapeColour)
     }
 
-    animate()
+    if (SpotifyAnalysisUtils.beatCounter > this.layerMarker.length - 1) {
+      SpotifyAnalysisUtils.beatCounter = 0
+    }
+  }
+
+  private mode2 (SpotifyAnalysisUtils: any) {
+    if (SpotifyAnalysisUtils.beatCounter > 3) {
+      for (let i = this.layerMarker[SpotifyAnalysisUtils.beatCounter - 4]; i < this.layerMarker[SpotifyAnalysisUtils.beatCounter - 3]; i = i + 2) {
+        this.changeColour(this.shapeArr[i], '0x0000')
+      }
+      for (let i = this.layerMarker[SpotifyAnalysisUtils.beatCounter - 2]; i < this.layerMarker[SpotifyAnalysisUtils.beatCounter]; i = i + 2) {
+        this.changeColour(this.shapeArr[i], this.shapeColour)
+      }
+    } else {
+      if (SpotifyAnalysisUtils.beatCounter !== 0) {
+        for (let i = this.layerMarker[SpotifyAnalysisUtils.beatCounter - 1]; i < this.layerMarker[SpotifyAnalysisUtils.beatCounter]; i = i + 2) {
+          this.changeColour(this.shapeArr[i], this.shapeColour)
+        }
+      } else {
+        this.changeColour(this.shapeArr[0], this.shapeColour)
+      }
+    }
+
+    if (SpotifyAnalysisUtils.beatCounter > this.layerMarker.length - 1) {
+      SpotifyAnalysisUtils.beatCounter = 0
+    }
+  }
+
+  private mode3 (SpotifyAnalysisUtils: any) {
+    // a
   }
 
   changeColour (currShape: THREE.Mesh, currColour: string) {
@@ -76,6 +184,86 @@ export default class VisualizerUtils {
       const colour = new THREE.Color(parseInt(currColour))
       const params: THREE.MeshLambertMaterialParameters = { color: colour }
       currShape.material.setValues(params)
+    }
+  }
+
+  rotateShape (shape: THREE.Mesh) {
+    const spinf = this.liveAudio.frequencyData[this.freqKey]
+
+    if (spinf > 150) {
+      if (spinf > 200) {
+        shape.rotation.x -= this.spinConstants[1]
+        shape.rotation.y -= this.spinConstants[0]
+        shape.rotation.z -= this.spinConstants[1]
+      } else {
+        shape.rotation.x -= this.spinConstants[2]
+        shape.rotation.y -= this.spinConstants[1]
+        shape.rotation.z -= this.spinConstants[2]
+      }
+    } else {
+      if (spinf > 100) {
+        shape.rotation.x -= this.spinConstants[3]
+        shape.rotation.y += this.spinConstants[1]
+        shape.rotation.z -= this.spinConstants[4]
+      } else {
+        shape.rotation.x -= this.spinConstants[4]
+        shape.rotation.y += this.spinConstants[2]
+        shape.rotation.z -= this.spinConstants[3]
+      }
+    }
+  }
+
+  private setColour (key: number) {
+    switch (key) {
+      /* case 1:
+        this.shapeColour = this.hslToHex(g_timbre[2], g_timbre[1], g_timbre[0])
+        break
+      case 2:
+        this.shapeColour = this.hslToHex(g_timbre[1], g_timbre[2], g_timbre[0])
+        break
+      case 3:
+        this.shapeColour = this.hslToHex(this.liveAudio.snareObject.snareEnergy, this.liveAudio.bassObject.bassAv, g_timbre[0])
+        break */
+      case 4:
+        this.shapeColour = this.rgbToHex(this.liveAudio.highsObject.highsEnergy, this.liveAudio.midsObject.midsEnergy, this.liveAudio.snareObject.snareEnergy)
+        break
+      case 5:
+        this.shapeColour = this.hslToHex(this.liveAudio.bassObject.bassEnergy, this.liveAudio.bassObject.bassAv + this.liveAudio.highsObject.highsEnergy, this.liveAudio.midsObject.midsEnergy)
+        break
+      case 6:
+        this.shapeColour = this.rgbToHex(this.liveAudio.snareObject.snareAv, this.liveAudio.avFreq / 2, this.liveAudio.avFreq / 2)
+        break
+      case 7:
+        this.shapeColour = this.rgbToHex(this.liveAudio.rms, this.liveAudio.avFreq, this.liveAudio.peak)
+        break
+      case 8:
+        this.shapeColour = this.rgbToHex(this.liveAudio.peak, this.liveAudio.avFreq, this.liveAudio.rms)
+        break
+      case 9:
+        this.shapeColour = this.rgbToHex(this.liveAudio.avFreq * 2, this.liveAudio.avFreq / 10, this.liveAudio.avFreq * 3)
+        break
+      case 10:
+        this.shapeColour = this.rgbToHex(this.liveAudio.frequencyData[13], this.liveAudio.frequencyData[9], this.liveAudio.frequencyData[5])
+        break
+      case 11:
+        this.shapeColour = this.hslToHex(this.liveAudio.highsObject.highsEnergy * this.liveAudio.avFreq, this.liveAudio.bassObject.bassEnergy, this.liveAudio.midsObject.midsEnergy)
+        break
+      case 12:
+        this.shapeColour = this.hslToHex(360 - (this.liveAudio.highsObject.highsEnergy * this.liveAudio.avFreq), this.liveAudio.bassObject.bassEnergy, this.liveAudio.midsObject.midsEnergy)
+        break
+      default:
+        this.shapeColour = this.rgbToHex(this.liveAudio.frequencyData[4], this.liveAudio.frequencyData[8], this.liveAudio.frequencyData[12])
+    }
+  }
+
+  private setColourKey (key: number) {
+    this.colourKey = key
+  }
+
+  private changeFreqMode (SpotifyAnalysisUtils: any) {
+    if (SpotifyAnalysisUtils.g_tatum % 53 === 0) {
+      this.freqKey = Math.floor(Math.random() * (11 - 2)) + 2
+      console.log('freq mode: ' + this.freqKey)
     }
   }
 
@@ -131,6 +319,17 @@ export default class VisualizerUtils {
     this.scene.add(spotLight)
   }
 
+  private canvasResizeListener (el: Element) {
+    el.addEventListener('resize', re => {
+      const width = el.clientWidth
+      const height = el.clientHeight
+
+      this.renderer.setSize(width, height)
+      this.camera.aspect = width / height
+      this.camera.updateProjectionMatrix()
+    })
+  }
+
   private setShapePosition () {
     let a = 0
     let f = 1
@@ -171,71 +370,6 @@ export default class VisualizerUtils {
       z = z - distance
     }
     console.log(this.layerMarker)
-  }
-
-  private canvasResizeListener (el: Element) {
-    el.addEventListener('resize', re => {
-      const width = el.clientWidth
-      const height = el.clientHeight
-
-      this.renderer.setSize(width, height)
-      this.camera.aspect = width / height
-      this.camera.updateProjectionMatrix()
-    })
-  }
-
-  private setColour (key: number) {
-    switch (key) {
-      /* case 1:
-        this.shapeColour = this.hslToHex(g_timbre[2], g_timbre[1], g_timbre[0])
-        break
-      case 2:
-        this.shapeColour = this.hslToHex(g_timbre[1], g_timbre[2], g_timbre[0])
-        break
-      case 3:
-        this.shapeColour = this.hslToHex(this.liveAudio.snareObject.snareEnergy, this.liveAudio.bassObject.bassAv, g_timbre[0])
-        break */
-      case 4:
-        this.shapeColour = this.rgbToHex(this.liveAudio.highsObject.highsEnergy, this.liveAudio.midsObject.midsEnergy, this.liveAudio.snareObject.snareEnergy)
-        break
-      case 5:
-        this.shapeColour = this.hslToHex(this.liveAudio.bassObject.bassEnergy, this.liveAudio.bassObject.bassAv + this.liveAudio.highsObject.highsEnergy, this.liveAudio.midsObject.midsEnergy)
-        break
-      case 6:
-        this.shapeColour = this.rgbToHex(this.liveAudio.snareObject.snareAv, this.liveAudio.avFreq / 2, this.liveAudio.avFreq / 2)
-        break
-      case 7:
-        this.shapeColour = this.rgbToHex(this.liveAudio.rms, this.liveAudio.avFreq, this.liveAudio.peak)
-        break
-      case 8:
-        this.shapeColour = this.rgbToHex(this.liveAudio.peak, this.liveAudio.avFreq, this.liveAudio.rms)
-        break
-      case 9:
-        this.shapeColour = this.rgbToHex(this.liveAudio.avFreq * 2, this.liveAudio.avFreq / 10, this.liveAudio.avFreq * 3)
-        break
-      case 10:
-        this.shapeColour = this.rgbToHex(this.liveAudio.frequencyData[13], this.liveAudio.frequencyData[9], this.liveAudio.frequencyData[5])
-        break
-      case 11:
-        this.shapeColour = this.hslToHex(this.liveAudio.highsObject.highsEnergy * this.liveAudio.avFreq, this.liveAudio.bassObject.bassEnergy, this.liveAudio.midsObject.midsEnergy)
-        break
-      case 12:
-        this.shapeColour = this.hslToHex(360 - (this.liveAudio.highsObject.highsEnergy * this.liveAudio.avFreq), this.liveAudio.bassObject.bassEnergy, this.liveAudio.midsObject.midsEnergy)
-        break
-      default:
-        this.shapeColour = this.rgbToHex(this.liveAudio.frequencyData[4], this.liveAudio.frequencyData[8], this.liveAudio.frequencyData[12])
-    }
-  }
-
-  private setColourKey (key: number) {
-    this.colourKey = key
-  }
-
-  private changeFreqMode () {
-    // if(g_tatum % 53 == 0) {
-    this.freqKey = Math.floor(Math.random() * (11 - 2)) + 2
-    // console.log("freq mode: " + freqKey);
-    // }
   }
 
   private rgbToHexHelper (num: number) {

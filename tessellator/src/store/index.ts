@@ -19,7 +19,9 @@ export default new Vuex.Store({
     topArtists: null,
     userPlaylists: null,
     usersPlaylists: new Map(),
-    toggleUsersPlaylists: new Map()
+    toggleUsersPlaylists: new Map(),
+    visualizerUtils: null,
+    spotifyAnalysisUtils: null
   },
   mutations: {
     mutateAccessToken (state, payload) {
@@ -63,8 +65,11 @@ export default new Vuex.Store({
       state.usersPlaylists = new Map()
       state.usersPlaylists = uPlaylists
     },
-    mutateToggleUsersPlaylists (state, payload) {
-      state.toggleUsersPlaylists.set(payload.key, payload.value)
+    mutateVisualizerUtils (state, payload) {
+      state.visualizerUtils = payload
+    },
+    mutateSpotifyAnalysisUtils (state, payload) {
+      state.spotifyAnalysisUtils = payload
     }
   },
   getters: {
