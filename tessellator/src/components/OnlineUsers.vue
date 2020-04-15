@@ -2,19 +2,22 @@
     <div>
         <div v-if='onlineUsers && onlineUsers.size !== 0'>
             <h1>Online Users ({{onlineUsers.size}})</h1>
-            <div v-for='(item) in onlineUsers.values()' :key='item.user'>
-              <OnlineItem :onlineUser="item"></OnlineItem>
-              <LastPlayedItem :trackDetails="item.lastPlayed"></LastPlayedItem>
-              {{item.user}}
-              <UserPlaylists :userID="item.user"></UserPlaylists>
+            <div class="online-users-container">
+              <div class="each-online-user" v-for='(item) in onlineUsers.values()' :key='item.user'>
+                <OnlineItem :onlineUser="item"></OnlineItem>
+                <LastPlayedItem :trackDetails="item.lastPlayed"></LastPlayedItem>
+                <UserPlaylists :userID="item.user"></UserPlaylists>
+              </div>
             </div>
         </div>
         <div v-else-if="lastOnlineUsers">
             <h1>Last Online Users</h1>
-            <div v-for='(item, i) in lastOnlineUsers.values()' :key="item.user + i">
-              <LastOnlineItem :lastOnlineUser="item"></LastOnlineItem>
-              <LastPlayedItem :trackDetails="item.lastPlayed"></LastPlayedItem>
-              <UserPlaylists :userID="item.user"></UserPlaylists>
+            <div class="online-users-container">
+              <div class="each-online-user" v-for='(item, i) in lastOnlineUsers.values()' :key="item.user + i">
+                <LastOnlineItem :lastOnlineUser="item"></LastOnlineItem>
+                <LastPlayedItem :trackDetails="item.lastPlayed"></LastPlayedItem>
+                <UserPlaylists :userID="item.user"></UserPlaylists>
+              </div>
             </div>
         </div>
     </div>
@@ -130,5 +133,7 @@ export default class OnlineUsers extends Vue {
 </script>
 
 <style scoped>
-
+.online-users-container {
+  display: inline-flex;
+}
 </style>

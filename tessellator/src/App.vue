@@ -18,7 +18,7 @@ html {
 body {
   width: 100%;
   height: 100%;
-  margin: 0;
+  margin: 0 0 15vh 0;
   padding: 0;
   overflow-x: hidden;
   color: #FFF;
@@ -63,5 +63,73 @@ a:hover, a:focus {
   font-weight: bold;
   color: #D31E1E;
   text-decoration: none;
+}
+
+.playlists-container {
+  display: inline-flex;
+  flex-direction: column;
+  width: 30vw;
+  min-width: 300px;
+  padding: 20px 0;
+}
+
+.icon {
+  margin: 0 10px;
+  height: 18px;
+  width: 18px;
+  display: block;
+  background-color: #b3b3b3;
+  mask-size: contain;
+  mask-repeat: no-repeat;
+}
+
+.icon:hover {
+  background-color: #FFF;
+  width: 20px;
+  height: 20px;
+}
+
+.icon.next {
+  mask-image: url('assets/icons/next-track-button.svg');
+}
+
+.icon.prev {
+  mask-image: url('assets/icons/previous-track.svg');
+}
+
+.icon.play {
+  mask-image: url('assets/icons/play-button-inside-a-circle.svg');
+  height: 30px;
+  width: 30px;
+}
+
+.icon.pause {
+  mask-image: url('assets/icons/rounded-pause-button.svg');
+  height: 30px;
+  width: 30px;
+}
+
+.icon.play:hover {
+  height: 35px;
+  width: 35px;
+}
+
+.icon.pause:hover {
+  height: 35px;
+  width: 35px;
+}
+
+.icon.shuffle {
+  mask-image: url('assets/icons/shuffle.svg');
+  width: 20px;
+  height: 20px;
+}
+
+.icon.shuffle.on {
+  background-color: #42b983;
+}
+
+.icon.shuffle.on:hover {
+  background-color: #3AD36B;
 }
 </style>

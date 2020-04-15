@@ -46,6 +46,7 @@ export class SpotifyAnalysis {
       VisualizerUtils.setUpdatedTrackFeatures(true, res.data)
     }).catch((error) => {
       console.log(error)
+      this.getTrackFeatures(VisualizerUtils, accessToken, trackID)
     })
   }
 
@@ -59,6 +60,7 @@ export class SpotifyAnalysis {
       VisualizerUtils.setUpdatedTrackAnalysis(true, res.data)
     }).catch((error) => {
       console.log(error)
+      this.getTrackAnalysis(VisualizerUtils, accessToken, trackID)
     })
   }
 

@@ -1,5 +1,5 @@
 <template>
-  <div v-if='trackDetails'>
+  <div v-if='trackDetails' class="item">
     Last Played:
     <a v-bind:href='trackDetails.external_urls.spotify' target='_blank'>
       {{ trackDetails.name }}
@@ -27,5 +27,7 @@ export default class LastPlayedItem extends Vue {
 </script>
 
 <style scoped>
-
+.item {
+  padding-bottom: 10px;
+}
 </style>

@@ -1,11 +1,9 @@
 <template>
-  <div>
-    <div v-if="isPaused">
-      <button @click="playPlayer(accessToken)">Play Player</button>
-    </div>
-    <div v-else>
-      <button @click="pausePlayer(accessToken)">Pause Player</button>
-    </div>
+  <div v-if="isPaused" class="button-container">
+    <i @click="playPlayer(accessToken)" class="icon play"></i>
+  </div>
+  <div v-else class="button-container">
+    <i @click="pausePlayer(accessToken)" class="icon pause"></i>
   </div>
 </template>
 

@@ -1,9 +1,9 @@
 <template>
-  <div v-if='playlistDetails'>
+  <div v-if='playlistDetails' class="playlist-item">
     <a v-bind:href='playlistDetails.external_urls.spotify' target='_blank'>
       {{ playlistDetails.name }}
     </a>
-    <button @click="playPlaylist(deviceID, playlistDetails.uri)"> Play </button>
+    <i @click="playPlaylist(deviceID, playlistDetails.uri)" class="icon play"></i>
   </div>
 </template>
 
@@ -39,5 +39,15 @@ export default class Playlist extends Vue {
 </script>
 
 <style scoped>
+.playlist-item {
+  display: flex;
+  padding: 10px;
+  justify-content: space-between;
+  flex-basis: auto;
+}
 
+.icon.play {
+  height: 20px;
+  width: 20px;
+}
 </style>

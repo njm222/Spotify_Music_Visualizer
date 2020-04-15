@@ -2,7 +2,12 @@
   <div>
     <template v-if="this.user">
       <h1>Hello, {{this.user.display_name}}</h1>
-      <router-link to="/dashboard">Go to Dashboard</router-link>
+      <div>
+        <router-link to="/dashboard">Go to Dashboard</router-link>
+      </div>
+      <div>
+        <router-link to="/visualizer">Go to Visualizer</router-link>
+      </div>
     </template>
     <template v-else>
       <div>

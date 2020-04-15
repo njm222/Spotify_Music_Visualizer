@@ -1,18 +1,20 @@
 <template>
-  <div>
-    <div>
-      trackPos: {{millisToMinutesAndSeconds(trackPosition)}}
-    </div>
-    <div>
-      duration: {{millisToMinutesAndSeconds(playerInfo.duration)}}
-    </div>
-    <div class='slider' @click="barClick">
-      <div class='slider-bar' ref="sliderRef">
-        <div class='slider-handle'
-             :style="{ left: this.position + 'px' }"
-             @mousedown="dragStart($event, 0)"></div>
-        <div class='slider-process'
-             :style="{ width: this.position + 'px' }"></div>
+  <div class="now-playing-center-container">
+    <div class="now-playing-center">
+      <div>
+        {{millisToMinutesAndSeconds(trackPosition)}}
+      </div>
+      <div class='slider' @click="barClick">
+        <div class='slider-bar' ref="sliderRef">
+          <div class='slider-handle'
+               :style="{ left: this.position + 'px' }"
+               @mousedown="dragStart($event, 0)"></div>
+          <div class='slider-process'
+               :style="{ width: this.position + 'px' }"></div>
+        </div>
+      </div>
+      <div>
+        {{millisToMinutesAndSeconds(playerInfo.duration)}}
       </div>
     </div>
   </div>
@@ -171,9 +173,22 @@ export default class SeekTrack extends Vue {
 </script>
 
 <style scoped>
+  .now-playing-center-container {
+    width: 50%;
+    max-width: 722px;
+  }
+
+  .now-playing-center {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
   .slider {
-    width: auto;
-    padding: 10px 50px;
+    width: 100%;
+    padding: 10px 10px;
   }
 
   .slider-bar {

@@ -303,36 +303,36 @@ export default class VisualizerUtils {
       for (let i = 0; i < this.shapeMax; i++) {
         this.shapeArr.push(new THREE.Mesh(cubeGeo, new THREE.MeshLambertMaterial({ color: 0x000000 })))
         this.scene.add(this.shapeArr[i])
-        console.log('added new cube')
       }
+      console.log('added new cube grid')
     } else if (shapeType === 1) {
       const octaGeo = new THREE.OctahedronGeometry(10, 0)
       for (let i = 0; i < this.shapeMax; i++) {
         this.shapeArr.push(new THREE.Mesh(octaGeo, new THREE.MeshLambertMaterial({ color: 0x000000 })))
         this.scene.add(this.shapeArr[i])
-        console.log('added new octa')
       }
+      console.log('added new octa grid')
     } else if (shapeType === 2) {
       const sphereGeo = new THREE.SphereGeometry(5, 32, 32)
       for (let i = 0; i < this.shapeMax; i++) {
         this.shapeArr.push(new THREE.Mesh(sphereGeo, new THREE.MeshLambertMaterial({ color: 0x000000 })))
         this.scene.add(this.shapeArr[i])
-        console.log('added new sphere')
       }
+      console.log('added new sphere grid')
     } else if (shapeType === 3) {
       const tetraGeo = new THREE.TetrahedronGeometry(10, 0)
       for (let i = 0; i < this.shapeMax; i++) {
         this.shapeArr.push(new THREE.Mesh(tetraGeo, new THREE.MeshLambertMaterial({ color: 0x000000 })))
         this.scene.add(this.shapeArr[i])
-        console.log('added new tetra')
       }
+      console.log('added new tetra grid')
     } else {
       const dodecaGeo = new THREE.DodecahedronGeometry(10, 0)
       for (let i = 0; i < this.shapeMax; i++) {
         this.shapeArr.push(new THREE.Mesh(dodecaGeo, new THREE.MeshLambertMaterial({ color: 0x000000 })))
         this.scene.add(this.shapeArr[i])
-        console.log('added new dodeca')
       }
+      console.log('added new dodeca grid')
     }
   }
 

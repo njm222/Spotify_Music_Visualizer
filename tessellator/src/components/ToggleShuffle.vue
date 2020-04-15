@@ -1,10 +1,10 @@
 <template>
   <div>
     <div v-if="isShuffle">
-      <button @click="toggleShuffle(accessToken)">Don't Shuffle Player</button>
+      <i @click="toggleShuffle(accessToken)" class="icon shuffle on"></i>
     </div>
     <div v-else>
-      <button @click="toggleShuffle(accessToken)">Shuffle Player</button>
+      <i @click="toggleShuffle(accessToken)" class="icon shuffle"></i>
     </div>
   </div>
 </template>

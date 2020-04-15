@@ -1,5 +1,5 @@
 <template>
-  <div v-if='onlineUser'>
+  <div v-if='onlineUser' class="item">
     <a v-bind:href='onlineUser.spotifyLink' target='_blank'>
       {{onlineUser.user}} is online
     </a>
@@ -25,5 +25,7 @@ export default class OnlineItem extends Vue {
 </script>
 
 <style scoped>
-
+.item {
+  padding-bottom: 10px;
+}
 </style>

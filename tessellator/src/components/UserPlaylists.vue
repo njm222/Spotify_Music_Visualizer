@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="this.usersPlaylists.get(userID)">
+    <div v-if="this.usersPlaylists.get(userID)" class="playlists-container">
       <div v-for='(playlist) in this.usersPlaylists.get(userID)' :key="userID + playlist.id">
         <UserPlaylist :playlistDetails="playlist" :userID="userID"></UserPlaylist>
       </div>

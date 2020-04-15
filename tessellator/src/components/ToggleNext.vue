@@ -1,7 +1,6 @@
 <template>
-  <div>
-    <button @click="prevTrack(accessToken)">Prev</button>
-    <button @click="nextTrack(accessToken)">Next</button>
+  <div class="button-container">
+    <i @click="nextTrack(accessToken)" class="icon next"></i>
   </div>
 </template>
 
@@ -18,17 +17,6 @@ export default class ToggleNextPrev extends Vue {
   nextTrack (accessToken: string) {
     console.log('=== next player ====')
     Vue.axios.post('https://api.spotify.com/v1/me/player/next', {}, {
-      headers: { Authorization: 'Bearer ' + accessToken }
-    }).then(res => {
-      console.log(res)
-    }).catch((error) => {
-      console.log(error)
-    })
-  }
-
-  prevTrack (accessToken: string) {
-    console.log('=== prev player ====')
-    Vue.axios.post('https://api.spotify.com/v1/me/player/previous', {}, {
       headers: { Authorization: 'Bearer ' + accessToken }
     }).then(res => {
       console.log(res)

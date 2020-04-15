@@ -1,9 +1,9 @@
 <template>
-  <div>
+  <div class="player-container">
     <template v-if="this.accessToken && this.playerInfo">
-      <div>
-        <h1>Player</h1>
+      <div class="player-bar">
         <TrackItem :trackDetails="this.playerInfo.track_window.current_track"></TrackItem>
+        <SeekTrack :playerInfo="playerInfo"></SeekTrack>
         <PlayerControls></PlayerControls>
       </div>
     </template>
@@ -15,12 +15,13 @@ import { Component, Vue, Watch } from 'vue-property-decorator'
 import { getCookie, setCookie } from '@/services/cookie-utils'
 import { addTrackPlayed, addArtistsPlayed, firebaseRef } from '@/services/firebase-utils'
 import TrackItem from '@/components/TrackItem.vue'
+import SeekTrack from '@/components/SeekTrack.vue'
 import PlayerControls from '@/components/PlayerControls.vue'
 import { SpotifyAnalysis } from '@/services/spotify-utils'
 import VisualizerUtils from '@/services/visualizer-utils'
 
 @Component({
-  components: { TrackItem, PlayerControls }
+  components: { TrackItem, SeekTrack, PlayerControls }
 })
 export default class Player extends Vue {
   get VisualzierUtils () {
@@ -178,5 +179,22 @@ export default class Player extends Vue {
 </script>
 
 <style scoped>
+.player-container {
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background: #282828;
+}
 
+.player-bar {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  height: 11vh;
+  justify-content: space-between;
+  padding: 0 16px;
+}
 </style>
