@@ -65,6 +65,10 @@ export default class SeekTrack extends Vue {
     return this.$store.state.spotifyAnalysisUtils
   }
 
+  get VisualizerUtils () {
+    return this.$store.state.visualizerUtils
+  }
+
   millisToMinutesAndSeconds (millis: number) {
     const minutes = Math.floor(millis / 60000)
     const seconds = ((millis % 60000) / 1000).toFixed(0)
@@ -77,7 +81,7 @@ export default class SeekTrack extends Vue {
   }
 
   private setPosition (pos: number) {
-    this.$data.position = pos - 1
+    this.$data.position = pos
   }
 
   barClick (ev: any) {
@@ -138,14 +142,14 @@ export default class SeekTrack extends Vue {
 
   trackTimer () {
     /** Need to add to if statement */
-    if (this.playerInfo.paused) {
-
-    } else {
-      this.$store.commit('mutateTrackPosition', this.trackPosition + 100)
-    }
+    const initialTime = new Date().getTime()
     this.timerRef = setTimeout(() => {
+      const delay = new Date().getTime() - initialTime
+      if (!this.playerInfo.paused) {
+        this.$store.commit('mutateTrackPosition', this.trackPosition + delay)
+      }
       this.trackTimer()
-    }, 100)
+    }, 250)
   }
 
   @Watch('trackPosition')
@@ -153,7 +157,7 @@ export default class SeekTrack extends Vue {
     if (value >= 0) {
       this.setPosition(Math.floor(value / this.playerInfo.duration * this.$data.sliderWidth))
       // change spotify Analysis here
-      this.SpotifyAnalysisUtils.changeAnalysis(value)
+      this.SpotifyAnalysisUtils.changeAnalysis(value, this.VisualizerUtils)
     }
   }
 

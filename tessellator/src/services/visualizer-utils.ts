@@ -10,28 +10,69 @@ export default class VisualizerUtils {
   public layerMarker: number[];
   private liveAudio: LiveAudio;
   private colourKey: number;
-  private modeKey: number;
+  private modeKey: any;
   private shapeColour: string;
   private freqKey: number;
   private spinConstants: number[];
   private currentTrackFeatures: SpotifyApi.AudioFeaturesResponse | undefined
   private currentTrackAnalysis: SpotifyApi.AudioAnalysisResponse | undefined
   private updatedTrackData: boolean[];
+  private changingMode!: boolean;
 
   constructor () {
     this.liveAudio = new LiveAudio()
     this.camera = new THREE.PerspectiveCamera()
-    this.renderer = new THREE.WebGLRenderer()
+    this.renderer = new THREE.WebGLRenderer({ antialias: true })
     this.scene = new THREE.Scene()
     this.shapeMax = 529
     this.shapeArr = []
     this.layerMarker = []
     this.colourKey = 1
-    this.modeKey = 1
+    this.modeKey = {
+      keyInternal: 1,
+      set key (val) {
+        this.keyInternal = val
+        this.keyListener(val)
+      },
+      get key () {
+        return this.keyInternal
+      },
+      registerListener: function (listener: any) {
+        this.keyListener = listener
+      }
+    }
+    this.modeKey.registerListener((val: number) => {
+      console.log('modeKey changed to ' + val)
+      this.changingMode = true
+      console.log(this.changingMode)
+      if (this.modeKey.key < 3) {
+        this.removeShape()
+        this.addShape(Math.floor(Math.random() * 5))
+        this.setShapePosition()
+      } else {
+        this.removeShape()
+        this.addShape(Math.floor(Math.random() * 5))
+        this.setShapePosition()
+      }
+      this.changingMode = false
+      console.log(this.changingMode)
+    })
+    this.changingMode = false
     this.shapeColour = '#FFF'
     this.freqKey = 4
     this.spinConstants = [0.03, 0.015, 0.075, 0.0025, 0.001]
     this.updatedTrackData = [false, false]
+  }
+
+  private removeShape () {
+    console.log('removing shapes')
+    for (let i = 0; i < this.shapeArr.length; i++) {
+      this.scene.remove(this.shapeArr[i])
+      this.shapeArr[i].geometry.dispose()
+      const material = this.shapeArr[i].material as THREE.Material
+      material.dispose()
+    }
+    this.shapeArr = []
   }
 
   setUpdatedTrackFeaturesFalse (bool: boolean) {
@@ -65,10 +106,7 @@ export default class VisualizerUtils {
     this.setShapePosition()
     this.camera.position.z = 90
 
-    // this.setColourKey(Math.floor(Math.random() * 13))
     this.setColourKey(5)
-
-    console.log(`colourKey: ${this.colourKey}`)
 
     const animate = () => {
       requestAnimationFrame(animate)
@@ -76,19 +114,18 @@ export default class VisualizerUtils {
         // Live Audio
         this.liveAudio.getData()
 
-        // Random Freq
-        this.changeFreqMode(SpotifyAnalysisUtils)
+        if (!this.changingMode) {
+          // Colour
+          this.setColour(this.colourKey, SpotifyAnalysisUtils)
 
-        // Colour
-        this.setColour(this.colourKey)
+          // Rotate Shape
+          for (let i = 0; i < this.shapeMax; i++) {
+            this.rotateShape(this.shapeArr[i])
+          }
 
-        // Rotate Shape
-        for (let i = 0; i < this.shapeMax; i++) {
-          this.rotateShape(this.shapeArr[i])
+          // Mode
+          this.doMode(this.modeKey.key, SpotifyAnalysisUtils)
         }
-
-        // Mode
-        this.doMode(this.modeKey, SpotifyAnalysisUtils)
 
         this.renderer.render(this.scene, this.camera)
       } else {
@@ -213,17 +250,17 @@ export default class VisualizerUtils {
     }
   }
 
-  private setColour (key: number) {
+  private setColour (key: number, SpotifyAnalysisUtils: any) {
     switch (key) {
-      /* case 1:
-        this.shapeColour = this.hslToHex(g_timbre[2], g_timbre[1], g_timbre[0])
+      case 1:
+        this.shapeColour = this.hslToHex(SpotifyAnalysisUtils.g_timbre[2], SpotifyAnalysisUtils.g_timbre[1], SpotifyAnalysisUtils.g_timbre[0])
         break
       case 2:
-        this.shapeColour = this.hslToHex(g_timbre[1], g_timbre[2], g_timbre[0])
+        this.shapeColour = this.hslToHex(SpotifyAnalysisUtils.g_timbre[1], SpotifyAnalysisUtils.g_timbre[2], SpotifyAnalysisUtils.g_timbre[0])
         break
       case 3:
-        this.shapeColour = this.hslToHex(this.liveAudio.snareObject.snareEnergy, this.liveAudio.bassObject.bassAv, g_timbre[0])
-        break */
+        this.shapeColour = this.hslToHex(this.liveAudio.snareObject.snareEnergy, this.liveAudio.bassObject.bassAv, SpotifyAnalysisUtils.g_timbre[0])
+        break
       case 4:
         this.shapeColour = this.rgbToHex(this.liveAudio.highsObject.highsEnergy, this.liveAudio.midsObject.midsEnergy, this.liveAudio.snareObject.snareEnergy)
         break
@@ -260,41 +297,39 @@ export default class VisualizerUtils {
     this.colourKey = key
   }
 
-  private changeFreqMode (SpotifyAnalysisUtils: any) {
-    if (SpotifyAnalysisUtils.g_tatum % 53 === 0) {
-      this.freqKey = Math.floor(Math.random() * (11 - 2)) + 2
-      console.log('freq mode: ' + this.freqKey)
-    }
-  }
-
   private addShape (shapeType: number) {
-    if (shapeType === 1) {
+    if (shapeType === 0) {
+      const cubeGeo = new THREE.BoxGeometry(10, 10, 10)
       for (let i = 0; i < this.shapeMax; i++) {
-        this.shapeArr.push(new THREE.Mesh(new THREE.BoxGeometry(10, 10, 10), new THREE.MeshLambertMaterial({ color: 0x000000 })))
+        this.shapeArr.push(new THREE.Mesh(cubeGeo, new THREE.MeshLambertMaterial({ color: 0x000000 })))
         this.scene.add(this.shapeArr[i])
         console.log('added new cube')
       }
-    } else if (shapeType === 2) {
+    } else if (shapeType === 1) {
+      const octaGeo = new THREE.OctahedronGeometry(10, 0)
       for (let i = 0; i < this.shapeMax; i++) {
-        this.shapeArr.push(new THREE.Mesh(new THREE.OctahedronGeometry(10, 0), new THREE.MeshLambertMaterial({ color: 0x000000 })))
+        this.shapeArr.push(new THREE.Mesh(octaGeo, new THREE.MeshLambertMaterial({ color: 0x000000 })))
         this.scene.add(this.shapeArr[i])
         console.log('added new octa')
       }
-    } else if (shapeType === 3) {
+    } else if (shapeType === 2) {
+      const sphereGeo = new THREE.SphereGeometry(5, 32, 32)
       for (let i = 0; i < this.shapeMax; i++) {
-        this.shapeArr.push(new THREE.Mesh(new THREE.SphereGeometry(5, 32, 32), new THREE.MeshLambertMaterial({ color: 0x000000 })))
+        this.shapeArr.push(new THREE.Mesh(sphereGeo, new THREE.MeshLambertMaterial({ color: 0x000000 })))
         this.scene.add(this.shapeArr[i])
         console.log('added new sphere')
       }
-    } else if (shapeType === 4) {
+    } else if (shapeType === 3) {
+      const tetraGeo = new THREE.TetrahedronGeometry(10, 0)
       for (let i = 0; i < this.shapeMax; i++) {
-        this.shapeArr.push(new THREE.Mesh(new THREE.TetrahedronGeometry(10, 0), new THREE.MeshLambertMaterial({ color: 0x000000 })))
+        this.shapeArr.push(new THREE.Mesh(tetraGeo, new THREE.MeshLambertMaterial({ color: 0x000000 })))
         this.scene.add(this.shapeArr[i])
         console.log('added new tetra')
       }
     } else {
+      const dodecaGeo = new THREE.DodecahedronGeometry(10, 0)
       for (let i = 0; i < this.shapeMax; i++) {
-        this.shapeArr.push(new THREE.Mesh(new THREE.DodecahedronGeometry(10, 0), new THREE.MeshLambertMaterial({ color: 0x000000 })))
+        this.shapeArr.push(new THREE.Mesh(dodecaGeo, new THREE.MeshLambertMaterial({ color: 0x000000 })))
         this.scene.add(this.shapeArr[i])
         console.log('added new dodeca')
       }

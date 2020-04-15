@@ -24,11 +24,17 @@ export default class VisualizerCanvas extends Vue {
     console.log(cmd)
 
     if (parseInt(cmd) === 0) {
-      this.VisualzierUtils.modeKey = 0
+      this.VisualzierUtils.modeKey.key = 0
     } else if (parseInt(cmd) === 1) {
-      this.VisualzierUtils.modeKey = 1
+      this.VisualzierUtils.modeKey.key = 1
     } else if (parseInt(cmd) === 2) {
-      this.VisualzierUtils.modeKey = 2
+      this.VisualzierUtils.modeKey.key = 2
+    } else if (cmd === 'q') {
+      this.VisualzierUtils.colourKey = 1
+    } else if (cmd === 'a') {
+      this.VisualzierUtils.colourKey = 2
+    } else if (cmd === 'z') {
+      this.VisualzierUtils.colourKey = 3
     } else if (cmd === 'w') {
       this.VisualzierUtils.colourKey = 4
     } else if (cmd === 's') {

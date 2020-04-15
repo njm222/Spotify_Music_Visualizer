@@ -1,6 +1,5 @@
 <template>
   <div class="visualizer">
-    <h1>Visualizer</h1>
     <Player v-if="this.$store.state.authUser"></Player>
     <VisualizerCanvas v-if="this.$store.state.playerInfo"></VisualizerCanvas>
     <VisualizerControls v-if="this.$store.state.visualizerUtils"></VisualizerControls>
