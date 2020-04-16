@@ -28,6 +28,7 @@ export default class VisualizerCanvas extends Vue {
   private changingMode: boolean;
   private stats: any;
   private animationID!: number
+  private rotateToggle: boolean;
 
   constructor (props) {
     super(props)
@@ -43,6 +44,7 @@ export default class VisualizerCanvas extends Vue {
     VisualizerCanvas.freqKey = 4
     VisualizerCanvas.spinConstants = [0.03, 0.015, 0.075, 0.0025, 0.001]
     this.changingMode = false
+    this.rotateToggle = true
   }
 
   get ModeKey () {
@@ -70,6 +72,7 @@ export default class VisualizerCanvas extends Vue {
       console.log('Empty visualizer')
       this.setupVisualizer()
     }
+    this.$store.commit('mutateModeKey', 1)
     this.$store.commit('mutateColourKey', '#FFF')
     // stats
     this.stats = new (Stats as any)()
@@ -117,6 +120,11 @@ export default class VisualizerCanvas extends Vue {
         // Colour
         this.setColour(this.ColourKey, this.SpotifyAnalysisUtils)
 
+        if (this.rotateToggle) {
+          for (let i = 0; i < VisualizerCanvas.shapeArr.length; i++) {
+            this.rotateShape(VisualizerCanvas.shapeArr[i])
+          }
+        }
         // Mode
         this.doMode(this.ModeKey, this.SpotifyAnalysisUtils)
       } else {
@@ -188,10 +196,6 @@ export default class VisualizerCanvas extends Vue {
       noiseFreq = ((VisualizerCanvas.liveAudio.bassObject.bassAv + VisualizerCanvas.liveAudio.kickObject.kickAv - VisualizerCanvas.liveAudio.midsObject.midsAv) / SpotifyAnalysisUtils.trackFeatures.energy)
     }
 
-    console.log(noiseFreq)
-    console.log(SpotifyAnalysisUtils.trackFeatures.valence)
-    console.log(SpotifyAnalysisUtils.trackFeatures.energy)
-
     const zHeight = (SpotifyAnalysisUtils.trackFeatures.energy * SpotifyAnalysisUtils.trackFeatures.danceability * (VisualizerCanvas.liveAudio.rms + VisualizerCanvas.liveAudio.highsObject.highsAv))
     const speed = (Date.now() + VisualizerCanvas.liveAudio.bassObject.bassEnergy + VisualizerCanvas.liveAudio.kickObject.kickEnergy) / (SpotifyAnalysisUtils.trackFeatures.tempo * SpotifyAnalysisUtils.trackFeatures.danceability * SpotifyAnalysisUtils.trackFeatures.energy * 50)
 
@@ -253,6 +257,32 @@ export default class VisualizerCanvas extends Vue {
     }
   }
 
+  rotateShape (shape: THREE.Mesh) {
+    const spinf = VisualizerCanvas.liveAudio.frequencyData[VisualizerCanvas.freqKey]
+
+    if (spinf > 150) {
+      if (spinf > 200) {
+        shape.rotation.x -= VisualizerCanvas.spinConstants[1]
+        shape.rotation.y -= VisualizerCanvas.spinConstants[0]
+        shape.rotation.z -= VisualizerCanvas.spinConstants[1]
+      } else {
+        shape.rotation.x -= VisualizerCanvas.spinConstants[2]
+        shape.rotation.y -= VisualizerCanvas.spinConstants[1]
+        shape.rotation.z -= VisualizerCanvas.spinConstants[2]
+      }
+    } else {
+      if (spinf > 100) {
+        shape.rotation.x -= VisualizerCanvas.spinConstants[3]
+        shape.rotation.y += VisualizerCanvas.spinConstants[1]
+        shape.rotation.z -= VisualizerCanvas.spinConstants[4]
+      } else {
+        shape.rotation.x -= VisualizerCanvas.spinConstants[4]
+        shape.rotation.y += VisualizerCanvas.spinConstants[2]
+        shape.rotation.z -= VisualizerCanvas.spinConstants[3]
+      }
+    }
+  }
+
   private changeColour (currShape: THREE.Mesh, currColour: string) {
     if (currShape.material instanceof THREE.Material) {
       const colour = new THREE.Color(parseInt(currColour))
@@ -304,96 +334,6 @@ export default class VisualizerCanvas extends Vue {
     }
   }
 
-  private canvasResizeListener (el: Element) {
-    el.addEventListener('onresize', re => {
-      const width = el.clientWidth
-      const height = el.clientHeight
-
-      VisualizerCanvas.renderer.setSize(width, height)
-      VisualizerCanvas.camera.aspect = width / height
-      VisualizerCanvas.camera.updateProjectionMatrix()
-    })
-  }
-
-  private addLighting () {
-    const l1 = new THREE.PointLight(0xffffff)
-    const spotLight = new THREE.SpotLight(0xffffff)
-    l1.position.set(300, 200, 0)
-    VisualizerCanvas.scene.add(l1)
-
-    spotLight.position.set(0, 0, 90)
-    spotLight.castShadow = true
-
-    spotLight.shadow.mapSize.width = 1024
-    spotLight.shadow.mapSize.height = 1024
-
-    spotLight.shadow.camera.near = 500
-    spotLight.shadow.camera.far = 4000
-    spotLight.shadow.camera.fov = 30
-    VisualizerCanvas.scene.add(spotLight)
-  }
-
-  private addOcean () {
-    VisualizerCanvas.shapeArr.push(new THREE.Mesh(
-      new THREE.PlaneBufferGeometry(window.innerWidth, window.innerWidth, 256, 256),
-      new THREE.MeshLambertMaterial()))
-    console.log(VisualizerCanvas.shapeArr)
-    VisualizerCanvas.shapeArr[0].rotation.set(-Math.PI / 4, 0, Math.PI / 2)
-    VisualizerCanvas.shapeArr[0].position.set(0, 0, -250)
-    VisualizerCanvas.scene.add(VisualizerCanvas.shapeArr[0])
-    console.log('added ocean')
-  }
-
-  private removeShape () {
-    console.log('removing shapes')
-    for (let i = 0; i < VisualizerCanvas.shapeArr.length; i++) {
-      VisualizerCanvas.scene.remove(VisualizerCanvas.shapeArr[i])
-      VisualizerCanvas.shapeArr[i].geometry.dispose()
-      const material = VisualizerCanvas.shapeArr[i].material as THREE.Material
-      material.dispose()
-    }
-    VisualizerCanvas.shapeArr = []
-  }
-
-  private addShape (shapeType: number) {
-    if (shapeType === 0) {
-      const cubeGeo = new THREE.BoxGeometry(10, 10, 10)
-      for (let i = 0; i < VisualizerCanvas.shapeMax; i++) {
-        VisualizerCanvas.shapeArr.push(new THREE.Mesh(cubeGeo, new THREE.MeshLambertMaterial({ color: 0x000000 })))
-        VisualizerCanvas.scene.add(VisualizerCanvas.shapeArr[i])
-      }
-      console.log('added new cube grid')
-    } else if (shapeType === 1) {
-      const octaGeo = new THREE.OctahedronGeometry(10, 0)
-      for (let i = 0; i < VisualizerCanvas.shapeMax; i++) {
-        VisualizerCanvas.shapeArr.push(new THREE.Mesh(octaGeo, new THREE.MeshLambertMaterial({ color: 0x000000 })))
-        VisualizerCanvas.scene.add(VisualizerCanvas.shapeArr[i])
-      }
-      console.log('added new octa grid')
-    } else if (shapeType === 2) {
-      const sphereGeo = new THREE.SphereGeometry(5, 32, 32)
-      for (let i = 0; i < VisualizerCanvas.shapeMax; i++) {
-        VisualizerCanvas.shapeArr.push(new THREE.Mesh(sphereGeo, new THREE.MeshLambertMaterial({ color: 0x000000 })))
-        VisualizerCanvas.scene.add(VisualizerCanvas.shapeArr[i])
-      }
-      console.log('added new sphere grid')
-    } else if (shapeType === 3) {
-      const tetraGeo = new THREE.TetrahedronGeometry(10, 0)
-      for (let i = 0; i < VisualizerCanvas.shapeMax; i++) {
-        VisualizerCanvas.shapeArr.push(new THREE.Mesh(tetraGeo, new THREE.MeshLambertMaterial({ color: 0x000000 })))
-        VisualizerCanvas.scene.add(VisualizerCanvas.shapeArr[i])
-      }
-      console.log('added new tetra grid')
-    } else {
-      const dodecaGeo = new THREE.DodecahedronGeometry(10, 0)
-      for (let i = 0; i < VisualizerCanvas.shapeMax; i++) {
-        VisualizerCanvas.shapeArr.push(new THREE.Mesh(dodecaGeo, new THREE.MeshLambertMaterial({ color: 0x000000 })))
-        VisualizerCanvas.scene.add(VisualizerCanvas.shapeArr[i])
-      }
-      console.log('added new dodeca grid')
-    }
-  }
-
   private setShapePosition () {
     let a = 0
     let f = 1
@@ -436,6 +376,83 @@ export default class VisualizerCanvas extends Vue {
     console.log(VisualizerCanvas.layerMarker)
   }
 
+  private removeShape () {
+    console.log('removing shapes')
+    for (let i = 0; i < VisualizerCanvas.shapeArr.length; i++) {
+      VisualizerCanvas.scene.remove(VisualizerCanvas.shapeArr[i])
+      VisualizerCanvas.shapeArr[i].geometry.dispose()
+      const material = VisualizerCanvas.shapeArr[i].material as THREE.Material
+      material.dispose()
+    }
+    VisualizerCanvas.shapeArr = []
+  }
+
+  private addOcean () {
+    VisualizerCanvas.shapeArr.push(new THREE.Mesh(new THREE.PlaneBufferGeometry(window.innerWidth, window.innerWidth, 256, 256), new THREE.MeshLambertMaterial()))
+    console.log(VisualizerCanvas.shapeArr)
+    VisualizerCanvas.shapeArr[0].rotation.set(-Math.PI / 4, 0, Math.PI / 2)
+    VisualizerCanvas.shapeArr[0].position.set(0, 0, -250)
+    VisualizerCanvas.scene.add(VisualizerCanvas.shapeArr[0])
+    console.log('added ocean')
+  }
+
+  private addShape (shapeType: number) {
+    if (shapeType === 0) {
+      const cubeGeo = new THREE.BoxGeometry(10, 10, 10)
+      for (let i = 0; i < VisualizerCanvas.shapeMax; i++) {
+        VisualizerCanvas.shapeArr.push(new THREE.Mesh(cubeGeo, new THREE.MeshLambertMaterial({ color: 0x000000 })))
+        VisualizerCanvas.scene.add(VisualizerCanvas.shapeArr[i])
+      }
+      console.log('added new cube grid')
+    } else if (shapeType === 1) {
+      const octaGeo = new THREE.OctahedronGeometry(10, 0)
+      for (let i = 0; i < VisualizerCanvas.shapeMax; i++) {
+        VisualizerCanvas.shapeArr.push(new THREE.Mesh(octaGeo, new THREE.MeshLambertMaterial({ color: 0x000000 })))
+        VisualizerCanvas.scene.add(VisualizerCanvas.shapeArr[i])
+      }
+      console.log('added new octa grid')
+    } else if (shapeType === 2) {
+      const sphereGeo = new THREE.SphereGeometry(5, 32, 32)
+      for (let i = 0; i < VisualizerCanvas.shapeMax; i++) {
+        VisualizerCanvas.shapeArr.push(new THREE.Mesh(sphereGeo, new THREE.MeshLambertMaterial({ color: 0x000000 })))
+        VisualizerCanvas.scene.add(VisualizerCanvas.shapeArr[i])
+      }
+      console.log('added new sphere grid')
+    } else if (shapeType === 3) {
+      const tetraGeo = new THREE.TetrahedronGeometry(10, 0)
+      for (let i = 0; i < VisualizerCanvas.shapeMax; i++) {
+        VisualizerCanvas.shapeArr.push(new THREE.Mesh(tetraGeo, new THREE.MeshLambertMaterial({ color: 0x000000 })))
+        VisualizerCanvas.scene.add(VisualizerCanvas.shapeArr[i])
+      }
+      console.log('added new tetra grid')
+    } else {
+      const dodecaGeo = new THREE.DodecahedronGeometry(10, 0)
+      for (let i = 0; i < VisualizerCanvas.shapeMax; i++) {
+        VisualizerCanvas.shapeArr.push(new THREE.Mesh(dodecaGeo, new THREE.MeshLambertMaterial({ color: 0x000000 })))
+        VisualizerCanvas.scene.add(VisualizerCanvas.shapeArr[i])
+      }
+      console.log('added new dodeca grid')
+    }
+  }
+
+  private addLighting () {
+    const l1 = new THREE.PointLight(0xffffff)
+    const spotLight = new THREE.SpotLight(0xffffff)
+    l1.position.set(300, 200, 0)
+    VisualizerCanvas.scene.add(l1)
+
+    spotLight.position.set(0, 0, 90)
+    spotLight.castShadow = true
+
+    spotLight.shadow.mapSize.width = 1024
+    spotLight.shadow.mapSize.height = 1024
+
+    spotLight.shadow.camera.near = 500
+    spotLight.shadow.camera.far = 4000
+    spotLight.shadow.camera.fov = 30
+    VisualizerCanvas.scene.add(spotLight)
+  }
+
   private rgbToHexHelper (num: number) {
     const hex = Math.ceil(num).toString(16)
     return hex.length === 1 ? '0' + hex : hex
@@ -474,6 +491,17 @@ export default class VisualizerCanvas extends Vue {
     return `0x${toHex(r)}${toHex(g)}${toHex(b)}`
   }
 
+  private canvasResizeListener (el: Element) {
+    el.addEventListener('onresize', re => {
+      const width = el.clientWidth
+      const height = el.clientHeight
+
+      VisualizerCanvas.renderer.setSize(width, height)
+      VisualizerCanvas.camera.aspect = width / height
+      VisualizerCanvas.camera.updateProjectionMatrix()
+    })
+  }
+
   @Watch('ModeKey')
   onModeKeyChanged (value: number, oldValue: number) {
     console.log(`changing mode key to ${value} from ${oldValue}`)
@@ -485,9 +513,11 @@ export default class VisualizerCanvas extends Vue {
       if (value < 3) {
         this.addShape(Math.floor(Math.random() * 5))
         this.setShapePosition()
+        this.rotateToggle = true
       } else {
         this.addOcean()
         VisualizerCanvas.noise = new SimplexNoise()
+        this.rotateToggle = false
       }
       this.changingMode = false
       console.log(this.changingMode)
