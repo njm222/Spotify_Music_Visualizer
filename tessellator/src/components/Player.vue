@@ -3,7 +3,7 @@
     <template v-if="this.accessToken && this.playerInfo">
       <div class="player-bar">
         <TrackItem :trackDetails="this.playerInfo.track_window.current_track"></TrackItem>
-        <SeekTrack :playerInfo="playerInfo"></SeekTrack>
+        <SeekTrack :playerInfo="this.playerInfo"></SeekTrack>
         <PlayerControls></PlayerControls>
       </div>
     </template>
@@ -18,16 +18,11 @@ import TrackItem from '@/components/TrackItem.vue'
 import SeekTrack from '@/components/SeekTrack.vue'
 import PlayerControls from '@/components/PlayerControls.vue'
 import { SpotifyAnalysis } from '@/services/spotify-utils'
-import VisualizerUtils from '@/services/visualizer-utils'
 
 @Component({
   components: { TrackItem, SeekTrack, PlayerControls }
 })
 export default class Player extends Vue {
-  get VisualzierUtils () {
-    return this.$store.state.visualizerUtils
-  }
-
   get SpotifyAnalysisUtils () {
     return this.$store.state.spotifyAnalysisUtils
   }
@@ -45,9 +40,6 @@ export default class Player extends Vue {
   }
 
   created (): void {
-    if (!this.VisualzierUtils) {
-      this.$store.commit('mutateVisualizerUtils', new VisualizerUtils())
-    }
     if (!this.SpotifyAnalysisUtils) {
       this.$store.commit('mutateSpotifyAnalysisUtils', new SpotifyAnalysis())
     }
@@ -158,10 +150,10 @@ export default class Player extends Vue {
         addTrackPlayed(response.data.item, this.$store.state.user.id)
         addArtistsPlayed(response.data.item, this.$store.state.user.id)
         // Get Audio Analysis from Spotify
-        if (this.VisualzierUtils && this.SpotifyAnalysisUtils) {
-          this.SpotifyAnalysisUtils.getTrackFeaturesAnalysis(this.VisualzierUtils, this.accessToken, this.$store.state.playerInfo.track_window.current_track.id)
+        if (this.SpotifyAnalysisUtils) {
+          this.SpotifyAnalysisUtils.getTrackFeaturesAnalysis(this.accessToken, this.$store.state.playerInfo.track_window.current_track.id)
         } else {
-          console.log('vis Utils doesnt exist')
+          console.log('SpotifyAnalysisUtils doesnt exist')
         }
       }
     }).catch(error => {

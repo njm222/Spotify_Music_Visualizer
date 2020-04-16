@@ -1,29 +1,32 @@
 import * as THREE from 'three'
+import SimplexNoise from 'simplex-noise'
 import LiveAudio from '@/services/liveAudio-utils'
 
+
 export default class VisualizerUtils {
-  public camera: THREE.PerspectiveCamera;
-  public renderer: THREE.WebGLRenderer = new THREE.WebGLRenderer();
-  public scene: THREE.Scene = new THREE.Scene();
-  public shapeMax: number;
-  public shapeArr: THREE.Mesh[];
-  public layerMarker: number[];
+  private static camera: THREE.PerspectiveCamera;
+  private static renderer: THREE.WebGLRenderer = new THREE.WebGLRenderer();
+  private static scene: THREE.Scene = new THREE.Scene();
+  private shapeMax: number;
+  private shapeArr: THREE.Mesh[];
+  private layerMarker: number[];
   private liveAudio: LiveAudio;
   private colourKey: number;
   private modeKey: any;
   private shapeColour: string;
   private freqKey: number;
   private spinConstants: number[];
-  private currentTrackFeatures: SpotifyApi.AudioFeaturesResponse | undefined
-  private currentTrackAnalysis: SpotifyApi.AudioAnalysisResponse | undefined
+  private currentTrackFeatures!: SpotifyApi.AudioFeaturesResponse;
+  private currentTrackAnalysis!: SpotifyApi.AudioAnalysisResponse;
   private updatedTrackData: boolean[];
   private changingMode!: boolean;
+  private static noise: SimplexNoise = new SimplexNoise()
 
   constructor () {
     this.liveAudio = new LiveAudio()
-    this.camera = new THREE.PerspectiveCamera()
-    this.renderer = new THREE.WebGLRenderer({ antialias: true })
-    this.scene = new THREE.Scene()
+    VisualizerUtils.camera = new THREE.PerspectiveCamera()
+    VisualizerUtils.renderer = new THREE.WebGLRenderer({ antialias: true })
+    VisualizerUtils.scene = new THREE.Scene()
     this.shapeMax = 529
     this.shapeArr = []
     this.layerMarker = []
@@ -44,15 +47,15 @@ export default class VisualizerUtils {
     this.modeKey.registerListener((val: number) => {
       console.log('modeKey changed to ' + val)
       this.changingMode = true
+      this.removeShape()
       console.log(this.changingMode)
+
       if (this.modeKey.key < 3) {
-        this.removeShape()
         this.addShape(Math.floor(Math.random() * 5))
         this.setShapePosition()
       } else {
-        this.removeShape()
-        this.addShape(Math.floor(Math.random() * 5))
-        this.setShapePosition()
+        this.addOcean()
+        VisualizerUtils.noise = new SimplexNoise()
       }
       this.changingMode = false
       console.log(this.changingMode)
@@ -62,12 +65,13 @@ export default class VisualizerUtils {
     this.freqKey = 4
     this.spinConstants = [0.03, 0.015, 0.075, 0.0025, 0.001]
     this.updatedTrackData = [false, false]
+    VisualizerUtils.noise = new SimplexNoise()
   }
 
   private removeShape () {
     console.log('removing shapes')
     for (let i = 0; i < this.shapeArr.length; i++) {
-      this.scene.remove(this.shapeArr[i])
+      VisualizerUtils.scene.remove(this.shapeArr[i])
       this.shapeArr[i].geometry.dispose()
       const material = this.shapeArr[i].material as THREE.Material
       material.dispose()
@@ -94,22 +98,28 @@ export default class VisualizerUtils {
   }
 
   setupCanvas (el: Element, SpotifyAnalysisUtils: any) {
-    this.camera = new THREE.PerspectiveCamera(75, el.clientWidth / el.clientHeight, 0.1, 1000)
-    this.renderer.setSize(el.clientWidth, el.clientHeight)
-    this.camera.aspect = el.clientWidth / el.clientHeight
-    el.appendChild(this.renderer.domElement)
+    VisualizerUtils.camera = new THREE.PerspectiveCamera(75, el.clientWidth / el.clientHeight, 0.1, 1000)
+    VisualizerUtils.renderer.setSize(el.clientWidth, el.clientHeight)
+    VisualizerUtils.camera.aspect = el.clientWidth / el.clientHeight
+    el.appendChild(VisualizerUtils.renderer.domElement)
 
     this.canvasResizeListener(el)
 
     this.addLighting()
     this.addShape(1)
     this.setShapePosition()
-    this.camera.position.z = 90
+    VisualizerUtils.camera.position.z = 90
 
     this.setColourKey(5)
 
+    // stats
+    const stats = new (Stats as any)()
+    document.body.appendChild(stats.dom)
+
+    console.log(VisualizerUtils.scene)
+
     const animate = () => {
-      requestAnimationFrame(animate)
+      stats.begin()
       if (this.updatedTrackData[0] && this.updatedTrackData[1]) {
         // Live Audio
         this.liveAudio.getData()
@@ -119,18 +129,21 @@ export default class VisualizerUtils {
           this.setColour(this.colourKey, SpotifyAnalysisUtils)
 
           // Rotate Shape
-          for (let i = 0; i < this.shapeMax; i++) {
-            this.rotateShape(this.shapeArr[i])
-          }
+          // for (let i = 0; i < this.shapeArr.length; i++) {
+          //   this.rotateShape(this.shapeArr[i])
+          // }
 
           // Mode
           this.doMode(this.modeKey.key, SpotifyAnalysisUtils)
         }
-
-        this.renderer.render(this.scene, this.camera)
       } else {
         console.log('pausing visualizer')
       }
+
+      stats.end()
+      VisualizerUtils.camera.updateProjectionMatrix()
+      requestAnimationFrame(animate)
+      VisualizerUtils.renderer.render(VisualizerUtils.scene, VisualizerUtils.camera)
     }
     animate()
   }
@@ -143,10 +156,10 @@ export default class VisualizerUtils {
       case 2:
         this.mode2(SpotifyAnalysisUtils)
         break
-      /* case 3:
-          mode3()
-          break
-        case 4:
+      case 3:
+        this.mode3(SpotifyAnalysisUtils)
+        break
+      /* case 4:
           mode4()
           break
         case 5:
@@ -213,7 +226,48 @@ export default class VisualizerUtils {
   }
 
   private mode3 (SpotifyAnalysisUtils: any) {
-    // a
+    if (SpotifyAnalysisUtils.barCounter >= 1) {
+      const shapeMaterial = this.shapeArr[0].material as THREE.MeshLambertMaterialParameters
+      shapeMaterial.wireframe = !shapeMaterial.wireframe
+      shapeMaterial.flatShading = !shapeMaterial.wireframe
+      // shapeMaterial.needsUpdate = true
+      SpotifyAnalysisUtils.barCounter = 0
+    }
+
+    let noiseFreq: number
+    if (this.currentTrackFeatures.energy > 0.7) {
+      noiseFreq = this.liveAudio.snareObject.snareAv + (this.liveAudio.bassObject.bassAv + this.liveAudio.midsObject.midsAv) / this.liveAudio.highsObject.highsAv
+    } else if (this.currentTrackFeatures.energy > 0.4) {
+      noiseFreq = (this.liveAudio.kickObject.kickAv * this.currentTrackFeatures.energy) + ((this.liveAudio.snareObject.snareAv + this.liveAudio.midsObject.midsAv) / (SpotifyAnalysisUtils.highsAv * SpotifyAnalysisUtils.g_valence * SpotifyAnalysisUtils.g_danceability))
+    } else {
+      noiseFreq = this.liveAudio.bassObject.bassAv + this.liveAudio.kickObject.kickAv - this.liveAudio.midsObject.midsAv
+    }
+    const shapeGeo = this.shapeArr[0].geometry as THREE.BufferGeometry
+    let position = shapeGeo.getAttribute('position') as THREE.BufferAttribute
+
+    const zHeight = (this.currentTrackFeatures.energy * this.currentTrackFeatures.danceability * this.liveAudio.bassObject.bassEnergy * 2)
+    const speed = Date.now() / (this.currentTrackFeatures.tempo * this.currentTrackFeatures.valence * 100)
+
+    for (let i = 0; i < position.count; i++) {
+      const z = this.calcPlanePosition(i, noiseFreq, speed, zHeight)
+      if (z > 0) {
+        position.setZ(i, z)
+        // mountain
+      } else {
+        position.setZ(i, zHeight)
+        // water
+      }
+    }
+    shapeGeo.setAttribute('position', position)
+    position = shapeGeo.getAttribute('position') as THREE.BufferAttribute
+    position.needsUpdate = true
+    // shapeGeo.computeVertexNormals()
+    shapeGeo.computeBoundingSphere()
+    this.changeColour(this.shapeArr[0], this.shapeColour)
+  }
+
+  calcPlanePosition (i: number, noiseFreq: number, speed: number, zHeight: number) {
+    return VisualizerUtils.noise.noise3D(((i % 513)) / noiseFreq, (Math.floor(i / 513)) / noiseFreq, speed) * zHeight
   }
 
   changeColour (currShape: THREE.Mesh, currColour: string) {
@@ -297,40 +351,51 @@ export default class VisualizerUtils {
     this.colourKey = key
   }
 
+  private addOcean () {
+    this.shapeArr.push(new THREE.Mesh(
+      new THREE.PlaneBufferGeometry(window.innerWidth, window.innerWidth, 512, 512),
+      new THREE.MeshLambertMaterial()))
+    console.log(this.shapeArr)
+    this.shapeArr[0].rotation.set(-Math.PI / 4, 0, Math.PI / 2)
+    this.shapeArr[0].position.set(0, 0, -250)
+    VisualizerUtils.scene.add(this.shapeArr[0])
+    console.log('added ocean')
+  }
+
   private addShape (shapeType: number) {
     if (shapeType === 0) {
       const cubeGeo = new THREE.BoxGeometry(10, 10, 10)
       for (let i = 0; i < this.shapeMax; i++) {
         this.shapeArr.push(new THREE.Mesh(cubeGeo, new THREE.MeshLambertMaterial({ color: 0x000000 })))
-        this.scene.add(this.shapeArr[i])
+        VisualizerUtils.scene.add(this.shapeArr[i])
       }
       console.log('added new cube grid')
     } else if (shapeType === 1) {
       const octaGeo = new THREE.OctahedronGeometry(10, 0)
       for (let i = 0; i < this.shapeMax; i++) {
         this.shapeArr.push(new THREE.Mesh(octaGeo, new THREE.MeshLambertMaterial({ color: 0x000000 })))
-        this.scene.add(this.shapeArr[i])
+        VisualizerUtils.scene.add(this.shapeArr[i])
       }
       console.log('added new octa grid')
     } else if (shapeType === 2) {
       const sphereGeo = new THREE.SphereGeometry(5, 32, 32)
       for (let i = 0; i < this.shapeMax; i++) {
         this.shapeArr.push(new THREE.Mesh(sphereGeo, new THREE.MeshLambertMaterial({ color: 0x000000 })))
-        this.scene.add(this.shapeArr[i])
+        VisualizerUtils.scene.add(this.shapeArr[i])
       }
       console.log('added new sphere grid')
     } else if (shapeType === 3) {
       const tetraGeo = new THREE.TetrahedronGeometry(10, 0)
       for (let i = 0; i < this.shapeMax; i++) {
         this.shapeArr.push(new THREE.Mesh(tetraGeo, new THREE.MeshLambertMaterial({ color: 0x000000 })))
-        this.scene.add(this.shapeArr[i])
+        VisualizerUtils.scene.add(this.shapeArr[i])
       }
       console.log('added new tetra grid')
     } else {
       const dodecaGeo = new THREE.DodecahedronGeometry(10, 0)
       for (let i = 0; i < this.shapeMax; i++) {
         this.shapeArr.push(new THREE.Mesh(dodecaGeo, new THREE.MeshLambertMaterial({ color: 0x000000 })))
-        this.scene.add(this.shapeArr[i])
+        VisualizerUtils.scene.add(this.shapeArr[i])
       }
       console.log('added new dodeca grid')
     }
@@ -340,7 +405,7 @@ export default class VisualizerUtils {
     const l1 = new THREE.PointLight(0xffffff)
     const spotLight = new THREE.SpotLight(0xffffff)
     l1.position.set(300, 200, 0)
-    this.scene.add(l1)
+    VisualizerUtils.scene.add(l1)
 
     spotLight.position.set(0, 0, 90)
     spotLight.castShadow = true
@@ -351,7 +416,7 @@ export default class VisualizerUtils {
     spotLight.shadow.camera.near = 500
     spotLight.shadow.camera.far = 4000
     spotLight.shadow.camera.fov = 30
-    this.scene.add(spotLight)
+    VisualizerUtils.scene.add(spotLight)
   }
 
   private canvasResizeListener (el: Element) {
@@ -359,9 +424,9 @@ export default class VisualizerUtils {
       const width = el.clientWidth
       const height = el.clientHeight
 
-      this.renderer.setSize(width, height)
-      this.camera.aspect = width / height
-      this.camera.updateProjectionMatrix()
+      VisualizerUtils.renderer.setSize(width, height)
+      VisualizerUtils.camera.aspect = width / height
+      VisualizerUtils.camera.updateProjectionMatrix()
     })
   }
 

@@ -2,7 +2,7 @@
   <div class="visualizer">
     <Player v-if="this.$store.state.authUser"></Player>
     <VisualizerCanvas v-if="this.$store.state.playerInfo"></VisualizerCanvas>
-    <VisualizerControls v-if="this.$store.state.visualizerUtils"></VisualizerControls>
+    <VisualizerControls v-if="this.$store.state.modeKey"></VisualizerControls>
   </div>
 </template>
 

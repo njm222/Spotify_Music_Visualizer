@@ -6,11 +6,7 @@
 import { Component, Vue } from 'vue-property-decorator'
 
 @Component
-export default class VisualizerCanvas extends Vue {
-  get VisualzierUtils () {
-    return this.$store.state.visualizerUtils
-  }
-
+export default class VisualizerControls extends Vue {
   mounted () {
     window.addEventListener('keypress', this.doCommand)
   }
@@ -24,29 +20,33 @@ export default class VisualizerCanvas extends Vue {
     console.log(cmd)
 
     if (parseInt(cmd) === 0) {
-      this.VisualzierUtils.modeKey.key = 0
+      this.$store.commit('mutateModeKey', 0)
     } else if (parseInt(cmd) === 1) {
-      this.VisualzierUtils.modeKey.key = 1
+      this.$store.commit('mutateModeKey', 1)
     } else if (parseInt(cmd) === 2) {
-      this.VisualzierUtils.modeKey.key = 2
+      this.$store.commit('mutateModeKey', 2)
+    } else if (parseInt(cmd) === 3) {
+      this.$store.commit('mutateModeKey', 3)
+    } else if (parseInt(cmd) === 4) {
+      this.$store.commit('mutateModeKey', 4)
     } else if (cmd === 'q') {
-      this.VisualzierUtils.colourKey = 1
+      this.$store.commit('mutateColourKey', 1)
     } else if (cmd === 'a') {
-      this.VisualzierUtils.colourKey = 2
+      this.$store.commit('mutateColourKey', 2)
     } else if (cmd === 'z') {
-      this.VisualzierUtils.colourKey = 3
+      this.$store.commit('mutateColourKey', 3)
     } else if (cmd === 'w') {
-      this.VisualzierUtils.colourKey = 4
+      this.$store.commit('mutateColourKey', 4)
     } else if (cmd === 's') {
-      this.VisualzierUtils.colourKey = 5
+      this.$store.commit('mutateColourKey', 5)
     } else if (cmd === 'x') {
-      this.VisualzierUtils.colourKey = 6
+      this.$store.commit('mutateColourKey', 6)
     } else if (cmd === 'e') {
-      this.VisualzierUtils.colourKey = 7
+      this.$store.commit('mutateColourKey', 7)
     } else if (cmd === 'd') {
-      this.VisualzierUtils.colourKey = 8
+      this.$store.commit('mutateColourKey', 8)
     } else if (cmd === 'c') {
-      this.VisualzierUtils.colourKey = 9
+      this.$store.commit('mutateColourKey', 10)
     }
   }
 }

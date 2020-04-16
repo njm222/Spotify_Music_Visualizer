@@ -22,7 +22,6 @@
 
 <script lang="ts">
 import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
-import { SpotifyPlayer } from '@/services/spotify-utils'
 
 @Component
 export default class SeekTrack extends Vue {
@@ -65,10 +64,6 @@ export default class SeekTrack extends Vue {
 
   get SpotifyAnalysisUtils () {
     return this.$store.state.spotifyAnalysisUtils
-  }
-
-  get VisualizerUtils () {
-    return this.$store.state.visualizerUtils
   }
 
   millisToMinutesAndSeconds (millis: number) {
@@ -159,7 +154,7 @@ export default class SeekTrack extends Vue {
     if (value >= 0) {
       this.setPosition(Math.floor(value / this.playerInfo.duration * this.$data.sliderWidth))
       // change spotify Analysis here
-      this.SpotifyAnalysisUtils.changeAnalysis(value, this.VisualizerUtils)
+      this.SpotifyAnalysisUtils.changeAnalysis(value)
     }
   }
 

@@ -29,47 +29,42 @@ export class SpotifyAnalysis {
 
   /** Get Track Analysis from Spotify Api */
 
-  getTrackFeaturesAnalysis (VisualizerUtils: any, accessToken: string, trackID: string) {
-    console.log(VisualizerUtils)
-    VisualizerUtils.setUpdatedTrackFeaturesFalse(false)
-    VisualizerUtils.setUpdatedTrackAnalysisFalse(false)
-    this.getTrackAnalysis(VisualizerUtils, accessToken, trackID)
-    this.getTrackFeatures(VisualizerUtils, accessToken, trackID)
+  getTrackFeaturesAnalysis (accessToken: string, trackID: string) {
+    this.getTrackAnalysis(accessToken, trackID)
+    this.getTrackFeatures(accessToken, trackID)
   }
 
-  getTrackFeatures (VisualizerUtils: any, accessToken: string, trackID: string) {
+  getTrackFeatures (accessToken: string, trackID: string) {
     console.log('=== track Features ====')
     Axios.get(`https://api.spotify.com/v1/audio-features/${trackID}`, {
       headers: { Authorization: 'Bearer ' + accessToken }
     }).then(res => {
       this.trackFeatures = res.data
-      VisualizerUtils.setUpdatedTrackFeatures(true, res.data)
     }).catch((error) => {
       console.log(error)
-      this.getTrackFeatures(VisualizerUtils, accessToken, trackID)
+      this.getTrackFeatures(accessToken, trackID)
     })
   }
 
-  getTrackAnalysis (VisualizerUtils: any, accessToken: string, trackID: string) {
+  getTrackAnalysis (accessToken: string, trackID: string) {
     console.log('=== track Analysis ====')
     Axios.get(`https://api.spotify.com/v1/audio-analysis/${trackID}`, {
       headers: { Authorization: 'Bearer ' + accessToken }
     }).then(res => {
       this.trackAnalysis = res.data
       this.setTrackAnalysisParts(res.data)
-      VisualizerUtils.setUpdatedTrackAnalysis(true, res.data)
     }).catch((error) => {
       console.log(error)
-      this.getTrackAnalysis(VisualizerUtils, accessToken, trackID)
+      this.getTrackAnalysis(accessToken, trackID)
     })
   }
 
   /** Update Analysis from trackCounter */
 
-  changeAnalysis (trackCounter: number, visualizerUtils: any) {
+  changeAnalysis (trackCounter: number) {
     trackCounter = trackCounter / 1000
     this.changeSection(trackCounter)
-    this.changeBar(trackCounter, visualizerUtils)
+    this.changeBar(trackCounter)
     this.changeBeat(trackCounter)
     this.changeTatum(trackCounter)
     this.changeSegment(trackCounter)
@@ -84,7 +79,7 @@ export class SpotifyAnalysis {
     }
   }
 
-  private changeBar (trackCounter: number, visualizerUtils: any) {
+  private changeBar (trackCounter: number) {
     if (this.g_bars[this.g_bar]) {
       const barEnd = this.g_bars[this.g_bar].start + this.g_bars[this.g_bar].duration
       if (trackCounter > barEnd) {
@@ -92,8 +87,8 @@ export class SpotifyAnalysis {
         this.g_bar++
         if (barConfidence > 0.5) {
           this.barCounter++
-          this.changeFreqKey(visualizerUtils)
-          this.changeColourKey(visualizerUtils)
+          // this.changeFreqKey(visualizerUtils)
+          // this.changeColourKey(visualizerUtils)
         }
       }
     }
@@ -234,17 +229,17 @@ export class SpotifyAnalysis {
 
   /** Visualizer Helper Functions */
 
-  private changeColourKey (visualizerUtils: any) {
-    if (this.g_bar % this.trackFeatures.time_signature === 0) {
-      visualizerUtils.colourKey = Math.floor(Math.random() * 13)
-      console.log('colour mode: ' + visualizerUtils.colourKey)
-    }
-  }
-
-  private changeFreqKey (visualizerUtils: any) {
-    visualizerUtils.freqKey = Math.floor(Math.random() * (11 - 2)) + 2
-    console.log('freq mode: ' + visualizerUtils.freqKey)
-  }
+  // private changeColourKey (visualizerUtils: any) {
+  //   if (this.g_bar % this.trackFeatures.time_signature === 0) {
+  //     visualizerUtils.colourKey = Math.floor(Math.random() * 13)
+  //     console.log('colour mode: ' + visualizerUtils.colourKey)
+  //   }
+  // }
+  //
+  // private changeFreqKey (visualizerUtils: any) {
+  //   visualizerUtils.freqKey = Math.floor(Math.random() * (11 - 2)) + 2
+  //   console.log('freq mode: ' + visualizerUtils.freqKey)
+  // }
 }
 
 export class SpotifyPlayer {

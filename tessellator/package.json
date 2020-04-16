@@ -19,6 +19,8 @@
     "firebase-admin": "^8.10.0",
     "query-string": "^6.11.1",
     "querystring": "^0.2.0",
+    "simplex-noise": "^2.4.0",
+    "stats.js": "^0.17.0",
     "three": "^0.115.0",
     "vue": "^2.6.11",
     "vue-axios": "^2.1.5",

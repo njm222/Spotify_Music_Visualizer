@@ -2,9 +2,9 @@
   <div class="home">
     <img alt="Vue logo" src="../assets/logo.png">
     <Login :key="this.$store.state.accessToken"/>
-    <OnlineUsers v-if="this.$store.state.user" :key="this.$store.state.authUser"/>
     <Player v-if="this.$store.state.authUser"/>
     <MyPlaylists v-if="this.$store.state.authUser"/>
+    <OnlineUsers v-if="this.$store.state.user" :key="this.$store.state.authUser"/>
   </div>
 </template>
 
