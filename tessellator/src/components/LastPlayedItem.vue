@@ -1,6 +1,5 @@
 <template>
   <div v-if='trackDetails' class="item">
-    Last Played:
     <a v-bind:href='trackDetails.external_urls.spotify' target='_blank'>
       {{ trackDetails.name }}
     </a>

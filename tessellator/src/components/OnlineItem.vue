@@ -1,7 +1,9 @@
 <template>
   <div v-if='onlineUser' class="item">
     <a v-bind:href='onlineUser.spotifyLink' target='_blank'>
-      {{onlineUser.user}} is online
+      <strong>
+        {{onlineUser.user}} is online
+      </strong>
     </a>
   </div>
 </template>

@@ -1,16 +1,22 @@
 <template>
-  <div>
-    <div v-if="this.topTracks">
+  <div class="outer-container">
+    <div v-if="this.topTracks" class="container">
       <h2>Top Tracks Played</h2>
-      <div v-for='(item, i) in topTracks' :key='item + i'>
+      <div v-for='(item, i) in topTracks' :key='item + i' class="item">
         <TopTrack :trackDetails="item.data().trackData" :playedCount="item.data().count"></TopTrack>
       </div>
     </div>
-    <div v-if="this.topArtists">
+    <div v-else>
+      loading ...
+    </div>
+    <div v-if="this.topArtists" class="container">
       <h2>Top Artists Played</h2>
-      <div v-for='(item, i) in topArtists' :key='item + i'>
+      <div v-for='(item, i) in topArtists' :key='item + i' class="item">
         <TopArtist :artistDetails="item.data().artistData" :playedCount="item.data().count"></TopArtist>
       </div>
+    </div>
+    <div v-else>
+      loading ...
     </div>
   </div>
 </template>
@@ -43,7 +49,7 @@ export default class TopPlayed extends Vue {
   private loadTopTracks () {
     console.log('getTracks')
     const topTracksRef = firebaseRef.firebase.firestore().collection('topUserTracks')
-    topTracksRef.orderBy('count', 'desc').limit(25).onSnapshot(collectionSnapshot => {
+    topTracksRef.orderBy('count', 'desc').limit(10).onSnapshot(collectionSnapshot => {
       console.log(`Received doc snapshot: ${collectionSnapshot}`)
       this.$store.commit('mutateTopTracks', collectionSnapshot.docs)
     },
@@ -55,7 +61,7 @@ export default class TopPlayed extends Vue {
   private loadTopArtists () {
     console.log('getArtists')
     const topTracksRef = firebaseRef.firebase.firestore().collection('topUserArtists')
-    topTracksRef.orderBy('count', 'desc').limit(25).onSnapshot(collectionSnapshot => {
+    topTracksRef.orderBy('count', 'desc').limit(10).onSnapshot(collectionSnapshot => {
       console.log(`Received doc snapshot: ${collectionSnapshot}`)
       this.$store.commit('mutateTopArtists', collectionSnapshot.docs)
     },
@@ -67,5 +73,21 @@ export default class TopPlayed extends Vue {
 </script>
 
 <style scoped>
-
+  .outer-container {
+    display: flex;
+    justify-content: space-evenly;
+  }
+  .container {
+    display: flex;
+    flex-direction: column;
+    margin: 0px 2em;
+  }
+  .item {
+    display: flex;
+    justify-content: center;
+    padding: 1.5em;
+  }
+  .item:hover {
+    background-color: hsla(0,0%,100%,0.1);
+  }
 </style>

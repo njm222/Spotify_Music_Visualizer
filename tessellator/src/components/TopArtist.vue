@@ -1,9 +1,9 @@
 <template>
-  <div v-if='artistDetails'>
-    <a v-bind:href='artistDetails.external_urls.spotify' target='_blank'>
+  <div v-if='artistDetails' class="item-inner">
+    <strong class="item-inner-text">{{ playedCount }}</strong>
+    <a v-bind:href='artistDetails.external_urls.spotify' target='_blank' class="item-inner-text">
       {{ artistDetails.name }}
     </a>
-    count: {{playedCount}}
   </div>
 </template>
 
@@ -21,5 +21,13 @@ export default class TopArtist extends Vue {
 </script>
 
 <style scoped>
+  .item-inner {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
 
+  .item-inner .item-inner-text {
+    margin: 0.5em 0;
+  }
 </style>

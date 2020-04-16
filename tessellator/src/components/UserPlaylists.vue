@@ -36,14 +36,16 @@ export default class UserPlaylists extends Vue {
 
   private getOnlineUserPlaylists (userID: string) {
     console.log(`getting ${userID}'s playlists`)
-    Vue.axios.get(`https://api.spotify.com/v1/users/${userID}/playlists`, {
+    Vue.axios.get(`https://api.spotify.com/v1/users/${userID}/playlists?limit=5`, {
       headers: {
         Authorization: 'Bearer ' + this.$store.state.accessToken
       }
     }).then((response) => {
+      console.log(response)
       this.$store.commit('mutateUsersPlaylists', {
         key: userID,
-        value: response.data.items
+        value: response.data.items,
+        next: response.data.next
       })
     }).catch((error) => {
       console.log(error)

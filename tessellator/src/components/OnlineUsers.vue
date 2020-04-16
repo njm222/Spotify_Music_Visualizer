@@ -1,9 +1,9 @@
 <template>
-    <div>
+    <div class="home-container-child">
         <div v-if='onlineUsers && onlineUsers.size !== 0'>
-            <h1>Online Users ({{onlineUsers.size}})</h1>
-            <div class="online-users-container">
-              <div class="each-online-user" v-for='(item) in onlineUsers.values()' :key='item.user'>
+          <h3>Online Users <i>({{onlineUsers.size}})</i></h3>
+            <div class="users-container">
+              <div class="each-user" v-for='(item) in onlineUsers.values()' :key='item.user'>
                 <OnlineItem :onlineUser="item"></OnlineItem>
                 <LastPlayedItem :trackDetails="item.lastPlayed"></LastPlayedItem>
                 <UserPlaylists :userID="item.user"></UserPlaylists>
@@ -11,9 +11,9 @@
             </div>
         </div>
         <div v-else-if="lastOnlineUsers">
-            <h1>Last Online Users</h1>
-            <div class="online-users-container">
-              <div class="each-online-user" v-for='(item, i) in lastOnlineUsers.values()' :key="item.user + i">
+            <h3>Last Online Users</h3>
+            <div class="users-container">
+              <div class="each-user" v-for='(item, i) in lastOnlineUsers.values()' :key="item.user + i">
                 <LastOnlineItem :lastOnlineUser="item"></LastOnlineItem>
                 <LastPlayedItem :trackDetails="item.lastPlayed"></LastPlayedItem>
                 <UserPlaylists :userID="item.user"></UserPlaylists>
@@ -133,7 +133,20 @@ export default class OnlineUsers extends Vue {
 </script>
 
 <style scoped>
-.online-users-container {
-  display: inline-flex;
-}
+  .home-container-child {
+    margin: 2% 3%;
+  }
+
+  .users-container {
+    display: inline-flex;
+  }
+
+  .each-user {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .each-user .item {
+    text-align: start;
+  }
 </style>

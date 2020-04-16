@@ -1,6 +1,6 @@
 <template>
-  <div v-if="this.userPlaylists && this.userPlaylists !== 0">
-    <h2>Your Playlists</h2>
+  <div class="home-container-child" v-if="this.userPlaylists && this.userPlaylists !== 0">
+    <h3>Your Playlists</h3>
     <div class="playlists-container">
       <div v-for='(item, i) in userPlaylists.items' :key='item + i'>
         <UserPlaylist :playlistDetails="item" :userID ="user.id"></UserPlaylist>

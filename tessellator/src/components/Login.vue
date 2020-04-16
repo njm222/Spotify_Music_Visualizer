@@ -1,12 +1,9 @@
 <template>
   <div>
     <template v-if="this.user">
-      <h1>Hello, {{this.user.display_name}}</h1>
+      <h1>hello, {{this.user.display_name}}</h1>
       <div>
-        <router-link to="/dashboard">Go to Dashboard</router-link>
-      </div>
-      <div>
-        <router-link to="/visualizer">Go to Visualizer</router-link>
+        <a @click="openVis">open visualizer</a>
       </div>
     </template>
     <template v-else>
@@ -32,6 +29,10 @@ export default class Login extends Vue {
 
   get accessToken () {
     return this.$store.state.accessToken
+  }
+
+  openVis () {
+    this.$store.commit('mutateOpenVisualizer', true)
   }
 
   created (): void {

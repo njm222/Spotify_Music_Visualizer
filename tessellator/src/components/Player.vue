@@ -5,6 +5,9 @@
         <TrackItem :trackDetails="this.playerInfo.track_window.current_track"></TrackItem>
         <SeekTrack :playerInfo="this.playerInfo"></SeekTrack>
         <PlayerControls></PlayerControls>
+        <div v-if="this.$store.state.openVisualizer">
+          <a @click="closeVis">close visualizer</a>
+        </div>
       </div>
     </template>
   </div>
@@ -37,6 +40,10 @@ export default class Player extends Vue {
 
   get user () {
     return this.$store.state.user
+  }
+
+  closeVis () {
+    this.$store.commit('mutateOpenVisualizer', false)
   }
 
   created (): void {

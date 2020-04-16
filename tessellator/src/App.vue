@@ -3,7 +3,6 @@
     <div id="nav">
       <router-link to="/">Home</router-link> |
       <router-link to="/about">About</router-link> |
-      <router-link to="/visualizer">Visualizer</router-link> |
       <router-link to="/dashboard">Dashboard</router-link> |
       <router-link to="/community">Community</router-link>
     </div>
@@ -63,6 +62,11 @@ a:hover, a:focus {
   font-weight: bold;
   color: #D31E1E;
   text-decoration: none;
+}
+
+.home-container {
+  display: flex;
+  justify-content: space-evenly;
 }
 
 .playlists-container {

@@ -499,6 +499,7 @@ export default class VisualizerCanvas extends Vue {
 <style scoped>
   .sceneContainer {
     position: absolute;
+    top: 0;
     height: 100vh;
     width: 100vw;
   }

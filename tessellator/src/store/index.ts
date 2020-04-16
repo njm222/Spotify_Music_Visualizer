@@ -10,6 +10,7 @@ export default new Vuex.Store({
     refreshToken: null,
     user: null,
     authUser: null,
+    openVisualizer: false,
     onlineUsers: null,
     lastOnlineUsers: null,
     deviceID: null,
@@ -36,6 +37,9 @@ export default new Vuex.Store({
     },
     mutateAuthUser (state, payload) {
       state.authUser = payload
+    },
+    mutateOpenVisualizer (state, payload) {
+      state.openVisualizer = payload
     },
     mutateOnlineUsers (state, payload) {
       state.onlineUsers = payload
