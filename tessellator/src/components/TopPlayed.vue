@@ -1,22 +1,30 @@
 <template>
   <div class="outer-container">
-    <div v-if="this.topTracks" class="container">
+    <div class="container">
       <h2>Top Tracks Played</h2>
-      <div v-for='(item, i) in topTracks' :key='item + i' class="item">
-        <TopTrack :trackDetails="item.data().trackData" :playedCount="item.data().count"></TopTrack>
-      </div>
+      <transition name="fadeUp" mode="out-in">
+        <div v-if="this.topTracks" key="topTracksCommunity">
+          <div v-for='(item, i) in topTracks' :key='item + i' class="item">
+            <TopTrack :trackDetails="item.data().trackData" :playedCount="item.data().count"></TopTrack>
+          </div>
+        </div>
+        <div v-else key="topTracksCommunityLoading">
+          <p>loading ...</p>
+        </div>
+      </transition>
     </div>
-    <div v-else>
-      loading ...
-    </div>
-    <div v-if="this.topArtists" class="container">
+    <div class="container">
       <h2>Top Artists Played</h2>
-      <div v-for='(item, i) in topArtists' :key='item + i' class="item">
-        <TopArtist :artistDetails="item.data().artistData" :playedCount="item.data().count"></TopArtist>
-      </div>
-    </div>
-    <div v-else>
-      loading ...
+      <transition name="fadeUp">
+        <div v-if="this.topArtists" key="topArtistsCommunity">
+          <div v-for='(item, i) in topArtists' :key='item + i' class="item">
+            <TopArtist :artistDetails="item.data().artistData" :playedCount="item.data().count"></TopArtist>
+          </div>
+        </div>
+        <div v-else key="topArtistsCommunityLoading">
+          <p>loading ...</p>
+        </div>
+      </transition>
     </div>
   </div>
 </template>
@@ -73,6 +81,13 @@ export default class TopPlayed extends Vue {
 </script>
 
 <style scoped>
+  .fadeUp-enter-active, .fadeUp-leave-active {
+    transition: all 1s;
+  }
+  .fadeUp-enter, .fadeUp-leave-to {
+    opacity: 0;
+    transform: translateY(100vh);
+  }
   .outer-container {
     display: flex;
     justify-content: space-evenly;

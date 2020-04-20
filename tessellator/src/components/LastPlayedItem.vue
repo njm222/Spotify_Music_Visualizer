@@ -26,7 +26,4 @@ export default class LastPlayedItem extends Vue {
 </script>
 
 <style scoped>
-.item {
-  padding-bottom: 10px;
-}
 </style>

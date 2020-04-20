@@ -27,7 +27,4 @@ export default class OnlineItem extends Vue {
 </script>
 
 <style scoped>
-.item {
-  padding-bottom: 10px;
-}
 </style>

@@ -1,12 +1,21 @@
 <template>
-  <div class="home-container-child" v-if="this.userPlaylists && this.userPlaylists !== 0">
-    <h3>Your Playlists</h3>
-    <div class="playlists-container">
-      <div v-for='(item, i) in userPlaylists.items' :key='item + i'>
-        <UserPlaylist :playlistDetails="item" :userID ="user.id"></UserPlaylist>
-      </div>
+    <div class="home-container-child">
+      <transition name="fade" mode="out-in">
+        <div class="playlists-title" v-if="this.user" key="myPlaylistsTitle">
+          <h3>Your Playlists</h3>
+        </div>
+      </transition>
+      <transition name="fadeLeft" mode="out-in">
+        <div class="playlists-container" v-if="this.userPlaylists" key="myPlaylistsContainer">
+          <div v-for='(item, i) in userPlaylists.items' :key='item + i'>
+            <UserPlaylist :playlistDetails="item" :userID ="user.id"></UserPlaylist>
+          </div>
+        </div>
+        <div v-else>
+          loading your playlists
+        </div>
+      </transition>
     </div>
-  </div>
 </template>
 
 <script lang="ts">
@@ -48,5 +57,10 @@ export default class MyPlaylists extends Vue {
 </script>
 
 <style scoped>
-
+  .playlists-container {
+    display: inline-flex;
+    flex-direction: column;
+    min-width: 300px;
+    padding: 1em;
+  }
 </style>

@@ -1,25 +1,37 @@
 <template>
     <div class="home-container-child">
-        <div v-if='onlineUsers && onlineUsers.size !== 0'>
-          <h3>Online Users <i>({{onlineUsers.size}})</i></h3>
-            <div class="users-container">
-              <div class="each-user" v-for='(item) in onlineUsers.values()' :key='item.user'>
-                <OnlineItem :onlineUser="item"></OnlineItem>
-                <LastPlayedItem :trackDetails="item.lastPlayed"></LastPlayedItem>
-                <UserPlaylists :userID="item.user"></UserPlaylists>
-              </div>
-            </div>
-        </div>
-        <div v-else-if="lastOnlineUsers">
+      <div class="online-users-title">
+        <transition name="fade" mode="out-in">
+          <div v-if='onlineUsers'>
+            <h3>Online Users <i>({{onlineUsers.size}})</i></h3>
+          </div>
+          <div v-else-if="lastOnlineUsers">
             <h3>Last Online Users</h3>
-            <div class="users-container">
-              <div class="each-user" v-for='(item, i) in lastOnlineUsers.values()' :key="item.user + i">
-                <LastOnlineItem :lastOnlineUser="item"></LastOnlineItem>
-                <LastPlayedItem :trackDetails="item.lastPlayed"></LastPlayedItem>
-                <UserPlaylists :userID="item.user"></UserPlaylists>
-              </div>
+          </div>
+          <div v-else>
+            <h3>Online Users <i>(?)</i></h3>
+          </div>
+        </transition>
+      </div>
+      <div class="users-container">
+        <transition name="fadeRight" mode="out-in">
+          <div v-if="onlineUsers" key="onlineUsersContainer">
+            <div class="each-user" v-for='(item) in onlineUsers.values()' :key='item.user'>
+              <OnlineItem :onlineUser="item"></OnlineItem>
+              <LastPlayedItem :trackDetails="item.lastPlayed"></LastPlayedItem>
+              <UserPlaylists :userID="item.user"></UserPlaylists>
             </div>
-        </div>
+          </div>
+          <div v-else-if="lastOnlineUsers" key="lastOnlineUsersContainer">
+            <div class="each-user" v-for='(item, i) in lastOnlineUsers.values()' :key="item.user + i">
+              <LastOnlineItem :lastOnlineUser="item"></LastOnlineItem>
+              <LastPlayedItem :trackDetails="item.lastPlayed"></LastPlayedItem>
+              <UserPlaylists :userID="item.user"></UserPlaylists>
+            </div>
+          </div>
+          <div v-else></div>
+        </transition>
+      </div>
     </div>
 </template>
 
@@ -35,6 +47,10 @@ import UserPlaylists from '@/components/UserPlaylists.vue'
   components: { LastPlayedItem, LastOnlineItem, OnlineItem, UserPlaylists }
 })
 export default class OnlineUsers extends Vue {
+  get user () {
+    return this.$store.state.user
+  }
+
   get onlineUsers () {
     return this.$store.getters.getOnlineUsers
   }
@@ -133,12 +149,9 @@ export default class OnlineUsers extends Vue {
 </script>
 
 <style scoped>
-  .home-container-child {
-    margin: 2% 3%;
-  }
-
   .users-container {
     display: inline-flex;
+    padding: 1em;
   }
 
   .each-user {
@@ -148,5 +161,6 @@ export default class OnlineUsers extends Vue {
 
   .each-user .item {
     text-align: start;
+    padding-bottom: 1em;
   }
 </style>

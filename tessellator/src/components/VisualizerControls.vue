@@ -1,5 +1,27 @@
 <template>
-  <div></div>
+  <div v-if="this.isOpen">
+    <div class="controls-container">
+      <a @click="closeVis">close visualizer</a>
+      <div>
+        Mode:
+
+        {{this.ModeKey}}
+      </div>
+      <div>
+        Colour:
+
+        {{this.ColourKey}}
+      </div>
+      <a @click="toggleRandomMode">Randomize Mode: {{this.RandomMode}}</a>
+      <a @click="toggleRandomColour">Randomize Colour: {{this.RandomColour}}</a>
+      <a @click="toggleCameraZoom" v-if="this.ModeKey > 1">Camera Zoom: {{this.CameraZoomToggle}}</a>
+      <a @click="toggleCameraRotate" v-if="this.ModeKey > 1">Camera Rotate: {{this.CameraRotateToggle}}</a>
+      <a @click="hideControls"> hide controls </a>
+    </div>
+  </div>
+  <div v-else class="hidden-controls-container">
+    <a @click="showControls"> > </a>
+  </div>
 </template>
 
 <script lang="ts">
@@ -7,11 +29,73 @@ import { Component, Vue } from 'vue-property-decorator'
 
 @Component
 export default class VisualizerControls extends Vue {
+  private isOpen: boolean;
+
+  constructor () {
+    super()
+    this.isOpen = false
+  }
+
+  get CameraZoomToggle () {
+    return this.$store.state.cameraZoomToggle
+  }
+
+  get CameraRotateToggle () {
+    return this.$store.state.cameraRotateToggle
+  }
+
+  get RandomMode () {
+    return this.$store.state.randomMode
+  }
+
+  get RandomColour () {
+    return this.$store.state.randomColour
+  }
+
+  get ModeKey () {
+    return this.$store.state.modeKey
+  }
+
+  get ColourKey () {
+    return this.$store.state.colourKey
+  }
+
+  toggleCameraZoom () {
+    this.$store.commit('mutateCameraZoomToggle', !this.CameraZoomToggle)
+  }
+
+  toggleCameraRotate () {
+    this.$store.commit('mutateCameraRotateToggle', !this.CameraRotateToggle)
+  }
+
+
+  toggleRandomMode () {
+    this.$store.commit('mutateRandomMode', !this.RandomMode)
+  }
+
+  toggleRandomColour () {
+    this.$store.commit('mutateRandomColour', !this.RandomColour)
+  }
+
+  closeVis () {
+    this.$store.commit('mutateOpenVisualizer', false)
+  }
+
+  hideControls () {
+    this.isOpen = false
+    console.log(this.isOpen)
+  }
+
+  showControls () {
+    this.isOpen = true
+    console.log(this.isOpen)
+  }
+
   mounted () {
     window.addEventListener('keypress', this.doCommand)
   }
 
-  beforeDestroy (): void {
+  beforeDestroy () {
     window.removeEventListener('keypress', this.doCommand)
   }
 
@@ -29,6 +113,8 @@ export default class VisualizerControls extends Vue {
       this.$store.commit('mutateModeKey', 3)
     } else if (parseInt(cmd) === 4) {
       this.$store.commit('mutateModeKey', 4)
+    } else if (parseInt(cmd) === 5) {
+      this.$store.commit('mutateModeKey', 5)
     } else if (cmd === 'q') {
       this.$store.commit('mutateColourKey', 1)
     } else if (cmd === 'a') {
@@ -53,5 +139,34 @@ export default class VisualizerControls extends Vue {
 </script>
 
 <style scoped>
+.controls-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 10vw;
+  height: 89%;
+  background: #292929;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  opacity: 0.6;
+  padding: 5vh 0;
+}
 
+.hidden-controls-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: #262626;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  opacity: 0.4;
+}
+
+.hidden-controls-container a {
+  font-size: 3vh;
+  padding: 0.1em;
+}
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <div v-if='lastOnlineUser'>
+  <div v-if='lastOnlineUser' class="item">
     <a v-bind:href='lastOnlineUser.spotifyLink' target='_blank' :key="calculatedTime">
       {{lastOnlineUser.user}} was last online {{calculatedTime}} mins ago
     </a>
@@ -37,5 +37,4 @@ export default class LastPlayedItem extends Vue {
 </script>
 
 <style scoped>
-
 </style>

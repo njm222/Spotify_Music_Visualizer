@@ -69,14 +69,6 @@ a:hover, a:focus {
   justify-content: space-evenly;
 }
 
-.playlists-container {
-  display: inline-flex;
-  flex-direction: column;
-  width: 30vw;
-  min-width: 300px;
-  padding: 20px 0;
-}
-
 .icon {
   margin: 0 10px;
   height: 18px;
@@ -135,5 +127,37 @@ a:hover, a:focus {
 
 .icon.shuffle.on:hover {
   background-color: #3AD36B;
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: all 1s;
+}
+
+.fade-enter, .fade-leave-to {
+  opacity: 0;
+}
+
+.fadeUp-enter-active, .fadeUp-leave-active {
+  transition: all 1s;
+}
+.fadeUp-enter, .fadeUp-leave-to {
+  opacity: 0;
+  transform: translateY(100vh);
+}
+
+.fadeLeft-enter-active, .fadeLeft-leave-active {
+  transition: all 1s;
+}
+.fadeLeft-enter, .fadeLeft-leave-to {
+  opacity: 0;
+  transform: translateX(40vw);
+}
+
+.fadeRight-enter-active, .fadeRight-leave-active {
+  transition: all 1s;
+}
+.fadeRight-enter, .fadeRight-leave-to {
+  opacity: 0;
+  transform: translateX(-40vw);
 }
 </style>

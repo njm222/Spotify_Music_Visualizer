@@ -1,14 +1,16 @@
 <template>
-  <div>
-    <div v-if="this.usersPlaylists.get(userID)" class="playlists-container">
-      <div v-for='(playlist) in this.usersPlaylists.get(userID)' :key="userID + playlist.id">
-        <UserPlaylist :playlistDetails="playlist" :userID="userID"></UserPlaylist>
+  <div class="item">
+    <transition name="fadeUp" mode="out-in">
+      <div v-if="this.usersPlaylists.get(userID)" class="playlists-container" key="close{{userID}}Playlists">
+        <div v-for='(playlist) in this.usersPlaylists.get(userID)' :key="userID + playlist.id">
+          <UserPlaylist :playlistDetails="playlist" :userID="userID"></UserPlaylist>
+        </div>
+        <button @click="hideUserPlaylists(userID)">Hide {{userID}}'s playlists</button>
       </div>
-      <button @click="hideUserPlaylists(userID)">Hide {{userID}}'s playlists</button>
-    </div>
-    <div v-else>
-      <button @click="getOnlineUserPlaylists(userID)">load {{userID}}'s playlists</button>
-    </div>
+      <div v-else key="open{{userID}}Playlists">
+        <button @click="getOnlineUserPlaylists(userID)">load {{userID}}'s playlists</button>
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -55,5 +57,8 @@ export default class UserPlaylists extends Vue {
 </script>
 
 <style scoped>
-
+  .fadeUp-enter, .fadeUp-leave-to {
+    opacity: 0;
+    transform: translateY(20vh);
+  }
 </style>

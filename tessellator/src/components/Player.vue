@@ -1,16 +1,20 @@
 <template>
-  <div class="player-container">
-    <template v-if="this.accessToken && this.playerInfo">
-      <div class="player-bar">
-        <TrackItem :trackDetails="this.playerInfo.track_window.current_track"></TrackItem>
-        <SeekTrack :playerInfo="this.playerInfo"></SeekTrack>
-        <PlayerControls></PlayerControls>
-        <div v-if="this.$store.state.openVisualizer">
-          <a @click="closeVis">close visualizer</a>
+  <transition name="fadeUp">
+    <div class="player-container" v-if="this.accessToken && this.playerInfo">
+      <div v-if="this.hidePlayerToggle" class="hidden-player-bar">
+        <a @click="showPlayer">show player</a>
+      </div>
+      <div v-else>
+        <div class="player-bar">
+          <a @click="hidePlayer">hide player</a>
+          <TrackItem :trackDetails="this.playerInfo.track_window.current_track"></TrackItem>
+          <SeekTrack :playerInfo="this.playerInfo"></SeekTrack>
+          <PlayerControls></PlayerControls>
         </div>
       </div>
-    </template>
-  </div>
+    </div>
+  </transition>
+
 </template>
 
 <script lang="ts">
@@ -26,6 +30,13 @@ import { SpotifyAnalysis } from '@/services/spotify-utils'
   components: { TrackItem, SeekTrack, PlayerControls }
 })
 export default class Player extends Vue {
+  private hidePlayerToggle: boolean;
+
+  constructor () {
+    super()
+    this.hidePlayerToggle = false
+  }
+
   get SpotifyAnalysisUtils () {
     return this.$store.state.spotifyAnalysisUtils
   }
@@ -42,8 +53,12 @@ export default class Player extends Vue {
     return this.$store.state.user
   }
 
-  closeVis () {
-    this.$store.commit('mutateOpenVisualizer', false)
+  hidePlayer () {
+    this.hidePlayerToggle = true
+  }
+
+  showPlayer () {
+    this.hidePlayerToggle = false
   }
 
   created (): void {
@@ -178,6 +193,11 @@ export default class Player extends Vue {
 </script>
 
 <style scoped>
+.fadeUp-enter, .fadeUp-leave-to {
+  opacity: 0;
+  transform: translateY(20vh);
+}
+
 .player-container {
   z-index: 1;
   display: flex;
@@ -195,5 +215,9 @@ export default class Player extends Vue {
   height: 11vh;
   justify-content: space-between;
   padding: 0 16px;
+}
+
+.hidden-player-bar {
+  opacity: 0.4;
 }
 </style>

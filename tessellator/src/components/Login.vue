@@ -1,18 +1,23 @@
 <template>
   <div>
-    <template v-if="this.user">
-      <h1>hello, {{this.user.display_name}}</h1>
-      <div>
-        <a @click="openVis">open visualizer</a>
+    <transition name="fade" mode="out-in">
+      <div v-if="this.user" key="LoginTrue">
+        <h1>hello, {{this.user.display_name}}</h1>
+        <transition name="fade" mode="out-in">
+          <div v-if="this.playerInfo" key="OpenVisualizer">
+            <a @click="openVis">open visualizer</a>
+          </div>
+          <div v-else key="LoadingVisualizer">
+            <p>loading visualizer</p>
+          </div>
+        </transition>
       </div>
-    </template>
-    <template v-else>
-      <div>
+      <div v-else key="LoginFalse">
         <h1>Welcome Home</h1>
         <a href="http://localhost:8081/login">Login</a>
         <h4>A 3D interactive music visualizer.</h4>
       </div>
-    </template>
+    </transition>
   </div>
 </template>
 
@@ -29,6 +34,10 @@ export default class Login extends Vue {
 
   get accessToken () {
     return this.$store.state.accessToken
+  }
+
+  get playerInfo () {
+    return this.$store.state.playerInfo
   }
 
   openVis () {
@@ -72,5 +81,4 @@ export default class Login extends Vue {
 </script>
 
 <style scoped>
-
 </style>

@@ -146,7 +146,7 @@ export default class SeekTrack extends Vue {
         this.$store.commit('mutateTrackPosition', this.trackPosition + delay)
       }
       this.trackTimer()
-    }, 250)
+    }, 10)
   }
 
   @Watch('trackPosition')

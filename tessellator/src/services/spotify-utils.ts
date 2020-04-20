@@ -22,9 +22,13 @@ export class SpotifyAnalysis {
   beatVariance!: number;
   tatumAv!: number;
   tatumVariance!: number;
+  changeColour: boolean
+  private changeMode: boolean;
 
   constructor () {
     this.resetTrackVariables()
+    this.changeColour = false
+    this.changeMode = false
   }
 
   /** Get Track Analysis from Spotify Api */
@@ -74,6 +78,7 @@ export class SpotifyAnalysis {
     if (this.g_sections[this.g_section]) {
       const sectionEnd = this.g_sections[this.g_section].start + this.g_sections[this.g_section].duration
       if (trackCounter > sectionEnd) {
+        this.changeMode = true
         this.g_section++
       }
     }
@@ -86,9 +91,9 @@ export class SpotifyAnalysis {
         const barConfidence = this.g_bars[this.g_bar].confidence
         this.g_bar++
         if (barConfidence > 0.5) {
+          console.log('## bar ##')
           this.barCounter++
-          // this.changeFreqKey(visualizerUtils)
-          // this.changeColourKey(visualizerUtils)
+          this.changeColour = true
         }
       }
     }
@@ -101,7 +106,7 @@ export class SpotifyAnalysis {
         const beatConfidence = this.g_beats[this.g_beat].confidence
         this.g_beat++
         if (beatConfidence > (this.beatAv + this.beatVariance)) {
-          console.log('beat')
+          console.log('## beat ##')
           this.beatCounter++
         }
       }
@@ -114,7 +119,7 @@ export class SpotifyAnalysis {
       if (trackCounter > tatumEnd) {
         const tatumConfidence = this.g_tatums[this.g_tatum].confidence
         this.g_tatum++
-        if (tatumConfidence > (this.tatumAv + this.tatumVariance)) {
+        if (tatumConfidence > (this.tatumAv - this.tatumVariance)) {
           this.tatumCounter++
         }
       }
@@ -226,20 +231,6 @@ export class SpotifyAnalysis {
   private setSegments (segments: any) {
     this.g_segments = segments
   }
-
-  /** Visualizer Helper Functions */
-
-  // private changeColourKey (visualizerUtils: any) {
-  //   if (this.g_bar % this.trackFeatures.time_signature === 0) {
-  //     visualizerUtils.colourKey = Math.floor(Math.random() * 13)
-  //     console.log('colour mode: ' + visualizerUtils.colourKey)
-  //   }
-  // }
-  //
-  // private changeFreqKey (visualizerUtils: any) {
-  //   visualizerUtils.freqKey = Math.floor(Math.random() * (11 - 2)) + 2
-  //   console.log('freq mode: ' + visualizerUtils.freqKey)
-  // }
 }
 
 export class SpotifyPlayer {

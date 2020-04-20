@@ -23,7 +23,11 @@ export default new Vuex.Store({
     toggleUsersPlaylists: new Map(),
     spotifyAnalysisUtils: null,
     modeKey: 1,
-    colourKey: null
+    colourKey: 1,
+    randomMode: false,
+    randomColour: false,
+    cameraZoomToggle: false,
+    cameraRotateToggle: false
   },
   mutations: {
     mutateAccessToken (state, payload) {
@@ -78,6 +82,18 @@ export default new Vuex.Store({
     },
     mutateColourKey (state, payload) {
       state.colourKey = payload
+    },
+    mutateRandomMode (state, payload) {
+      state.randomMode = payload
+    },
+    mutateRandomColour (state, payload) {
+      state.randomColour = payload
+    },
+    mutateCameraZoomToggle (state, payload) {
+      state.cameraZoomToggle = payload
+    },
+    mutateCameraRotateToggle (state, payload) {
+      state.cameraRotateToggle = payload
     }
   },
   getters: {
