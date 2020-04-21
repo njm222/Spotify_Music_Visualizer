@@ -10,6 +10,11 @@
           </div>
           <div v-else>
             <h3>Online Users <i>(?)</i></h3>
+            <fingerprint-spinner
+                    :animation-duration="1500"
+                    :size="64"
+                    color="#FFF"
+            ></fingerprint-spinner>
           </div>
         </transition>
       </div>
@@ -42,9 +47,10 @@ import LastPlayedItem from '@/components/LastPlayedItem.vue'
 import LastOnlineItem from '@/components/LastOnlineItem.vue'
 import OnlineItem from '@/components/OnlineItem.vue'
 import UserPlaylists from '@/components/UserPlaylists.vue'
+import { FingerprintSpinner } from 'epic-spinners'
 
 @Component({
-  components: { LastPlayedItem, LastOnlineItem, OnlineItem, UserPlaylists }
+  components: { LastPlayedItem, LastOnlineItem, OnlineItem, UserPlaylists, FingerprintSpinner }
 })
 export default class OnlineUsers extends Vue {
   get user () {

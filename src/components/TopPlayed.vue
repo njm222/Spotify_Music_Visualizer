@@ -31,9 +31,6 @@
             <TopArtist :artistDetails="item.data().artistData" :playedCount="item.data().count"></TopArtist>
           </div>
         </div>
-        <div v-else key="topArtistsCommunityLoading">
-          <p>loading ...</p>
-        </div>
       </transition>
     </div>
   </div>
