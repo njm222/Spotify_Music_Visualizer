@@ -2,10 +2,10 @@
   <div>
     <transition name="fade" mode="out-in">
       <div v-if="this.user" key="LoginTrue">
-        <h1>hello, {{this.user.display_name}}</h1>
+        <h1>hello, {{this.user.display_name}}_</h1>
         <transition name="fade" mode="out-in">
           <div v-if="this.playerInfo" key="OpenVisualizer">
-            <a @click="openVis">open visualizer</a>
+            <button class="btn secondary" @click="openVis">open visualizer</button>
           </div>
           <div v-else key="LoadingVisualizer">
             <p>loading visualizer</p>
@@ -14,7 +14,7 @@
       </div>
       <div v-else key="LoginFalse">
         <h1>Welcome Home</h1>
-        <a href="/login">Login</a>
+        <button class="btn secondary" href="/login">Login</button>
         <h4>A 3D interactive music visualizer.</h4>
       </div>
     </transition>

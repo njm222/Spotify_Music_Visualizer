@@ -1,10 +1,10 @@
 <template>
   <div>
     <div v-if="this.$data.hasLikedTrack">
-      <button @click="unlikeTrack(accessToken)">Unlike</button>
+      <i @click="unlikeTrack(accessToken)" class="icon heart on"></i>
     </div>
     <div v-else>
-      <button @click="likeTrack(accessToken)">Like</button>
+      <i @click="likeTrack(accessToken)" class="icon heart"></i>
     </div>
   </div>
 </template>
@@ -29,14 +29,17 @@ export default class SaveTrack extends Vue {
   }
 
   mounted () {
-    this.checkTrack(this.accessToken)
+    this.$nextTick(() => {
+      this.checkTrack(this.accessToken)
+    })
   }
 
   checkTrack (accessToken: string) {
-    console.log('checking track')
+    console.log(`checking track ${this.trackID}`)
     Vue.axios.get(`https://api.spotify.com/v1/me/tracks/contains?ids=${this.trackID}`, {
       headers: { Authorization: 'Bearer ' + accessToken }
     }).then((res: any) => {
+      console.log(res.data)
       this.$data.hasLikedTrack = res.data[0]
       console.log(this.$data.hasLikedTrack)
     }).catch((error) => {
@@ -50,6 +53,7 @@ export default class SaveTrack extends Vue {
       headers: { Authorization: 'Bearer ' + accessToken }
     }).then(res => {
       console.log(res)
+      this.checkTrack(this.accessToken)
     }).catch((error) => {
       console.log(error)
     })
@@ -61,6 +65,7 @@ export default class SaveTrack extends Vue {
       headers: { Authorization: 'Bearer ' + accessToken }
     }).then(res => {
       console.log(res)
+      this.checkTrack(this.accessToken)
     }).catch((error) => {
       console.log(error)
     })
@@ -76,5 +81,7 @@ export default class SaveTrack extends Vue {
 </script>
 
 <style scoped>
-
+.icon.heart.on {
+  background-color: #d31e1e;
+}
 </style>

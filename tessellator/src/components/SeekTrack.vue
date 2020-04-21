@@ -41,7 +41,6 @@ export default class SeekTrack extends Vue {
   }
 
   created () {
-    console.log('+++ created +++')
     this.$nextTick(() => {
       this.$data.sliderWidth = (this.$refs.sliderRef as HTMLElement).clientWidth
       this.$data.offset = (this.$refs.sliderRef as HTMLElement).getBoundingClientRect().left
@@ -91,7 +90,6 @@ export default class SeekTrack extends Vue {
 
   dragStart () {
     this.$data.dragging = true
-    console.log(this.$data.dragging)
   }
 
   drag (ev: any) {
@@ -169,8 +167,7 @@ export default class SeekTrack extends Vue {
 
 <style scoped>
   .now-playing-center-container {
-    width: 90%;
-    margin: 0 1em 0.5em;
+    width: 50%;
   }
 
   .now-playing-center {

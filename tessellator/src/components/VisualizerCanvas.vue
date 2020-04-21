@@ -29,9 +29,9 @@ export default class VisualizerCanvas extends Vue {
   static shapeColour: string;
   static freqKey: number;
   static spinConstants: number[];
-  private changingMode: boolean;
+  private changingMode!: boolean;
   private stats: any;
-  private animationID!: number
+  private animationID!: number;
   private rotateShapeToggle: boolean;
 
   constructor () {
@@ -47,7 +47,6 @@ export default class VisualizerCanvas extends Vue {
     VisualizerCanvas.shapeColour = '#FFF'
     VisualizerCanvas.freqKey = 4
     VisualizerCanvas.spinConstants = [0.03, 0.015, 0.075, 0.0025, 0.001]
-    this.changingMode = false
     this.rotateShapeToggle = false
   }
 
@@ -114,6 +113,7 @@ export default class VisualizerCanvas extends Vue {
   }
 
   private setupVisualizer () {
+    this.changingMode = true
     const el = this.$refs.sceneRef as Element
     this.$nextTick(() => {
       VisualizerCanvas.camera = new THREE.PerspectiveCamera(75, el.clientWidth / el.clientHeight, 0.1, 1000)
@@ -134,6 +134,8 @@ export default class VisualizerCanvas extends Vue {
 
       const afterimagePass = new AfterimagePass()
       VisualizerCanvas.composer.addPass(afterimagePass)
+
+      this.changingMode = false
       this.animate()
     })
   }

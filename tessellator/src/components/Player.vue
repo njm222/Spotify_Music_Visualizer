@@ -176,7 +176,7 @@ export default class Player extends Vue {
         console.log(response.data)
         // send firebase Data as lastPlayed under /users/{uid}
         this.sendTrackData(response.data.item)
-        // send firestore aka server
+        // send to firestore
         addTrackPlayed(response.data.item, this.$store.state.user.id)
         addArtistsPlayed(response.data.item, this.$store.state.user.id)
         // Get Audio Analysis from Spotify

@@ -64,6 +64,39 @@ a:hover, a:focus {
   text-decoration: none;
 }
 
+.btn {
+  cursor: pointer;
+  display: inline-block;
+  font-weight: 400;
+  color: #FFF;
+  text-align: center;
+  vertical-align: middle;
+  background-color: transparent;
+  border: 1px solid transparent;
+  padding: .375rem .75rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  border-radius: .25rem;
+  transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+
+.btn.primary {
+  background-color: #44644B;
+  border-color: #44644B;
+}
+
+.btn.secondary {
+  background-color: #3AD36B;
+  border-color: #3BD36B;
+}
+
+.btn.primary:hover,
+.btn.secondary:hover {
+  background-color: #0069d9;
+  border-color: #0062cc;
+  font-weight: bolder;
+}
+
 .home-container {
   display: flex;
   justify-content: space-evenly;
@@ -103,6 +136,16 @@ a:hover, a:focus {
   mask-image: url('assets/icons/rounded-pause-button.svg');
   height: 30px;
   width: 30px;
+}
+
+.icon.heart {
+  mask-image: url('assets/icons/heart.svg');
+  height: 25px;
+  width: 25px;
+}
+
+.icon.heart.on {
+  background-color: #d31e1e;
 }
 
 .icon.play:hover {

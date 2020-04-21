@@ -3,7 +3,7 @@
     <transition name="fadeRight" mode="out-in">
       <div v-if="this.isOpen" class="child" key="OpenVisualizerControls">
         <div class="controls">
-          <a @click="closeVis">close visualizer</a>
+          <button class="btn close" @click="closeVis">close visualizer</button>
           <div>
             Mode:
 
@@ -14,19 +14,19 @@
 
             <strong>{{this.ColourKey}}</strong>
           </div>
-          <a @click="toggleRandomMode" v-bind:style="{color: (this.RandomMode? '#3AD36B' : '#FFF')}">
+          <button class="btn toggle" @click="toggleRandomMode" v-bind:class="{on: this.RandomMode}">
             Randomize Mode
-          </a>
-          <a @click="toggleRandomColour" v-bind:style="{color: (this.RandomColour? '#3AD36B' : '#FFF')}">
+          </button>
+          <button class="btn toggle" @click="toggleRandomColour" v-bind:class="{on: this.RandomColour}">
             Randomize Colour
-          </a>
-          <a @click="toggleCameraZoom" v-if="this.ModeKey > 1" v-bind:style="{color: (this.CameraZoomToggle? '#3AD36B' : '#FFF')}">
+          </button>
+          <button class="btn toggle" @click="toggleCameraZoom" v-if="this.ModeKey > 1" v-bind:class="{on: this.CameraZoomToggle}">
             Camera Zoom
-          </a>
-          <a @click="toggleCameraRotate" v-if="this.ModeKey > 1" v-bind:style="{color: (this.CameraRotateToggle? '#3AD36B' : '#FFF')}">
+          </button>
+          <button class="btn toggle" @click="toggleCameraRotate" v-if="this.ModeKey > 1" v-bind:class="{on: this.CameraRotateToggle}">
             Camera Rotate
-          </a>
-          <a @click="hideControls"> hide controls </a>
+          </button>
+          <button class="btn close" @click="hideControls"> hide controls </button>
         </div>
       </div>
       <div v-else class="child closed" key="CloseVisualizerControls">
@@ -196,5 +196,24 @@ export default class VisualizerControls extends Vue {
 .hidden-controls-container a {
   font-size: 3vh;
   padding: 0.1em;
+}
+
+.btn:hover {
+  font-weight: bold;
+  color: #D31E1E;
+}
+
+.btn.toggle {
+  border-color: #FFF;
+}
+
+.btn.toggle.on {
+  border-color: transparent;
+  background: #121212;
+  color: #3AD36B;
+}
+
+.btn.close {
+  background: #121212;
 }
 </style>

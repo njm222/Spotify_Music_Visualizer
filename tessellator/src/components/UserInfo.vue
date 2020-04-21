@@ -9,7 +9,7 @@
       </p>
       <p>Number of followers: {{ this.user.followers.total }}</p>
       <p>
-        <button v-on:click="logOut()" class="btn btn-primary">Log out</button>
+        <button v-on:click="logOut()" class="btn secondary">Log out</button>
       </p>
     </template>
   </div>
