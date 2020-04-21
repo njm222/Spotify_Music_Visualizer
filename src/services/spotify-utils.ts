@@ -1,6 +1,7 @@
 import Axios from 'axios'
 
 export class SpotifyAnalysis {
+  loaded: boolean
   trackFeatures!: SpotifyApi.AudioFeaturesResponse;
   trackAnalysis!: SpotifyApi.AudioAnalysisResponse;
   g_section!: number;
@@ -29,11 +30,13 @@ export class SpotifyAnalysis {
     this.resetTrackVariables()
     this.changeColour = false
     this.changeMode = false
+    this.loaded = false
   }
 
   /** Get Track Analysis from Spotify Api */
 
   getTrackFeaturesAnalysis (accessToken: string, trackID: string) {
+    this.loaded = false
     this.getTrackAnalysis(accessToken, trackID)
     this.getTrackFeatures(accessToken, trackID)
   }
@@ -147,6 +150,7 @@ export class SpotifyAnalysis {
     this.setTatums(trackData.tatums)
     this.setSegments(trackData.segments)
     this.calculateTrackDeviation()
+    this.loaded = true
   }
 
   private calculateBeatDeviation () {

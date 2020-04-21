@@ -4,7 +4,7 @@
       <div v-if="this.user" key="LoginTrue">
         <h1>hello, {{this.user.display_name}}_</h1>
         <transition name="fade" mode="out-in">
-          <div v-if="this.playerInfo" key="OpenVisualizer">
+          <div v-if="this.SpotifyAnalysisUtils && this.SpotifyAnalysisUtils.loaded" key="OpenVisualizer">
             <button class="btn secondary" @click="openVis">open visualizer</button>
           </div>
           <div v-else key="LoadingVisualizer">
@@ -38,6 +38,10 @@ export default class Login extends Vue {
 
   get playerInfo () {
     return this.$store.state.playerInfo
+  }
+
+  get SpotifyAnalysisUtils () {
+    return this.$store.state.spotifyAnalysisUtils
   }
 
   openVis () {

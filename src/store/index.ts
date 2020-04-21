@@ -24,10 +24,10 @@ export default new Vuex.Store({
     spotifyAnalysisUtils: null,
     modeKey: 1,
     colourKey: 1,
-    randomMode: false,
-    randomColour: false,
-    cameraZoomToggle: false,
-    cameraRotateToggle: false
+    randomMode: true,
+    randomColour: true,
+    cameraZoomToggle: true,
+    cameraRotateToggle: true
   },
   mutations: {
     mutateAccessToken (state, payload) {

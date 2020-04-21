@@ -174,17 +174,17 @@ export default class Player extends Vue {
       if (response.data) {
         console.log('has new track DATA')
         console.log(response.data)
-        // send firebase Data as lastPlayed under /users/{uid}
-        this.sendTrackData(response.data.item)
-        // send to firestore
-        addTrackPlayed(response.data.item, this.$store.state.user.id)
-        addArtistsPlayed(response.data.item, this.$store.state.user.id)
         // Get Audio Analysis from Spotify
         if (this.SpotifyAnalysisUtils) {
           this.SpotifyAnalysisUtils.getTrackFeaturesAnalysis(this.accessToken, this.$store.state.playerInfo.track_window.current_track.id)
         } else {
           console.log('SpotifyAnalysisUtils doesnt exist')
         }
+        // send firebase Data as lastPlayed under /users/{uid}
+        this.sendTrackData(response.data.item)
+        // send to firestore
+        addTrackPlayed(response.data.item, this.$store.state.user.id)
+        addArtistsPlayed(response.data.item, this.$store.state.user.id)
       }
     }).catch(error => {
       console.log(error)

@@ -10,7 +10,6 @@ import { Component, Vue, Watch } from 'vue-property-decorator'
 import LiveAudio from '@/services/liveAudio-utils'
 import * as THREE from 'three'
 import SimplexNoise from 'simplex-noise'
-import Stats from 'three/examples/jsm/libs/stats.module'
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer'
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass'
 import { AfterimagePass } from 'three/examples/jsm/postprocessing/AfterimagePass'
@@ -30,7 +29,6 @@ export default class VisualizerCanvas extends Vue {
   static freqKey: number;
   static spinConstants: number[];
   private changingMode!: boolean;
-  private stats: any;
   private animationID!: number;
   private rotateShapeToggle: boolean;
 
@@ -103,8 +101,8 @@ export default class VisualizerCanvas extends Vue {
       page_location: '/visualizer'
     })
     // stats
-    this.stats = new (Stats as any)()
-    document.body.appendChild(this.stats.dom)
+    // this.stats = new (Stats as any)()
+    // document.body.appendChild(this.stats.dom)
   }
 
   beforeDestroy () {
@@ -121,7 +119,6 @@ export default class VisualizerCanvas extends Vue {
       VisualizerCanvas.camera.aspect = el.clientWidth / el.clientHeight
       console.log(el.children)
       el.appendChild(VisualizerCanvas.renderer.domElement)
-
       this.canvasResizeListener(el)
 
       this.addLighting()
@@ -131,7 +128,6 @@ export default class VisualizerCanvas extends Vue {
       // postprocessing
       VisualizerCanvas.composer = new EffectComposer(VisualizerCanvas.renderer)
       VisualizerCanvas.composer.addPass(new RenderPass(VisualizerCanvas.scene, VisualizerCanvas.camera))
-
       const afterimagePass = new AfterimagePass()
       VisualizerCanvas.composer.addPass(afterimagePass)
 
@@ -147,8 +143,7 @@ export default class VisualizerCanvas extends Vue {
   }
 
   private renderer () {
-    this.stats.begin()
-    if (this.SpotifyAnalysisUtils.trackAnalysis && this.SpotifyAnalysisUtils.trackFeatures) {
+    if (this.SpotifyAnalysisUtils.loaded) {
       // Live Audio
       VisualizerCanvas.liveAudio.getData()
 
@@ -193,7 +188,6 @@ export default class VisualizerCanvas extends Vue {
       (VisualizerCanvas.composer.passes[1] as any).uniforms.damp.value = Math.min(0.82, VisualizerCanvas.liveAudio.bassObject.bassEnergy / 255)
       VisualizerCanvas.composer.render()
     }
-    this.stats.end()
   }
 
   private mode4 (SpotifyAnalysisUtils: any) {
@@ -677,7 +671,7 @@ export default class VisualizerCanvas extends Vue {
 
   private changeModeKey () {
     if (this.SpotifyAnalysisUtils.changeMode) {
-      const newModeKey = Math.floor(1 + Math.random() * 4)
+      const newModeKey = Math.floor(1 + Math.random() * 5)
       this.$store.commit('mutateModeKey', newModeKey)
       this.SpotifyAnalysisUtils.changeMode = false
       console.log(`changing mode key to ${newModeKey}`)
