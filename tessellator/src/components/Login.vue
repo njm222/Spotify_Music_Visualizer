@@ -14,7 +14,7 @@
       </div>
       <div v-else key="LoginFalse">
         <h1>Welcome Home</h1>
-        <a href="http://localhost:8081/login">Login</a>
+        <a href="/login">Login</a>
         <h4>A 3D interactive music visualizer.</h4>
       </div>
     </transition>
@@ -63,7 +63,7 @@ export default class Login extends Vue {
   }
 
   private refreshAccessToken () {
-    Vue.axios.post('http://localhost:8081/refreshToken', {
+    Vue.axios.post('/refreshToken', {
       refreshToken: this.$store.state.refreshToken
     }).then((response) => {
       setCookie('accessToken', response.data.access_token)
@@ -72,11 +72,11 @@ export default class Login extends Vue {
   }
 
   updateGtagUserID (name: string) {
-    this.$gtag.set({user_id: name})
+    this.$gtag.set({ user_id: name })
     this.$gtag.pageview({
-      page_title: 'Login'
+      page_title: 'Login',
       page_path: '/login',
-      page_location: 'http://localhost:8080/login'
+      page_location: '/login'
     })
   }
 

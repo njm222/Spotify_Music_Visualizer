@@ -1,25 +1,31 @@
 const express = require('express');
+const path = require('path')
 const request = require('request'); // "Request" library
 const cors = require('cors');
+const dotenv = require('dotenv');
 const querystring = require('query-string');
 const fbAdmin = require('firebase-admin');
 const FieldValue = fbAdmin.firestore.FieldValue;
 const app = express();
-app.use(express.static(__dirname + '/public'))
-  .use(cors("http://localhost:8080"));
+
+app.use(express.static(__dirname + '/dist'))
+  .use(cors());
 app.use(express.json());
+dotenv.config();
 
 const client_id = '95d690a7b1ce48da9ba8fe7042a953d3';
 const client_secret = '9bcb3d57b4294fa987b40fc9461deb9a';
+const server_port = process.env.PORT || 8081;
 const redirect_uri = 'http://localhost:8081/callback';
-const server_address = 'http://localhost:8081'; // by default it should be http://localhost:8080 or 8081 by default
-const server_port = '8081';
-const frontend_server = 'http://localhost:8080'; // your Vue server port (8080 or 8081 by default)
 const scope = 'user-read-private user-read-email user-read-birthdate user-top-read user-read-recently-played user-modify-playback-state user-read-playback-state user-read-currently-playing streaming user-library-modify user-library-read';
 
-app.listen(server_port, () =>{
+app.listen(server_port, () => {
   console.log("Server is listening on port: " + server_port);
 });
+
+app.get('/', function (req, res) {
+  res.sendFile(path.join(__dirname, '/dist/index.html'))
+})
 
 app.get('/login', function (req, res) {
   // redirect to Spotify login page
@@ -55,9 +61,9 @@ app.get('/callback' , function (req, res) {
       const refresh_token = body.refresh_token;
       res.cookie('accessToken', access_token);
       res.cookie('refreshToken', refresh_token);
-      res.redirect(frontend_server);
+      res.redirect('/');
     } else {
-      res.redirect(server_address +
+      res.redirect('/' +
         querystring.stringify({
           error: 'invalid_token'
         }));
@@ -89,17 +95,18 @@ app.post('/refreshToken', function (req, res) {
 
 /** Firebase */
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBARk3BcjSSYFGe3LkDQAu1H-6VMxrolNM",
-  authDomain: "tessellator-space.firebaseapp.com",
-  databaseURL: "https://tessellator-space.firebaseio.com",
-  projectId: "tessellator-space",
-  storageBucket: "tessellator-space.appspot.com",
-  messagingSenderId: "1095910844942",
-  appId: "1:1095910844942:web:1a329d270ba9ed1c05aa5f"
+const serviceAccount = {
+  "type": process.env.Type,
+  "project_id": process.env.Project_id,
+  "private_key_id": process.env.Private_key_id,
+  "private_key": process.env.Private_key.replace(/\\n/g, '\n'),
+  "client_email": process.env.Client_email,
+  "client_id": process.env.Client_id,
+  "auth_uri": process.env.Auth_uri,
+  "token_uri": process.env.Token_uri,
+  "auth_provider_x509_cert_url": process.env.Auth_provider_x509_cert_url,
+  "client_x509_cert_url": process.env.Client_x509_cert_url,
 };
-
-const serviceAccount = require("./keys/serviceAccountKey.json");
 
 fbAdmin.initializeApp({
   credential: fbAdmin.credential.cert(serviceAccount),
@@ -123,7 +130,7 @@ app.post('/addUser', function (req, res) {
   fbAdmin.firestore().collection('users').doc(userData.id).set({
     userData: userData
   }, { merge: true }).then(ref => {
-    console.log('Added document with ID: ', ref)
+    // console.log('Added document with ID: ', ref)
   }).catch((error) => {
     console.log(error)
   })

@@ -13,8 +13,7 @@ Vue.use(VueGtag, {
   }
 }, router)
 
-Vue.config.productionTip = false
-axios.defaults.baseURL = 'http://localhost:8081'
+Vue.config.productionTip = process.env.NODE_ENV
 
 new Vue({
   router,

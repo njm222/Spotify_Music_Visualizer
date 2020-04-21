@@ -3,13 +3,13 @@ import Axios from 'axios'
 import firebase from 'firebase'
 
 const firebaseConfig = {
-  apiKey: 'AIzaSyBARk3BcjSSYFGe3LkDQAu1H-6VMxrolNM',
-  authDomain: 'tessellator-space.firebaseapp.com',
-  databaseURL: 'https://tessellator-space.firebaseio.com',
-  projectId: 'tessellator-space',
-  storageBucket: 'tessellator-space.appspot.com',
-  messagingSenderId: '1095910844942',
-  appId: '1:1095910844942:web:1a329d270ba9ed1c05aa5f'
+  apiKey: process.env.VUE_APP_ApiKey,
+  authDomain: process.env.VUE_APP_AuthDomain,
+  databaseURL: process.env.VUE_APP_DatabaseURL,
+  projectId: process.env.VUE_APP_ProjectId,
+  storageBucket: process.env.VUE_APP_StorageBucket,
+  messagingSenderId: process.env.VUE_APP_MessagingSenderId,
+  appId: process.env.VUE_APP_AppId
 }
 
 firebase.initializeApp(firebaseConfig)
@@ -49,7 +49,7 @@ function handleUserPresense (auth: any, spotifyUrl: string) {
 
 export function authUser (userData: SpotifyApi.UserProfileResponse): Promise<boolean> {
   return new Promise((resolve, reject) => {
-    Axios.post('http://localhost:8081/authUser', userData).then((res) => {
+    Axios.post('/authUser', userData).then((res) => {
       console.log(`Sent user id: ${userData.id} to server`)
       firebase.auth().signInWithCustomToken(res.data).then((res) => {
         handleUserPresense(res, userData.external_urls.spotify)
@@ -62,7 +62,7 @@ export function authUser (userData: SpotifyApi.UserProfileResponse): Promise<boo
 }
 
 export function addUser (UserData: SpotifyApi.UserProfileResponse) {
-  Axios.post('http://localhost:8081/addUser', {
+  Axios.post('/addUser', {
     userData: UserData
   }).then((res) => {
     console.log(res)
@@ -72,7 +72,7 @@ export function addUser (UserData: SpotifyApi.UserProfileResponse) {
 }
 
 export function addTrackPlayed (trackData: SpotifyApi.TrackObjectFull, userID: string) {
-  Axios.post('http://localhost:8081/addTrackPlayed', {
+  Axios.post('/addTrackPlayed', {
     trackData: trackData,
     userID: userID
   }).then((res) => {
@@ -83,7 +83,7 @@ export function addTrackPlayed (trackData: SpotifyApi.TrackObjectFull, userID: s
 }
 
 export function addArtistsPlayed (trackData: SpotifyApi.TrackObjectFull, userID: string) {
-  Axios.post('http://localhost:8081/addArtistsPlayed', {
+  Axios.post('/addArtistsPlayed', {
     artistsData: trackData.artists,
     userID: userID
   }).then((res) => {

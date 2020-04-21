@@ -2,14 +2,13 @@
   <div class="home">
     <Player v-if="this.$store.state.authUser"></Player>
     <div v-if="!this.$store.state.openVisualizer">
-      <img alt="Vue logo" src="../assets/logo.png">
       <Login :key="this.$store.state.accessToken"/>
-      <!--<div v-if="this.$store.state.playerInfo">-->
-        <!--<transition-group class="home-container" name="fade">-->
-          <!--<OnlineUsers v-if="this.$store.state.user" :key="this.$store.state.authUser"/>-->
-          <!--<MyPlaylists v-if="this.$store.state.authUser" key="myPlaylistsContainer"/>-->
-        <!--</transition-group>-->
-      <!--</div>-->
+      <div v-if="this.$store.state.playerInfo">
+        <transition-group class="home-container" name="fade">
+          <OnlineUsers v-if="this.$store.state.user" :key="this.$store.state.authUser"/>
+          <MyPlaylists v-if="this.$store.state.authUser" key="myPlaylistsContainer"/>
+        </transition-group>
+      </div>
     </div>
     <div v-else>
       <div v-if="this.$store.state.openVisualizer">

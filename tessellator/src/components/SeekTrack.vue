@@ -28,7 +28,7 @@ export default class SeekTrack extends Vue {
   @Prop({ required: true })
   playerInfo!: Spotify.PlaybackState
 
-  private timerRef!: number;
+  private timerRef!: any;
 
   data () {
     return {

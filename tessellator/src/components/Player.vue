@@ -135,7 +135,7 @@ export default class Player extends Vue {
   }
 
   private refreshAccessToken () {
-    Vue.axios.post('http://localhost:8081/refreshToken', {
+    Vue.axios.post('/refreshToken', {
       refreshToken: this.$store.state.refreshToken
     }).then(response => {
       setCookie('accessToken', response.data.access_token)

@@ -22,7 +22,7 @@ export default class VisualizerCanvas extends Vue {
   static scene: THREE.Scene;
   static camera: THREE.PerspectiveCamera;
   static renderer: THREE.WebGLRenderer;
-  static composer: THREE.Comp
+  static composer: EffectComposer
   static shapeArr: THREE.Mesh[];
   static shapeMax: number;
   static layerMarker: number[];
@@ -99,9 +99,9 @@ export default class VisualizerCanvas extends Vue {
     this.$store.commit('mutateModeKey', 1)
     this.$store.commit('mutateColourKey', 1)
     this.$gtag.pageview({
-      page_title: 'Visualizer'
+      page_title: 'Visualizer',
       page_path: '/visualizer',
-      page_location: 'http://localhost:8080/visualizer'
+      page_location: '/visualizer'
     })
     // stats
     this.stats = new (Stats as any)()
@@ -129,12 +129,11 @@ export default class VisualizerCanvas extends Vue {
       VisualizerCanvas.camera.position.z = 90
 
       // postprocessing
+      VisualizerCanvas.composer = new EffectComposer(VisualizerCanvas.renderer)
+      VisualizerCanvas.composer.addPass(new RenderPass(VisualizerCanvas.scene, VisualizerCanvas.camera))
 
-      VisualizerCanvas.composer = new EffectComposer( VisualizerCanvas.renderer );
-      VisualizerCanvas.composer.addPass( new RenderPass( VisualizerCanvas.scene, VisualizerCanvas.camera ) );
-
-      const afterimagePass = new AfterimagePass();
-      VisualizerCanvas.composer.addPass( afterimagePass );
+      const afterimagePass = new AfterimagePass()
+      VisualizerCanvas.composer.addPass(afterimagePass)
       this.animate()
     })
   }
@@ -186,11 +185,11 @@ export default class VisualizerCanvas extends Vue {
 
     VisualizerCanvas.camera.updateProjectionMatrix()
     if (this.ModeKey > 2) {
-      VisualizerCanvas.composer.passes[1].uniforms["damp"].value = Math.min(0.92, VisualizerCanvas.liveAudio.kickObject.kickEnergy / 255)
+      (VisualizerCanvas.composer.passes[1] as any).uniforms.damp.value = Math.min(0.92, VisualizerCanvas.liveAudio.kickObject.kickEnergy / 255)
       VisualizerCanvas.composer.render()
     } else {
+      (VisualizerCanvas.composer.passes[1] as any).uniforms.damp.value = Math.min(0.82, VisualizerCanvas.liveAudio.bassObject.bassEnergy / 255)
       VisualizerCanvas.composer.render()
-      VisualizerCanvas.composer.passes[1].uniforms["damp"].value = Math.min(0.82, VisualizerCanvas.liveAudio.bassObject.bassEnergy / 255)
     }
     this.stats.end()
   }
@@ -247,7 +246,7 @@ export default class VisualizerCanvas extends Vue {
     } else if (SpotifyAnalysisUtils.trackFeatures.valence > 0.4) {
       noiseFreq = (VisualizerCanvas.liveAudio.bassObject.bassAv + VisualizerCanvas.liveAudio.kickObject.kickAv - VisualizerCanvas.liveAudio.midsObject.midsAv) / SpotifyAnalysisUtils.trackFeatures.energy
     } else if (this.SpotifyAnalysisUtils.trackFeatures.valence > 0.1) {
-      noiseFreq = (VisualizerCanvas.liveAudio.bassObject.bassAv + VisualizerCanvas.liveAudio.kickObject.kickAv  - VisualizerCanvas.liveAudio.highsObject.highsEnergy) / SpotifyAnalysisUtils.trackFeatures.danceability
+      noiseFreq = (VisualizerCanvas.liveAudio.bassObject.bassAv + VisualizerCanvas.liveAudio.kickObject.kickAv - VisualizerCanvas.liveAudio.highsObject.highsEnergy) / SpotifyAnalysisUtils.trackFeatures.danceability
     } else {
       noiseFreq = ((VisualizerCanvas.liveAudio.bassObject.bassAv + VisualizerCanvas.liveAudio.kickObject.kickAv - VisualizerCanvas.liveAudio.midsObject.midsAv - VisualizerCanvas.liveAudio.highsObject.highsEnergy) / SpotifyAnalysisUtils.trackFeatures.energy)
     }
@@ -255,7 +254,7 @@ export default class VisualizerCanvas extends Vue {
     console.log(SpotifyAnalysisUtils.trackFeatures.valence)
     console.log(noiseFreq)
 
-    const zHeight = (SpotifyAnalysisUtils.trackFeatures.energy * SpotifyAnalysisUtils.trackFeatures.danceability * (VisualizerCanvas.liveAudio.rms + VisualizerCanvas.liveAudio.highsObject.highsEnergy)) * (1.5 - SpotifyAnalysisUtils.trackFeatures.valence
+    const zHeight = (SpotifyAnalysisUtils.trackFeatures.energy * SpotifyAnalysisUtils.trackFeatures.danceability * (VisualizerCanvas.liveAudio.rms + VisualizerCanvas.liveAudio.highsObject.highsEnergy)) * (1.5 - SpotifyAnalysisUtils.trackFeatures.valence)
     const speed = (Date.now() + VisualizerCanvas.liveAudio.bassObject.bassEnergy + VisualizerCanvas.liveAudio.kickObject.kickEnergy) / (SpotifyAnalysisUtils.trackFeatures.tempo * SpotifyAnalysisUtils.trackFeatures.danceability * SpotifyAnalysisUtils.trackFeatures.energy * 100)
 
     const shapeGeo = VisualizerCanvas.shapeArr[0].geometry as THREE.BufferGeometry
@@ -292,7 +291,7 @@ export default class VisualizerCanvas extends Vue {
     this.removeShape()
     this.addGenerativeSphere(SpotifyAnalysisUtils, isWireframe)
     // this.modifyGenerativeSphere(VisualizerCanvas.shapeArr[0])
-    if(SpotifyAnalysisUtils.barCounter >= 1) {
+    if (SpotifyAnalysisUtils.barCounter >= 1) {
       const shapeMaterial = VisualizerCanvas.shapeArr[0].material as THREE.MeshPhongMaterial
       shapeMaterial.wireframe = !shapeMaterial.wireframe
       shapeMaterial.flatShading = !shapeMaterial.wireframe
@@ -342,7 +341,7 @@ export default class VisualizerCanvas extends Vue {
 
     if (this.ModeKey > 1 && zoomVal > 0.8) {
       if (beatConfidence > 0.9) {
-        if (this.SpotifyAnalysisUtils.g_bar % 2 == 0) {
+        if (this.SpotifyAnalysisUtils.g_bar % 2 === 0) {
           VisualizerCanvas.camera.zoom = zoomVal * (1 - (this.TrackTime / 1000 - beatEnd))
         } else {
           VisualizerCanvas.camera.zoom = zoomVal * (this.TrackTime / 1000 - beatEnd)
@@ -353,7 +352,6 @@ export default class VisualizerCanvas extends Vue {
     } else {
       VisualizerCanvas.camera.zoom = 0.8
     }
-
   }
 
   rotateCamera () {
@@ -380,7 +378,6 @@ export default class VisualizerCanvas extends Vue {
     // console.log(rotationX)
     // console.log(rotationY)
     // console.log(rotationZ)
-
   }
 
   rotateShape (shape: THREE.Mesh) {
@@ -524,11 +521,11 @@ export default class VisualizerCanvas extends Vue {
 
   private addGenerativeSphere (SpotifyAnalysisUtils: any, isWireframe: boolean) {
     let segments = 1
-    const chords = SpotifyAnalysisUtils.g_pitches.filter(pitch => pitch > 0.5)
+    const chords: number[] = SpotifyAnalysisUtils.g_pitches.filter((pitch: number) => pitch > 0.5)
     if (chords.length > 0) {
-     segments = chords.reduce((sum, currVal) => sum + currVal)
+      segments = chords.reduce((sum, currVal) => sum + currVal)
     }
-    VisualizerCanvas.shapeArr.push(new THREE.Mesh(new THREE.SphereBufferGeometry(50, Math.ceil(segments * 3), Math.ceil(segments * 3), 0, Math.PI * 2, Math.sin(SpotifyAnalysisUtils.trackFeatures.tempo * this.TrackTime / 1000000) * Math.PI * 2, (VisualizerCanvas.liveAudio.rms / 255) * 6), new THREE.MeshPhongMaterial({wireframe: isWireframe, flatShading: !isWireframe})));
+    VisualizerCanvas.shapeArr.push(new THREE.Mesh(new THREE.SphereBufferGeometry(50, Math.ceil(segments * 3), Math.ceil(segments * 3), 0, Math.PI * 2, Math.sin(SpotifyAnalysisUtils.trackFeatures.tempo * this.TrackTime / 1000000) * Math.PI * 2, (VisualizerCanvas.liveAudio.rms / 255) * 6), new THREE.MeshPhongMaterial({ wireframe: isWireframe, flatShading: !isWireframe })))
     VisualizerCanvas.shapeArr[0].rotation.set(Math.PI / 2, 0, 0)
     VisualizerCanvas.scene.add(VisualizerCanvas.shapeArr[0])
     console.log((VisualizerCanvas.shapeArr[0].geometry as THREE.SphereBufferGeometry).parameters.thetaStart)
@@ -667,7 +664,7 @@ export default class VisualizerCanvas extends Vue {
     }
   }
 
-  private changeColourKey() {
+  private changeColourKey () {
     if (this.SpotifyAnalysisUtils.changeColour) {
       const newColourKey = Math.floor(Math.random() * 9)
       this.$store.commit('mutateColourKey', newColourKey)
@@ -676,13 +673,13 @@ export default class VisualizerCanvas extends Vue {
     }
   }
 
-  private changeModeKey() {
-   if (this.SpotifyAnalysisUtils.changeMode) {
-     const newModeKey = Math.floor(1 + Math.random() * 4)
-     this.$store.commit('mutateModeKey', newModeKey)
-     this.SpotifyAnalysisUtils.changeMode = false
-     console.log(`changing mode key to ${newModeKey}`)
-   }
+  private changeModeKey () {
+    if (this.SpotifyAnalysisUtils.changeMode) {
+      const newModeKey = Math.floor(1 + Math.random() * 4)
+      this.$store.commit('mutateModeKey', newModeKey)
+      this.SpotifyAnalysisUtils.changeMode = false
+      console.log(`changing mode key to ${newModeKey}`)
+    }
   }
 }
 </script>

@@ -82,7 +82,6 @@ export default class VisualizerControls extends Vue {
     this.$store.commit('mutateCameraRotateToggle', !this.CameraRotateToggle)
   }
 
-
   toggleRandomMode () {
     this.$store.commit('mutateRandomMode', !this.RandomMode)
   }
