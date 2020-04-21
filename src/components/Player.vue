@@ -201,13 +201,17 @@ export default class Player extends Vue {
 </script>
 
 <style scoped>
+.fadeUp-enter-active, .fadeUp-leave-active {
+  transition: all 0.5s ease-in-out;
+}
+
 .fadeUp-enter, .fadeUp-leave-to {
   opacity: 0;
-  transform: translateY(20vh);
+  transform: translateY(10vh);
 }
 
 .fadeDown-enter-active, .fadeDown-leave-active {
-  transition: all 0.5s;
+  transition: all 0.5s ease-in-out;
 }
 
 .fadeDown-enter, .fadeDown-leave-to {

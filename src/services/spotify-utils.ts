@@ -1,4 +1,5 @@
 import Axios from 'axios'
+import router from '@/router'
 
 export class SpotifyAnalysis {
   loaded: boolean
@@ -36,7 +37,6 @@ export class SpotifyAnalysis {
   /** Get Track Analysis from Spotify Api */
 
   getTrackFeaturesAnalysis (accessToken: string, trackID: string) {
-    this.loaded = false
     this.getTrackAnalysis(accessToken, trackID)
     this.getTrackFeatures(accessToken, trackID)
   }
@@ -49,7 +49,11 @@ export class SpotifyAnalysis {
       this.trackFeatures = res.data
     }).catch((error) => {
       console.log(error)
-      this.getTrackFeatures(accessToken, trackID)
+      if (error.code === 401) {
+        router.push({ name: 'Home' })
+      } else {
+        this.getTrackFeatures(accessToken, trackID)
+      }
     })
   }
 
@@ -62,7 +66,11 @@ export class SpotifyAnalysis {
       this.setTrackAnalysisParts(res.data)
     }).catch((error) => {
       console.log(error)
-      this.getTrackAnalysis(accessToken, trackID)
+      if (error.code === 401) {
+        router.push({ name: 'Home' })
+      } else {
+        this.getTrackAnalysis(accessToken, trackID)
+      }
     })
   }
 

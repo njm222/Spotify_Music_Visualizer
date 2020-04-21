@@ -11,6 +11,8 @@
 </template>
 
 <style>
+@import url('https://fonts.googleapis.com/css?family=Tomorrow&display=swap');
+
 html {
   min-height: 100vh;
 }
@@ -99,7 +101,7 @@ a:hover, a:focus {
 
 .home-container {
   display: flex;
-  justify-content: space-evenly;
+  justify-content: space-around;
 }
 
 .icon {
@@ -173,7 +175,7 @@ a:hover, a:focus {
 }
 
 .fade-enter-active, .fade-leave-active {
-  transition: all 1s;
+  transition: all 1s ease-in-out;
 }
 
 .fade-enter, .fade-leave-to {
@@ -181,7 +183,7 @@ a:hover, a:focus {
 }
 
 .fadeUp-enter-active, .fadeUp-leave-active {
-  transition: all 1s;
+  transition: all 1s ease-in-out;
 }
 .fadeUp-enter, .fadeUp-leave-to {
   opacity: 0;
@@ -189,7 +191,7 @@ a:hover, a:focus {
 }
 
 .fadeLeft-enter-active, .fadeLeft-leave-active {
-  transition: all 1s;
+  transition: all 1s ease-in-out;
 }
 .fadeLeft-enter, .fadeLeft-leave-to {
   opacity: 0;
@@ -197,7 +199,7 @@ a:hover, a:focus {
 }
 
 .fadeRight-enter-active, .fadeRight-leave-active {
-  transition: all 1s;
+  transition: all 1s ease-in-out;
 }
 .fadeRight-enter, .fadeRight-leave-to {
   opacity: 0;

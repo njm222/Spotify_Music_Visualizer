@@ -247,11 +247,8 @@ export default class VisualizerCanvas extends Vue {
       noiseFreq = ((VisualizerCanvas.liveAudio.bassObject.bassAv + VisualizerCanvas.liveAudio.kickObject.kickAv - VisualizerCanvas.liveAudio.midsObject.midsAv - VisualizerCanvas.liveAudio.highsObject.highsEnergy) / SpotifyAnalysisUtils.trackFeatures.energy)
     }
 
-    console.log(SpotifyAnalysisUtils.trackFeatures.valence)
-    console.log(noiseFreq)
-
     const zHeight = (SpotifyAnalysisUtils.trackFeatures.energy * SpotifyAnalysisUtils.trackFeatures.danceability * (VisualizerCanvas.liveAudio.rms + VisualizerCanvas.liveAudio.highsObject.highsEnergy)) * (1.5 - SpotifyAnalysisUtils.trackFeatures.valence)
-    const speed = (Date.now() + VisualizerCanvas.liveAudio.bassObject.bassEnergy + VisualizerCanvas.liveAudio.kickObject.kickEnergy) / (SpotifyAnalysisUtils.trackFeatures.tempo * SpotifyAnalysisUtils.trackFeatures.danceability * SpotifyAnalysisUtils.trackFeatures.energy * 100)
+    const speed = (Date.now() + VisualizerCanvas.liveAudio.bassObject.bassEnergy + VisualizerCanvas.liveAudio.kickObject.kickEnergy) / (SpotifyAnalysisUtils.trackFeatures.tempo * SpotifyAnalysisUtils.trackFeatures.danceability * SpotifyAnalysisUtils.trackFeatures.energy * 20)
 
     const shapeGeo = VisualizerCanvas.shapeArr[0].geometry as THREE.BufferGeometry
     const position = shapeGeo.getAttribute('position') as THREE.BufferAttribute

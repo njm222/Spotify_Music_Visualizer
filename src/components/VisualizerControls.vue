@@ -153,7 +153,7 @@ export default class VisualizerControls extends Vue {
 
 <style scoped>
 .fadeRight-enter-active, .fadeRight-leave-active {
-  transition: all 0.5s;
+  transition: all 0.5s ease-in-out;
 }
 .fadeRight-enter, .fadeRight-leave-to {
   opacity: 0;

@@ -1,7 +1,18 @@
 <template>
   <div class="outer-container">
-    <div class="container">
-      <h2>Top Tracks Played</h2>
+    <div class="tabs">
+      <div class="tab" v-bind:class="{off: !toggleTracks}" key="topTracksTitle">
+        <button class="btn" @click="setToggle(toggleTracks)">
+        <h2>Top Tracks Played</h2>
+        </button>
+      </div>
+      <div class="tab" v-bind:class="{off: toggleTracks}" key="topTracksTitle">
+        <button class="btn" @click="setToggle(toggleTracks)">
+          <h2>Top Artists Played</h2>
+        </button>
+      </div>
+    </div>
+    <div v-if="toggleTracks" class="container">
       <transition name="fadeUp" mode="out-in">
         <div v-if="this.topTracks" key="topTracksCommunity">
           <div v-for='(item, i) in topTracks' :key='item + i' class="item">
@@ -13,9 +24,8 @@
         </div>
       </transition>
     </div>
-    <div class="container">
-      <h2>Top Artists Played</h2>
-      <transition name="fadeUp">
+    <div v-else class="container">
+      <transition name="fadeUp" mode="out-in">
         <div v-if="this.topArtists" key="topArtistsCommunity">
           <div v-for='(item, i) in topArtists' :key='item + i' class="item">
             <TopArtist :artistDetails="item.data().artistData" :playedCount="item.data().count"></TopArtist>
@@ -39,6 +49,8 @@ import { firebaseRef } from '@/services/firebase-utils'
   components: { TopTrack, TopArtist }
 })
 export default class TopPlayed extends Vue {
+  private toggleTracks: boolean
+
   get topTracks () {
     return this.$store.state.topTracks
   }
@@ -47,11 +59,16 @@ export default class TopPlayed extends Vue {
     return this.$store.state.topArtists
   }
 
+  setToggle (toggle: boolean) {
+    this.toggleTracks = !toggle
+  }
+
   constructor () {
     super()
     console.log('loaded top tracks')
     this.loadTopTracks()
     this.loadTopArtists()
+    this.toggleTracks = true
   }
 
   private loadTopTracks () {
@@ -81,28 +98,47 @@ export default class TopPlayed extends Vue {
 </script>
 
 <style scoped>
-  .fadeUp-enter-active, .fadeUp-leave-active {
-    transition: all 1s;
-  }
-  .fadeUp-enter, .fadeUp-leave-to {
-    opacity: 0;
-    transform: translateY(100vh);
-  }
-  .outer-container {
-    display: flex;
-    justify-content: space-evenly;
-  }
-  .container {
-    display: flex;
-    flex-direction: column;
-    margin: 0px 2em;
-  }
-  .item {
-    display: flex;
-    justify-content: center;
-    padding: 1.5em;
-  }
-  .item:hover {
-    background-color: hsla(0,0%,100%,0.1);
-  }
+.fadeUp-enter-active, .fadeUp-leave-active {
+  transition: all 0.5s ease-in-out;
+}
+.fadeUp-enter, .fadeUp-leave-to {
+  opacity: 0;
+  transform: translateY(100vh);
+}
+.outer-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+}
+
+.tabs {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+}
+
+.tab {
+  opacity: 1;
+  transition: all 0.5s ease-in-out;
+}
+
+.tab.off button:hover {
+  border-color: #FFF;
+}
+
+.tab.off {
+  opacity: 0.3;
+}
+
+.item {
+  display: flex;
+  padding: 1em 10%;
+}
+.item:hover {
+  background-color: hsla(0,0%,100%,0.1);
+}
 </style>

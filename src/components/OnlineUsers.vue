@@ -151,12 +151,12 @@ export default class OnlineUsers extends Vue {
 <style scoped>
   .users-container {
     display: inline-flex;
-    padding: 1em;
   }
 
   .each-user {
     display: flex;
     flex-direction: column;
+    padding: 1em 0;
   }
 
   .each-user .item {

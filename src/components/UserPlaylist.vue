@@ -41,7 +41,7 @@ export default class Playlist extends Vue {
 <style scoped>
 .playlist-item {
   display: flex;
-  padding: 10px;
+  padding: 1em 0;
   justify-content: space-between;
   flex-basis: auto;
 }

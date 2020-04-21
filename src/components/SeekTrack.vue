@@ -167,7 +167,7 @@ export default class SeekTrack extends Vue {
 
 <style scoped>
   .now-playing-center-container {
-    width: 50%;
+    width: 70%;
   }
 
   .now-playing-center {

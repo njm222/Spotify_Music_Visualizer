@@ -57,6 +57,9 @@ export default class UserPlaylists extends Vue {
 </script>
 
 <style scoped>
+  .fadeUp-enter-active, .fadeUp-leave-active {
+    transition: all 0.5s ease-in-out;
+  }
   .fadeUp-enter, .fadeUp-leave-to {
     opacity: 0;
     transform: translateY(20vh);
