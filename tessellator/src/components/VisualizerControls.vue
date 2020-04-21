@@ -1,26 +1,40 @@
 <template>
-  <div v-if="this.isOpen">
-    <div class="controls-container">
-      <a @click="closeVis">close visualizer</a>
-      <div>
-        Mode:
+  <div class="controls-container">
+    <transition name="fadeRight" mode="out-in">
+      <div v-if="this.isOpen" class="child" key="OpenVisualizerControls">
+        <div class="controls">
+          <a @click="closeVis">close visualizer</a>
+          <div>
+            Mode:
 
-        {{this.ModeKey}}
-      </div>
-      <div>
-        Colour:
+            <strong>{{this.ModeKey}}</strong>
+          </div>
+          <div>
+            Colour:
 
-        {{this.ColourKey}}
+            <strong>{{this.ColourKey}}</strong>
+          </div>
+          <a @click="toggleRandomMode" v-bind:style="{color: (this.RandomMode? '#3AD36B' : '#FFF')}">
+            Randomize Mode
+          </a>
+          <a @click="toggleRandomColour" v-bind:style="{color: (this.RandomColour? '#3AD36B' : '#FFF')}">
+            Randomize Colour
+          </a>
+          <a @click="toggleCameraZoom" v-if="this.ModeKey > 1" v-bind:style="{color: (this.CameraZoomToggle? '#3AD36B' : '#FFF')}">
+            Camera Zoom
+          </a>
+          <a @click="toggleCameraRotate" v-if="this.ModeKey > 1" v-bind:style="{color: (this.CameraRotateToggle? '#3AD36B' : '#FFF')}">
+            Camera Rotate
+          </a>
+          <a @click="hideControls"> hide controls </a>
+        </div>
       </div>
-      <a @click="toggleRandomMode">Randomize Mode: {{this.RandomMode}}</a>
-      <a @click="toggleRandomColour">Randomize Colour: {{this.RandomColour}}</a>
-      <a @click="toggleCameraZoom" v-if="this.ModeKey > 1">Camera Zoom: {{this.CameraZoomToggle}}</a>
-      <a @click="toggleCameraRotate" v-if="this.ModeKey > 1">Camera Rotate: {{this.CameraRotateToggle}}</a>
-      <a @click="hideControls"> hide controls </a>
-    </div>
-  </div>
-  <div v-else class="hidden-controls-container">
-    <a @click="showControls"> > </a>
+      <div v-else class="child closed" key="CloseVisualizerControls">
+        <div class="hidden-controls-container">
+          <a @click="showControls"> > </a>
+        </div>
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -139,18 +153,35 @@ export default class VisualizerControls extends Vue {
 </script>
 
 <style scoped>
-.controls-container {
+.fadeRight-enter-active, .fadeRight-leave-active {
+  transition: all 0.5s;
+}
+.fadeRight-enter, .fadeRight-leave-to {
+  opacity: 0;
+  transform: translateX(-15vw);
+}
+
+.controls-container .child {
   position: absolute;
   top: 0;
   left: 0;
-  width: 10vw;
-  height: 89%;
+  min-width: 1.5em;
+  height: 100%;
   background: #292929;
+  opacity: 0.9;
+}
+
+.controls-container .child.closed {
+  opacity: 0.3;
+}
+
+.controls {
+  width: 10vw;
+  height: 70%;
+  padding: 15vh 0.5em;
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
-  opacity: 0.6;
-  padding: 5vh 0;
 }
 
 .hidden-controls-container {
@@ -158,11 +189,9 @@ export default class VisualizerControls extends Vue {
   top: 0;
   left: 0;
   height: 100%;
-  background: #262626;
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
-  opacity: 0.4;
 }
 
 .hidden-controls-container a {

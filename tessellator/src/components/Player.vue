@@ -1,16 +1,24 @@
 <template>
   <transition name="fadeUp">
     <div class="player-container" v-if="this.accessToken && this.playerInfo">
-      <div v-if="this.hidePlayerToggle" class="hidden-player-bar">
-        <a @click="showPlayer">show player</a>
-      </div>
-      <div v-else>
-        <div class="player-bar">
-          <a @click="hidePlayer">hide player</a>
-          <TrackItem :trackDetails="this.playerInfo.track_window.current_track"></TrackItem>
-          <SeekTrack :playerInfo="this.playerInfo"></SeekTrack>
-          <PlayerControls></PlayerControls>
+      <transition name="fadeDown" mode="out-in">
+        <div v-if="this.hidePlayerToggle" class="hidden-bar-container" key="HiddenPlayerContainer">
+          <div>
+            <a @click="showPlayer">show player</a>
+          </div>
         </div>
+        <div v-else class="player-bar-container" key="OpenPlayerContainer">
+          <div class="hideToggle">
+            <a @click="hidePlayer">hide player</a>
+          </div>
+          <div class="player-bar">
+            <TrackItem :trackDetails="this.playerInfo.track_window.current_track"></TrackItem>
+            <PlayerControls></PlayerControls>
+          </div>
+        </div>
+      </transition>
+      <div class="player-progress" v-bind:class="[this.hidePlayerToggle ? 'off' : 'on']">
+        <SeekTrack :playerInfo="this.playerInfo"></SeekTrack>
       </div>
     </div>
   </transition>
@@ -198,6 +206,15 @@ export default class Player extends Vue {
   transform: translateY(20vh);
 }
 
+.fadeDown-enter-active, .fadeDown-leave-active {
+  transition: all 0.5s;
+}
+
+.fadeDown-enter, .fadeDown-leave-to {
+  opacity: 0;
+  transform: translateY(10vh);
+}
+
 .player-container {
   z-index: 1;
   display: flex;
@@ -205,19 +222,48 @@ export default class Player extends Vue {
   position: fixed;
   bottom: 0;
   width: 100%;
-  background: #282828;
+}
+
+.player-bar-container {
+  display: flex;
+  flex-direction: column;
+  padding: 0.5em 1em 0;
+  background: #292929;
+  opacity: 0.9;
+}
+
+.player-container .hidden-bar-container {
+  display: flex;
+  flex-direction: column;
+  background: #292929;
+  opacity: 0.3;
 }
 
 .player-bar {
   align-items: center;
   display: flex;
   flex-direction: row;
-  height: 11vh;
-  justify-content: space-between;
-  padding: 0 16px;
+  justify-content: space-around;
 }
 
-.hidden-player-bar {
-  opacity: 0.4;
+.player-progress {
+  display: flex;
+  justify-content: center;
+  background: #292929;
+  transition: 1s;
+}
+
+.player-progress.on {
+  opacity: 0.9;
+}
+
+.player-progress.off {
+  opacity: 0.3;
+}
+
+.hideToggle {
+  position: fixed;
+  right: 0;
+  left: 0;
 }
 </style>

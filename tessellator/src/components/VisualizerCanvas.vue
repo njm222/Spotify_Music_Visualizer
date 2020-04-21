@@ -98,6 +98,11 @@ export default class VisualizerCanvas extends Vue {
     }
     this.$store.commit('mutateModeKey', 1)
     this.$store.commit('mutateColourKey', 1)
+    this.$gtag.pageview({
+      page_title: 'Visualizer'
+      page_path: '/visualizer',
+      page_location: 'http://localhost:8080/visualizer'
+    })
     // stats
     this.stats = new (Stats as any)()
     document.body.appendChild(this.stats.dom)
@@ -240,9 +245,9 @@ export default class VisualizerCanvas extends Vue {
     if (SpotifyAnalysisUtils.trackFeatures.valence > 0.7) {
       noiseFreq = ((VisualizerCanvas.liveAudio.bassObject.bassAv - VisualizerCanvas.liveAudio.highsObject.highsAv) / (SpotifyAnalysisUtils.trackFeatures.energy * SpotifyAnalysisUtils.trackFeatures.danceability * SpotifyAnalysisUtils.trackFeatures.valence))
     } else if (SpotifyAnalysisUtils.trackFeatures.valence > 0.4) {
-      noiseFreq = (VisualizerCanvas.liveAudio.bassObject.bassAv + VisualizerCanvas.liveAudio.kickObject.kickAv - VisualizerCanvas.liveAudio.highsObject.highsAv - VisualizerCanvas.liveAudio.midsObject.midsAv) / SpotifyAnalysisUtils.trackFeatures.energy
+      noiseFreq = (VisualizerCanvas.liveAudio.bassObject.bassAv + VisualizerCanvas.liveAudio.kickObject.kickAv - VisualizerCanvas.liveAudio.midsObject.midsAv) / SpotifyAnalysisUtils.trackFeatures.energy
     } else if (this.SpotifyAnalysisUtils.trackFeatures.valence > 0.1) {
-      noiseFreq = (VisualizerCanvas.liveAudio.bassObject.bassAv + VisualizerCanvas.liveAudio.kickObject.kickAv - VisualizerCanvas.liveAudio.midsObject.midsAv - VisualizerCanvas.liveAudio.highsObject.highsEnergy) / SpotifyAnalysisUtils.trackFeatures.danceability
+      noiseFreq = (VisualizerCanvas.liveAudio.bassObject.bassAv + VisualizerCanvas.liveAudio.kickObject.kickAv  - VisualizerCanvas.liveAudio.highsObject.highsEnergy) / SpotifyAnalysisUtils.trackFeatures.danceability
     } else {
       noiseFreq = ((VisualizerCanvas.liveAudio.bassObject.bassAv + VisualizerCanvas.liveAudio.kickObject.kickAv - VisualizerCanvas.liveAudio.midsObject.midsAv - VisualizerCanvas.liveAudio.highsObject.highsEnergy) / SpotifyAnalysisUtils.trackFeatures.energy)
     }

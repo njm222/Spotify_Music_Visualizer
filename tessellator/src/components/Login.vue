@@ -55,6 +55,7 @@ export default class Login extends Vue {
       console.log(response)
       this.$store.commit('mutateUser', response.data)
       this.$store.dispatch('actionAuthUser', response.data)
+      this.updateGtagUserID(response.data.id)
     }).catch((error) => {
       console.log(error)
       this.refreshAccessToken()
@@ -68,6 +69,15 @@ export default class Login extends Vue {
       setCookie('accessToken', response.data.access_token)
       this.$store.commit('mutateAccessToken', getCookie('accessToken'))
     }).catch(console.log)
+  }
+
+  updateGtagUserID (name: string) {
+    this.$gtag.set({user_id: name})
+    this.$gtag.pageview({
+      page_title: 'Login'
+      page_path: '/login',
+      page_location: 'http://localhost:8080/login'
+    })
   }
 
   @Watch('user')
