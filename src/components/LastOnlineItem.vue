@@ -21,7 +21,9 @@ export default class LastPlayedItem extends Vue {
   private calculatedTime!: string
   private timerRef!: any;
 
-  mounted () {
+
+  constructor () {
+    super()
     this.calcTime()
   }
 

@@ -34,7 +34,9 @@
               <UserPlaylists :userID="item.user"></UserPlaylists>
             </div>
           </div>
-          <div v-else></div>
+          <div v-else>
+            <p>no users</p>
+          </div>
         </transition>
       </div>
     </div>
@@ -114,15 +116,17 @@ export default class OnlineUsers extends Vue {
     firebaseRef.firebase.database().ref('users/').on('value', (snapshot: any) => {
       onlineU.clear()
       snapshot.forEach((user: any) => {
-        const onlineUserData = {
-          user: user.child('connections').val(),
-          spotifyLink: user.child('spotifyLink').val(),
-          lastPlayed: user.child('lastPlayed').val()
-        }
-        if (onlineUserData.user) {
-          onlineU.set(onlineUserData.user, onlineUserData)
-        } else {
-          onlineU.delete(onlineUserData.user)
+        if (this.user.id !== user.key) {
+          const onlineUserData = {
+            user: user.child('connections').val(),
+            spotifyLink: user.child('spotifyLink').val(),
+            lastPlayed: user.child('lastPlayed').val()
+          }
+          if (onlineUserData.user) {
+            onlineU.set(onlineUserData.user, onlineUserData)
+          } else {
+            onlineU.delete(onlineUserData.user)
+          }
         }
       })
       if (onlineU.size === 0) {
@@ -140,13 +144,15 @@ export default class OnlineUsers extends Vue {
     firebaseRef.firebase.database().ref('users/').orderByChild('lastOnline').on('value', (snapshot: any) => {
       lastOnlineU.clear()
       snapshot.forEach((user: any) => {
-        const lastOnlineUserData = {
-          user: user.key,
-          spotifyLink: user.child('spotifyLink').val(),
-          lastPlayed: user.child('lastPlayed').val(),
-          lastOnline: user.child('lastOnline').val()
+        if (this.user.id !== user.key) {
+          const lastOnlineUserData = {
+            user: user.key,
+            spotifyLink: user.child('spotifyLink').val(),
+            lastPlayed: user.child('lastPlayed').val(),
+            lastOnline: user.child('lastOnline').val()
+          }
+          lastOnlineU.set(lastOnlineUserData.user, lastOnlineUserData)
         }
-        lastOnlineU.set(lastOnlineUserData.user, lastOnlineUserData)
       })
       this.$store.commit('mutateLastOnlineUsers', lastOnlineU)
     })
