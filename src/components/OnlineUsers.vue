@@ -10,6 +10,11 @@
           </div>
           <div v-else>
             <h3>Online Users <i>(?)</i></h3>
+            <fingerprint-spinner
+                    :animation-duration="1500"
+                    :size="64"
+                    color="#FFF"
+            ></fingerprint-spinner>
           </div>
         </transition>
       </div>
@@ -23,13 +28,15 @@
             </div>
           </div>
           <div v-else-if="lastOnlineUsers" key="lastOnlineUsersContainer">
-            <div class="each-user" v-for='(item, i) in lastOnlineUsers.values()' :key="item.user + i">
+            <div class="each-user" v-for='(item, i) in Array.from(lastOnlineUsers.values()).reverse()' :key="item.user + i">
               <LastOnlineItem :lastOnlineUser="item"></LastOnlineItem>
               <LastPlayedItem :trackDetails="item.lastPlayed"></LastPlayedItem>
               <UserPlaylists :userID="item.user"></UserPlaylists>
             </div>
           </div>
-          <div v-else></div>
+          <div v-else>
+            <p>no users</p>
+          </div>
         </transition>
       </div>
     </div>
@@ -42,9 +49,10 @@ import LastPlayedItem from '@/components/LastPlayedItem.vue'
 import LastOnlineItem from '@/components/LastOnlineItem.vue'
 import OnlineItem from '@/components/OnlineItem.vue'
 import UserPlaylists from '@/components/UserPlaylists.vue'
+import { FingerprintSpinner } from 'epic-spinners'
 
 @Component({
-  components: { LastPlayedItem, LastOnlineItem, OnlineItem, UserPlaylists }
+  components: { LastPlayedItem, LastOnlineItem, OnlineItem, UserPlaylists, FingerprintSpinner }
 })
 export default class OnlineUsers extends Vue {
   get user () {
@@ -108,15 +116,17 @@ export default class OnlineUsers extends Vue {
     firebaseRef.firebase.database().ref('users/').on('value', (snapshot: any) => {
       onlineU.clear()
       snapshot.forEach((user: any) => {
-        const onlineUserData = {
-          user: user.child('connections').val(),
-          spotifyLink: user.child('spotifyLink').val(),
-          lastPlayed: user.child('lastPlayed').val()
-        }
-        if (onlineUserData.user) {
-          onlineU.set(onlineUserData.user, onlineUserData)
-        } else {
-          onlineU.delete(onlineUserData.user)
+        if (this.user.id !== user.key) {
+          const onlineUserData = {
+            user: user.child('connections').val(),
+            spotifyLink: user.child('spotifyLink').val(),
+            lastPlayed: user.child('lastPlayed').val()
+          }
+          if (onlineUserData.user) {
+            onlineU.set(onlineUserData.user, onlineUserData)
+          } else {
+            onlineU.delete(onlineUserData.user)
+          }
         }
       })
       if (onlineU.size === 0) {
@@ -134,13 +144,15 @@ export default class OnlineUsers extends Vue {
     firebaseRef.firebase.database().ref('users/').orderByChild('lastOnline').on('value', (snapshot: any) => {
       lastOnlineU.clear()
       snapshot.forEach((user: any) => {
-        const lastOnlineUserData = {
-          user: user.key,
-          spotifyLink: user.child('spotifyLink').val(),
-          lastPlayed: user.child('lastPlayed').val(),
-          lastOnline: user.child('lastOnline').val()
+        if (this.user.id !== user.key) {
+          const lastOnlineUserData = {
+            user: user.key,
+            spotifyLink: user.child('spotifyLink').val(),
+            lastPlayed: user.child('lastPlayed').val(),
+            lastOnline: user.child('lastOnline').val()
+          }
+          lastOnlineU.set(lastOnlineUserData.user, lastOnlineUserData)
         }
-        lastOnlineU.set(lastOnlineUserData.user, lastOnlineUserData)
       })
       this.$store.commit('mutateLastOnlineUsers', lastOnlineU)
     })
@@ -162,5 +174,6 @@ export default class OnlineUsers extends Vue {
   .each-user .item {
     text-align: start;
     padding-bottom: 1em;
+    min-width: 300px;
   }
 </style>

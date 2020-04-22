@@ -4,11 +4,16 @@
       <div v-if="this.user" key="LoginTrue">
         <h1>hello, {{this.user.display_name}}_</h1>
         <transition name="fade" mode="out-in">
-          <div v-if="this.SpotifyAnalysisUtils && this.SpotifyAnalysisUtils.loaded" key="OpenVisualizer">
+          <div class="visualizer-button-container" v-if="this.SpotifyAnalysisUtils && this.SpotifyAnalysisUtils.loaded" key="OpenVisualizer">
             <button class="btn secondary" @click="openVis">open visualizer</button>
           </div>
-          <div v-else key="LoadingVisualizer">
-            <p>loading visualizer</p>
+          <div class="visualizer-button-container" v-else key="LoadingVisualizer">
+            <breeding-rhombus-spinner
+                    :animation-duration="2000"
+                    :size="64"
+                    color="#FFF"
+            ></breeding-rhombus-spinner>
+            <p class="loading">loading visualizer</p>
           </div>
         </transition>
       </div>
@@ -25,8 +30,11 @@
 import { Component, Vue, Watch } from 'vue-property-decorator'
 import { getCookie, setCookie } from '@/services/cookie-utils'
 import { addUser } from '@/services/firebase-utils'
+import { BreedingRhombusSpinner } from 'epic-spinners'
 
-@Component
+@Component({
+  components: { BreedingRhombusSpinner }
+})
 export default class Login extends Vue {
   get user () {
     return this.$store.state.user
@@ -95,4 +103,19 @@ export default class Login extends Vue {
 </script>
 
 <style scoped>
+.visualizer-button-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2em 0;
+}
+
+@keyframes fade {
+  from { opacity: 0; }
+}
+
+.visualizer-button-container .loading {
+  animation: fade 1.5s infinite alternate;
+  padding-top: 1em;
+}
 </style>

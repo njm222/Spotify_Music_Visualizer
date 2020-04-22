@@ -12,7 +12,11 @@
           </div>
         </div>
         <div v-else>
-          loading your playlists
+          <fingerprint-spinner
+                  :animation-duration="1500"
+                  :size="64"
+                  color="#FFF"
+          ></fingerprint-spinner>
         </div>
       </transition>
     </div>
@@ -21,9 +25,10 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import UserPlaylist from '@/components/UserPlaylist.vue'
+import { FingerprintSpinner } from 'epic-spinners'
 
 @Component({
-  components: { UserPlaylist }
+  components: { UserPlaylist, FingerprintSpinner }
 })
 export default class MyPlaylists extends Vue {
   get userPlaylists () {

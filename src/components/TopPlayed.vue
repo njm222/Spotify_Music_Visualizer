@@ -19,8 +19,12 @@
             <TopTrack :trackDetails="item.data().trackData" :playedCount="item.data().count"></TopTrack>
           </div>
         </div>
-        <div v-else key="topTracksCommunityLoading">
-          <p>loading ...</p>
+        <div class="loading-container" v-else key="topTracksCommunityLoading">
+          <fingerprint-spinner
+                  :animation-duration="1500"
+                  :size="64"
+                  color="#FFF"
+          ></fingerprint-spinner>
         </div>
       </transition>
     </div>
@@ -31,8 +35,12 @@
             <TopArtist :artistDetails="item.data().artistData" :playedCount="item.data().count"></TopArtist>
           </div>
         </div>
-        <div v-else key="topArtistsCommunityLoading">
-          <p>loading ...</p>
+        <div class="loading-container" v-else key="topArtistsCommunityLoading">
+          <fingerprint-spinner
+                  :animation-duration="1500"
+                  :size="64"
+                  color="#FFF"
+          ></fingerprint-spinner>
         </div>
       </transition>
     </div>
@@ -44,9 +52,10 @@ import { Component, Prop, Vue } from 'vue-property-decorator'
 import TopTrack from '@/components/TopTrack.vue'
 import TopArtist from '@/components/TopArtist.vue'
 import { firebaseRef } from '@/services/firebase-utils'
+import { FingerprintSpinner } from 'epic-spinners'
 
 @Component({
-  components: { TopTrack, TopArtist }
+  components: { TopTrack, TopArtist, FingerprintSpinner }
 })
 export default class TopPlayed extends Vue {
   private toggleTracks: boolean
@@ -126,12 +135,19 @@ export default class TopPlayed extends Vue {
   transition: all 0.5s ease-in-out;
 }
 
-.tab.off button:hover {
+.tab.off .btn:hover {
   border-color: #FFF;
 }
 
 .tab.off {
   opacity: 0.3;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .item {
