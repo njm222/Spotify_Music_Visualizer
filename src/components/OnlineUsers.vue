@@ -28,7 +28,7 @@
             </div>
           </div>
           <div v-else-if="lastOnlineUsers" key="lastOnlineUsersContainer">
-            <div class="each-user" v-for='(item, i) in lastOnlineUsers.values()' :key="item.user + i">
+            <div class="each-user" v-for='(item, i) in Array.from(lastOnlineUsers.values()).reverse()' :key="item.user + i">
               <LastOnlineItem :lastOnlineUser="item"></LastOnlineItem>
               <LastPlayedItem :trackDetails="item.lastPlayed"></LastPlayedItem>
               <UserPlaylists :userID="item.user"></UserPlaylists>
