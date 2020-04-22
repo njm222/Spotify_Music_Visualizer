@@ -168,5 +168,6 @@ export default class OnlineUsers extends Vue {
   .each-user .item {
     text-align: start;
     padding-bottom: 1em;
+    min-width: 300px;
   }
 </style>

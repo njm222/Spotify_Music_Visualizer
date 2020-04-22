@@ -135,7 +135,7 @@ export default class TopPlayed extends Vue {
   transition: all 0.5s ease-in-out;
 }
 
-.tab.off button:hover {
+.tab.off .btn:hover {
   border-color: #FFF;
 }
 
