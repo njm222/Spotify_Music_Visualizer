@@ -58,7 +58,7 @@ export default class AudioAnalyser {
     // create analyser
     this.analyser = this.context.createAnalyser()
     this.analyser.fftSize = 256
-    this.analyser.smoothingTimeConstant = 0.85
+    this.analyser.smoothingTimeConstant = 0.9
     this.frequencyData = new Uint8Array(this.analyser.frequencyBinCount)
     this.bufferLength = this.analyser.frequencyBinCount
     this.analyser.minDecibels = -90
@@ -108,7 +108,7 @@ export default class AudioAnalyser {
     this.highsObject.energy = 0
   }
 
-  getData() {
+  updateData() {
     this.resetData()
     this.analyser.getByteFrequencyData(this.frequencyData)
     this.getFreqSection(this.bassObject)

@@ -1,48 +1,54 @@
-import { useEffect, useRef } from 'react'
+import { memo, useEffect, useMemo } from 'react'
 import { useFrame } from '@react-three/fiber'
 import AudioAnalyzer from '@/helpers/AudioAnalyzer'
+import useStore from '@/helpers/store'
+import Mode0 from './modes/Mode0'
 import Mode1 from './modes/Mode1'
 import Mode2 from './modes/Mode2'
 
 function Lights() {
   return (
     <>
-      <color attach='background' args={['#f0f0f0']} />
+      <color attach='background' args={['#000']} />
       <ambientLight intensity={1} />
       <pointLight position={[20, 30, 10]} />
-      <pointLight position={[-10, -10, -10]} color='blue' />
+      <pointLight position={[-10, -10, -10]} />
     </>
   )
 }
 
 const Visualizer = () => {
-  const analyzer = useRef()
+  const set = useStore((state) => state.set)
+  const modeKey = useStore((state) => state.modeKey)
 
   useEffect(() => {
-    analyzer.current = new AudioAnalyzer()
+    set({ audioAnalyzer: new AudioAnalyzer() })
   }, [])
 
-  useFrame((state) => {
-    analyzer.current.getData()
+  useFrame(() => {
+    useStore.getState().audioAnalyzer?.updateData()
+    useStore.getState().spotifyAnalyzer?.updateData()
   })
 
-  const renderMode = (mode) => {
-    switch (mode) {
+  const Mode = useMemo(() => {
+    switch (modeKey) {
+      case 0:
+        return <Mode0 />
       case 1:
         return <Mode1 />
       case 2:
         return <Mode2 />
       default:
-        return <Mode1 />
+        return <Mode0 />
     }
-  }
+  }, [modeKey])
 
   return (
     <>
       <Lights />
-      {renderMode(1)}
+      {Mode}
     </>
   )
 }
 
-export default Visualizer
+export default memo(Visualizer)

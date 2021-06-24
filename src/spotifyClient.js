@@ -61,7 +61,8 @@ const addPlayerListeners = (player) => {
   })
   player.addListener('ready', (data) => {
     console.log('Ready with deviceID ', data.device_id)
-    spotifyClient.play({ device_id: data.device_id })
+    spotifyClient.transferMyPlayback([data.device_id])
+    .then(() => spotifyClient.play({device_id: data.device_id}))
   })
   player.addListener('player_state_changed', async (data) => {
     console.log('player state changed')
@@ -71,11 +72,11 @@ const addPlayerListeners = (player) => {
       const analysis = await getTrackAnalysis(trackId)
       const features = await getTrackFeatures(trackId)
 
+      useStore.getState().spotifyAnalyzer.setData(analysis)
       useStore.setState({
+        spotifyFeatures: features,
         player: {
           playerState,
-          analysis,
-          features,
           lastPlayed: trackId,
         },
       })
