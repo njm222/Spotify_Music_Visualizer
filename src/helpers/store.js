@@ -22,4 +22,8 @@ const useStore = create((set) => {
   }
 })
 
+export const mutations = {
+  position: 0,
+}
+
 export default useStore

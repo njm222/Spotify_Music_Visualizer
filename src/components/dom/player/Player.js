@@ -1,17 +1,14 @@
 import { memo, useEffect, useMemo, useRef } from 'react'
 import Image from 'next/image'
-import useStore from '@/helpers/store'
+import useStore, { mutations } from '@/helpers/store'
 import { sdkInit } from '@/spotifyClient'
 import PlayerControls from './PlayerControls'
 
 const Player = () => {
-  const [set, playerState] = useStore((state) => [
-    state.set,
-    state.player.playerState,
-  ])
+  const playerState = useStore((state) => state.player.playerState)
 
+  const initialTime = useRef()
   const timerRef = useRef(null)
-  const delay = useRef(0)
 
   useEffect(() => {
     if (!document.getElementById('spotify-sdk')) {
@@ -29,31 +26,27 @@ const Player = () => {
       return
     }
 
+    clearInterval(timerRef.current)
+
     if (playerState?.paused) {
       // clear timeout
-      clearTimeout(timerRef)
       return
     }
-
-    delay.current = new Date().getTime()
-    timerRef.current = setTimeout(() => {
-      delay.current = new Date().getTime() - delay.current
-      set((state) => ({
-        player: {
-          playerState: {
-            ...state.player.playerState,
-            position: state.player.playerState?.position + delay.current,
-          },
-        },
-      }))
-    }, 10)
-  }, [playerState, set])
+    initialTime.current = new Date().getTime()
+    timerRef.current = setInterval(() => {
+      const currentTime = new Date().getTime()
+      const delay = currentTime - initialTime.current
+      initialTime.current = currentTime
+      console.log(delay)
+      mutations.position += delay
+    }, 50)
+  }, [playerState])
 
   const progressBarStyles = useMemo(
     () => ({
-      width: (playerState?.position * 100) / playerState?.duration + '%',
+      width: (mutations.position * 100) / playerState?.duration + '%',
     }),
-    [playerState?.position, playerState?.duration]
+    [playerState]
   )
 
   return playerState ? (

@@ -1,5 +1,5 @@
 import SpotifyWebApi from 'spotify-web-api-js'
-import useStore from '@/helpers/store'
+import useStore, { mutations } from '@/helpers/store'
 
 const spotifyClient = new SpotifyWebApi()
 
@@ -61,8 +61,9 @@ const addPlayerListeners = (player) => {
   })
   player.addListener('ready', (data) => {
     console.log('Ready with deviceID ', data.device_id)
-    spotifyClient.transferMyPlayback([data.device_id])
-    .then(() => spotifyClient.play({device_id: data.device_id}))
+    spotifyClient
+      .transferMyPlayback([data.device_id])
+      .then(() => spotifyClient.play({ device_id: data.device_id }))
   })
   player.addListener('player_state_changed', async (data) => {
     console.log('player state changed')
@@ -80,6 +81,7 @@ const addPlayerListeners = (player) => {
           lastPlayed: trackId,
         },
       })
+      mutations.position = playerState.position
       // send trackId and artistsId to firestore
       // send trackId as lastPlayed under /users/{uid} (should this be there for this release?)
       return
@@ -90,6 +92,7 @@ const addPlayerListeners = (player) => {
         playerState,
       },
     }))
+    mutations.position = playerState.position
   })
 }
 

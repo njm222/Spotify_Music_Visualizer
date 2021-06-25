@@ -1,4 +1,4 @@
-import useStore from '@/helpers/store'
+import useStore, { mutations } from '@/helpers/store'
 
 export default class SpotifyAnalyzer {
   constructor() {
@@ -19,7 +19,7 @@ export default class SpotifyAnalyzer {
     this.beat = {}
     this.bar = {}
     this.section = {}
-    
+
     this.timbre = {}
     this.pitches = {}
   }
@@ -42,8 +42,10 @@ export default class SpotifyAnalyzer {
   }
 
   updateData() {
-    const position = useStore.getState().player.playerState?.position / 1000
-    if (!position) { return }
+    const position = mutations.position / 1000
+    if (!position) {
+      return
+    }
     this.updateSegment(position)
     this.updateTatum(position)
     this.updateBeat(position)
@@ -51,9 +53,11 @@ export default class SpotifyAnalyzer {
     this.updateSection(position)
   }
 
-  updateSegment (position) {
+  updateSegment(position) {
     const data = this.segments[this.segmentCounter]
-    if (!data) { return }
+    if (!data) {
+      return
+    }
 
     const end = data.start + data.duration
 
@@ -65,49 +69,57 @@ export default class SpotifyAnalyzer {
     }
   }
 
-  updateTatum (position) {
+  updateTatum(position) {
     const data = this.tatums[this.tatumCounter]
-    if (!data) { return }
+    if (!data) {
+      return
+    }
 
     const end = data.start + data.duration
 
-    if (position >= end) {
+    if (position >= end && this.tatumCounter < this.tatums.length) {
       this.tatumCounter += 1
       this.tatum = this.tatums[this.tatumCounter]
     }
   }
 
-  updateBeat (position) {
+  updateBeat(position) {
     const data = this.beats[this.beatCounter]
-    if (!data) { return }
+    if (!data) {
+      return
+    }
 
     const end = data.start + data.duration
 
-    if (position >= end) {
+    if (position >= end && this.beatCounter < this.beats.length) {
       this.beatCounter += 1
       this.beat = this.beats[this.beatCounter]
     }
   }
 
-  updateBar (position) {
+  updateBar(position) {
     const data = this.bars[this.barCounter]
-    if (!data) { return }
+    if (!data) {
+      return
+    }
 
     const end = data.start + data.duration
 
-    if (position >= end) {
+    if (position >= end && this.barCounter < this.bars.length) {
       this.barCounter += 1
       this.bar = this.bars[this.barCounter]
     }
   }
 
-  updateSection (position) {
+  updateSection(position) {
     const data = this.sections[this.sectionCounter]
-    if (!data) { return }
+    if (!data) {
+      return
+    }
 
     const end = data.start + data.duration
 
-    if (position >= end) {
+    if (position >= end && this.sectionCounter < this.sections.length) {
       this.beatCounter += 1
       this.section = this.sections[this.sectionCounter]
     }
