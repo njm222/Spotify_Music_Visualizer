@@ -61,7 +61,7 @@ export default class SpotifyAnalyzer {
 
     const end = data.start + data.duration
 
-    if (position >= end) {
+    if (position >= end && this.segmentCounter < this.segments.length) {
       this.segmentCounter += 1
       this.timbre = this.segments[this.segmentCounter].timbre
       this.pitches = this.segments[this.segmentCounter].pitches
