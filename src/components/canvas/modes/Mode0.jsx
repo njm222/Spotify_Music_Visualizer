@@ -63,7 +63,7 @@ const Terrain = () => {
 
     // Switch wireframe on every bar
     terrainMaterialRef.current.wireframe =
-      useStore.getState().spotifyAnalyzer?.tatumCounter % 2 === 0
+      useStore.getState().spotifyAnalyzer?.barCounter % 2 === 0
   })
 
   return (
