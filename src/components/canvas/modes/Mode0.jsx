@@ -5,19 +5,22 @@ import * as THREE from 'three'
 import getColour from '@/helpers/getColour'
 import useStore from '@/helpers/store'
 
-const simplexNoise = new simplex(Math.round(Math.random() * 1000))
+let simplexNoise = new simplex(Math.round(Math.random() * 1000))
 
 const Terrain = () => {
   // Get reference of the terrain
   const terrainGeometryRef = useRef()
   const terrainMaterialRef = useRef()
+  const keyChangeRef = useRef()
 
   // Set the grid size and resolution
   const size = [10, 10]
   const res = [512, 512]
 
-  const sectionTempo = useStore((state) => state.spotifyAnalyzer?.section.tempo)
-  // Animate the z value of each vertex in the terrain grid using a noise function
+  const { tempo, key } = useStore((state) => state.spotifyAnalyzer?.section)
+
+  console.log(key)
+
   useFrame((state, delta) => {
     // Set the variables for simplex
     const nAmplitude = Math.max(
@@ -36,7 +39,7 @@ const Terrain = () => {
     const { position } = terrainGeometry.attributes
 
     // Get the current time
-    const time = state.clock.getElapsedTime() * (sectionTempo / 500) + nScale
+    const time = state.clock.getElapsedTime() * (tempo / 500) + nScale
 
     // For each vertex set the position on the z-axis based on the noise function
     for (let i = 0; i < position.count; i++) {
@@ -59,7 +62,11 @@ const Terrain = () => {
       delta * 2
     )
 
-    // console.log(useStore.getState().spotifyAnalyzer?.tatumCounter)
+    // Update simplex seed on every section change
+    if (keyChangeRef.current !== key) {
+      simplexNoise = new simplex(Math.round(Math.random() * 1000))
+      keyChangeRef.current = key
+    }
 
     // Switch wireframe on every bar
     terrainMaterialRef.current.wireframe =

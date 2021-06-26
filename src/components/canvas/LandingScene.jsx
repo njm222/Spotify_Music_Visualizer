@@ -20,7 +20,6 @@ const LandingScene = () => {
   })
 
   const handleClick = () => {
-    console.log(camera.position)
     setClicked(true)
     setTimeout(() => {
       fetch('http://localhost:8888/login', { credentials: 'include' })

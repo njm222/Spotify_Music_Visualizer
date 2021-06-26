@@ -9,6 +9,7 @@ const Player = () => {
 
   const initialTime = useRef()
   const timerRef = useRef(null)
+  const progressBarRef = useRef(null)
 
   useEffect(() => {
     if (!document.getElementById('spotify-sdk')) {
@@ -38,15 +39,11 @@ const Player = () => {
       const delay = currentTime - initialTime.current
       initialTime.current = currentTime
       mutations.position += delay
+      // update progress bar
+      progressBarRef.current.style.width =
+        (mutations.position * 100) / playerState?.duration + '%'
     }, 10)
   }, [playerState])
-
-  const progressBarStyles = useMemo(
-    () => ({
-      width: (mutations.position * 100) / playerState?.duration + '%',
-    }),
-    [playerState]
-  )
 
   return playerState ? (
     <div className='playerContainer'>
@@ -71,7 +68,7 @@ const Player = () => {
           <PlayerControls />
         </div>
         <div className='progress'>
-          <div className='progress__bar' style={progressBarStyles} />
+          <div className='progress__bar' ref={progressBarRef} />
         </div>
       </div>
       <div className='playerRight'></div>
