@@ -37,9 +37,8 @@ const Player = () => {
       const currentTime = new Date().getTime()
       const delay = currentTime - initialTime.current
       initialTime.current = currentTime
-      console.log(delay)
       mutations.position += delay
-    }, 50)
+    }, 10)
   }, [playerState])
 
   const progressBarStyles = useMemo(

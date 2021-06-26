@@ -1,6 +1,7 @@
 import { useState, useEffect, memo, Suspense } from 'react'
 import { useThree, useFrame } from '@react-three/fiber'
 import { Stars } from '@react-three/drei'
+import * as THREE from 'three'
 import Text from './Text'
 
 const LandingScene = () => {
@@ -9,22 +10,26 @@ const LandingScene = () => {
   const [clicked, setClicked] = useState(false)
 
   useEffect(() => {
-    camera.position.z = 41
+    camera.position.z = 40
   }, [])
 
-  useFrame((state) => {
-    if (clicked && camera.position.z > 0.1) {
-      camera.position.z -= 0.5 // TODO: lerp camera position
-    } else if (clicked) {
-      console.log('done')
-      setClicked(false)
+  useFrame((state, delta) => {
+    if (clicked) {
+      camera.position.lerp(new THREE.Vector3(0, 0, -40), delta) // TODO: lerp camera position
+    }
+  })
+
+  const handleClick = () => {
+    console.log(camera.position)
+    setClicked(true)
+    setTimeout(() => {
       fetch('http://localhost:8888/login', { credentials: 'include' })
         .then((response) => response.json())
         .then(({ uri }) => {
           window.location = uri
         })
-    }
-  })
+    }, 500)
+  }
 
   const setPointer = (value) => {
     document.documentElement.style.cursor = value ? 'pointer' : 'unset'
@@ -45,7 +50,7 @@ const LandingScene = () => {
         fade
       />
       <Text
-        onPointerDown={() => setClicked(true)}
+        onPointerDown={() => handleClick()}
         onPointerEnter={() => setPointer(true)}
         onPointerLeave={() => setPointer(false)}
       >
