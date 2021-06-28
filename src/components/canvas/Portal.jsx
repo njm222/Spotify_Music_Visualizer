@@ -53,10 +53,11 @@ function Portal({ children, ...props }) {
         state.camera.updateProjectionMatrix()
         state.camera.updateMatrixWorld()
         time.current += 1
-      } else {
+      } else if (time.current < 101) {
         // switch out of portal
         console.log('cams have been switched')
         set({ isVisualizer: true, orbitControls: false })
+        time.current += 1
         return
       }
     }

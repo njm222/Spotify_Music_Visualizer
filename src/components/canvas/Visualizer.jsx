@@ -18,6 +18,7 @@ function Lights() {
 }
 
 const Visualizer = () => {
+  console.log('visualizer')
   const set = useStore((state) => state.set)
   const modeKey = useStore((state) => state.modeKey)
 

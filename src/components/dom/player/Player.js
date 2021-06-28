@@ -30,9 +30,9 @@ const Player = () => {
     clearInterval(timerRef.current)
 
     if (playerState?.paused) {
-      // clear timeout
       return
     }
+
     initialTime.current = new Date().getTime()
     timerRef.current = setInterval(() => {
       const currentTime = new Date().getTime()
