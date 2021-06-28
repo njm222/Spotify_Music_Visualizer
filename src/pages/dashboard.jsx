@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import useStore from '@/helpers/store'
 import dynamic from 'next/dynamic'
 import { setAccessToken } from '@/spotifyClient'
+import Keyboard from '@/components/dom/controls/Keybaord'
 
 const WelcomeUser = dynamic(() => import('@/components/dom/WelcomeUser'), {
   ssr: false,
@@ -51,6 +52,7 @@ const Page = () => {
         </>
       )}
       <Player />
+      <Keyboard />
       <VisualizerPreview r3f />
     </>
   )
