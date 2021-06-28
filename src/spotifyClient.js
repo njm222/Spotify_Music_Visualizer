@@ -75,6 +75,7 @@ const addPlayerListeners = (player) => {
 
       useStore.getState().spotifyAnalyzer.setData(analysis)
       useStore.setState({
+        ready: true,
         spotifyFeatures: features,
         player: {
           playerState,
@@ -99,6 +100,7 @@ const addPlayerListeners = (player) => {
 /* -------- PLAYER CONTROLS -------- */
 
 export const playTrack = async (trackId = null) => {
+  useStore.getState().audioAnalyzer.context.resume() // temp solution
   const results = await spotifyClient.play(trackId)
   return results
 }

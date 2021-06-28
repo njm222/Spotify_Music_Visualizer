@@ -39,6 +39,7 @@ export default class SpotifyAnalyzer {
     this.beats = data.beats
     this.bars = data.bars
     this.sections = data.sections
+    this.updateData()
   }
 
   updateData() {

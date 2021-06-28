@@ -9,6 +9,7 @@ const useStore = create((set) => {
     orbitControls: false,
     accessToken: null,
     refreshToken: null,
+    ready: false,
     isVisualizer: false,
     colourKey: 0,
     modeKey: 0,

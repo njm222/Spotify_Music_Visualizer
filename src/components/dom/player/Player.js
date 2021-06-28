@@ -39,9 +39,11 @@ const Player = () => {
       const delay = currentTime - initialTime.current
       initialTime.current = currentTime
       mutations.position += delay
-      // update progress bar
-      progressBarRef.current.style.width =
-        (mutations.position * 100) / playerState?.duration + '%'
+      if (progressBarRef.current) {
+        // update progress bar
+        progressBarRef.current.style.width =
+          (mutations.position * 100) / playerState?.duration + '%'
+      }
     }, 10)
   }, [playerState])
 

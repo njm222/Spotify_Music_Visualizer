@@ -19,8 +19,6 @@ const Terrain = () => {
 
   const { tempo, key } = useStore((state) => state.spotifyAnalyzer?.section)
 
-  console.log(key)
-
   useFrame((state, delta) => {
     // Set the variables for simplex
     const nAmplitude = Math.max(
@@ -31,6 +29,11 @@ const Terrain = () => {
       2 -
       useStore.getState().spotifyFeatures?.energy -
       useStore.getState().spotifyFeatures?.danceability
+
+    // Wait for Spotify to load
+    if (!nScale || !nAmplitude) {
+      return
+    }
 
     // Get a reference of the terrain grid's geometry
     const terrainGeometry = terrainGeometryRef.current
