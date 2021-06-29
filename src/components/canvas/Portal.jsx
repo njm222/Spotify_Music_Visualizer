@@ -18,46 +18,53 @@ function Portal({ children, ...props }) {
   // The is a separate scene that we create, React will portal into that
   const [scene] = useState(() => new THREE.Scene())
   // Tie this component into the render-loop
-  useFrame((state) => {
+  useFrame((state, delta) => {
     if (isVisualizer) {
+      state.camera.position.lerp(new THREE.Vector3(0, 0, 3), delta)
       return
     }
-    if (state.camera.position.distanceTo(mesh.current.position) < 2) {
-      if (!portalCam) {
-        console.log('switching cams')
-        setPortalCam(true)
-      }
-    } else if (state.camera.position.distanceTo(mesh.current.position) < 5) {
-      if (!portalCam) {
-        console.log('lerping between cams')
-        state.camera.position.lerp(mesh.current.position, 0.01)
-        state.camera.updateProjectionMatrix()
-        state.camera.updateMatrixWorld()
-        cam.current.position.lerp(new THREE.Vector3(0, 0, 10), 0.1)
-        if (cam.current.zoom > 0.3) {
-          cam.current.zoom -= 0.01
-        }
-        cam.current.lookAt(mesh.current.position)
-        cam.current.updateProjectionMatrix()
-        cam.current.updateMatrixWorld()
-      }
+
+    if (
+      !portalCam &&
+      state.camera.position.distanceTo(mesh.current.position) <= 2.1
+    ) {
+      console.log('switching cams')
+      setPortalCam(true)
     }
+
+    if (state.camera.position.distanceTo(mesh.current.position) < 5) {
+      console.log('lerping between cams')
+      // rotate camera center
+      state.camera.quaternion.slerp(
+        new THREE.Quaternion(-Math.PI * 2, 0, 0, 1),
+        delta
+      )
+      // position camera center
+      state.camera.position.lerp(new THREE.Vector3(0, 0, 2), delta)
+      state.camera.updateProjectionMatrix()
+      state.camera.updateMatrixWorld()
+      if (cam.current.zoom > 0.3) {
+        cam.current.zoom -= 0.01
+      }
+      cam.current.lookAt(mesh.current.position)
+      cam.current.updateProjectionMatrix()
+      cam.current.updateMatrixWorld()
+    }
+
     if (portalCam && !isVisualizer) {
-      if (time.current < 100) {
+      time.current += 1
+      if (time.current < 50) {
         state.camera.fov =
           50 +
           10 *
             Math.sin((8 * Math.PI * time.current) / 100) *
             (1 - time.current / 100)
-        // state.camera.position.lerp(cam.current.position, 0.05)
         state.camera.updateProjectionMatrix()
         state.camera.updateMatrixWorld()
-        time.current += 1
-      } else if (time.current < 101) {
+      } else if (time.current < 51) {
         // switch out of portal
         console.log('cams have been switched')
         set({ isVisualizer: true, orbitControls: false })
-        time.current += 1
         return
       }
     }
