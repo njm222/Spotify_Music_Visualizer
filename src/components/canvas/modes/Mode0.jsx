@@ -15,14 +15,14 @@ const Terrain = () => {
 
   // Set the grid size and resolution
   const size = [10, 10]
-  const res = [512, 512]
+  const res = [256, 256]
 
   const { tempo } = useStore((state) => state.spotifyAnalyzer?.section)
 
   useFrame((state, delta) => {
     // Set the variables for simplex
     const nAmplitude = Math.max(
-      useStore.getState().audioAnalyzer?.avFreq / 200,
+      useStore.getState().audioAnalyzer?.avFreq / 150,
       0.1
     )
     const nScale =
@@ -30,28 +30,28 @@ const Terrain = () => {
       useStore.getState().spotifyFeatures?.energy -
       useStore.getState().spotifyFeatures?.danceability
 
-    // Wait for Spotify to load
-    if (!nScale || !nAmplitude) {
-      return
-    }
-
     // Get a reference of the terrain grid's geometry
     const terrainGeometry = terrainGeometryRef.current
+
+    // Wait for Spotify to load
+    if (!nScale || !nAmplitude || !terrainGeometry) {
+      return
+    }
 
     // Get the terrain vertices
     const { position } = terrainGeometry.attributes
 
     // Get the current time
-    const time = state.clock.getElapsedTime() * (tempo / 500) + nScale
+    const time = state.clock.getElapsedTime() * (tempo / 500)
 
     // For each vertex set the position on the z-axis based on the noise function
     for (let i = 0; i < position.count; i++) {
       const z = simplexNoise.noise3D(
         position.getX(i) /
+          (nScale - useStore.getState().audioAnalyzer?.bassObject.energy / 300),
+        position.getY(i) /
           (nScale -
             useStore.getState().audioAnalyzer?.snareObject.energy / 300),
-        position.getY(i) /
-          (nScale - useStore.getState().audioAnalyzer?.midsObject.energy / 300),
         time
       )
       position.setZ(i, z * nAmplitude)
@@ -74,7 +74,7 @@ const Terrain = () => {
       sectionChangeRef.current = tempo
     }
 
-    // Switch wireframe on every bar
+    // Switch wireframe on every bar change
     terrainMaterialRef.current.wireframe =
       useStore.getState().spotifyAnalyzer?.barCounter % 2 === 0
   })
@@ -86,11 +86,7 @@ const Terrain = () => {
         args={[...size, ...res]}
         ref={terrainGeometryRef}
       />
-      <meshLambertMaterial
-        attach='material'
-        color={'hotpink'}
-        ref={terrainMaterialRef}
-      />
+      <meshPhongMaterial attach='material' ref={terrainMaterialRef} />
     </mesh>
   )
 }
