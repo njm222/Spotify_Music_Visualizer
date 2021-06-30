@@ -63,10 +63,10 @@ export default class SpotifyAnalyzer {
     const end = data.start + data.duration
 
     if (position >= end && this.segmentCounter < this.segments.length) {
-      this.segmentCounter += 1
       this.timbre = this.segments[this.segmentCounter]?.timbre
       this.pitches = this.segments[this.segmentCounter]?.pitches
       this.segment = this.segments[this.segmentCounter]
+      this.segmentCounter += 1
     }
   }
 
@@ -79,8 +79,8 @@ export default class SpotifyAnalyzer {
     const end = data.start + data.duration
 
     if (position >= end && this.tatumCounter < this.tatums.length) {
-      this.tatumCounter += 1
       this.tatum = this.tatums[this.tatumCounter]
+      this.tatumCounter += 1
     }
   }
 
@@ -93,8 +93,8 @@ export default class SpotifyAnalyzer {
     const end = data.start + data.duration
 
     if (position >= end && this.beatCounter < this.beats.length) {
-      this.beatCounter += 1
       this.beat = this.beats[this.beatCounter]
+      this.beatCounter += 1
     }
   }
 
@@ -107,8 +107,8 @@ export default class SpotifyAnalyzer {
     const end = data.start + data.duration
 
     if (position >= end && this.barCounter < this.bars.length) {
-      this.barCounter += 1
       this.bar = this.bars[this.barCounter]
+      this.barCounter += 1
     }
   }
 
@@ -121,8 +121,8 @@ export default class SpotifyAnalyzer {
     const end = data.start + data.duration
 
     if (position >= end && this.sectionCounter < this.sections.length) {
-      this.beatCounter += 1
       this.section = this.sections[this.sectionCounter]
+      this.beatCounter += 1
     }
   }
 }

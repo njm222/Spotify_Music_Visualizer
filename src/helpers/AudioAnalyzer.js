@@ -58,11 +58,11 @@ export default class AudioAnalyser {
     // create analyser
     this.analyser = this.context.createAnalyser()
     this.analyser.fftSize = 256
-    this.analyser.smoothingTimeConstant = 0.9
+    this.analyser.smoothingTimeConstant = 0.8
     this.frequencyData = new Uint8Array(this.analyser.frequencyBinCount)
     this.bufferLength = this.analyser.frequencyBinCount
-    this.analyser.minDecibels = -90
-    this.analyser.maxDecibels = -25
+    // this.analyser.minDecibels = -90
+    // this.analyser.maxDecibels = -25
     this.source = null
 
     if (navigator.mediaDevices.getUserMedia) {
