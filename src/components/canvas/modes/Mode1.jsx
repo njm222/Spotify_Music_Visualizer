@@ -1,9 +1,8 @@
 import { useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
-import { TorusKnot } from '@react-three/drei'
 import { Vector3, Float32BufferAttribute } from 'three'
 import useStore from '@/helpers/store'
-
+import '../shaders/FireflyMaterial'
 const Mode1 = () => {
   const mesh = useRef()
   const audioAnalyzer = useStore((state) => state.audioAnalyzer)
@@ -21,15 +20,16 @@ const Mode1 = () => {
 
   useFrame(() => {
     // update torus attributes
-    const radius = audioAnalyzer.avFreq / 10
+    const radius = audioAnalyzer.midsObject.average / 100
     const tube = audioAnalyzer.avFreq / 100
     const tubularSegments = Math.floor(audioAnalyzer.avFreq)
     const radialSegments = Math.floor(audioAnalyzer.avFreq)
     const p = 2
     const q = 3
 
-    // buffers
+    // generate torus buffer //
 
+    // buffers
     const indices = []
     const vertices = []
     const normals = []
@@ -67,10 +67,10 @@ const Mode1 = () => {
       B.crossVectors(T, N)
       N.crossVectors(B, T)
 
-      // normalize B, N. T can be ignored, we don't use it
-
+      // normalize B, N.
       B.normalize()
       N.normalize()
+      // T can be ignored, we don't use it
 
       for (let j = 0; j <= radialSegments; ++j) {
         // now calculate the vertices. they are nothing more than an extrusion of the torus curve.
@@ -120,6 +120,7 @@ const Mode1 = () => {
       }
     }
 
+    mesh.current.geometry.setIndex(indices)
     mesh.current.geometry.setAttribute(
       'position',
       new Float32BufferAttribute(vertices, 3)
@@ -129,12 +130,14 @@ const Mode1 = () => {
       new Float32BufferAttribute(normals, 3)
     )
     mesh.current.geometry.setAttribute('uv', new Float32BufferAttribute(uvs, 3))
+    mesh.current.geometry.verticesNeedUpdate = true
   })
   return (
     <>
-      <TorusKnot ref={mesh} args={[1, 1, 16, 16]} position={[0, 0, -50]}>
-        <meshStandardMaterial attach='material' color={'red'} />
-      </TorusKnot>
+      <points ref={mesh}>
+        <bufferGeometry attach='geometry' />
+        <fireflyMaterial transparent depthWrite={false} />
+      </points>
     </>
   )
 }
