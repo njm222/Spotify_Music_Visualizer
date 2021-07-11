@@ -2,12 +2,15 @@ import { useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Vector3, Float32BufferAttribute } from 'three'
 import useStore from '@/helpers/store'
-import '../shaders/FireflyMaterial'
+import '../shaders/BasicMaterial'
+
 const Mode1 = () => {
   const mesh = useRef()
   const audioAnalyzer = useStore((state) => state.audioAnalyzer)
+  const spotifyAnalyzer = useStore((state) => state.spotifyAnalyzer)
+  const spotifyFeatures = useStore((state) => state.spotifyFeatures)
 
-  function calculatePositionOnCurve(u, p, q, radius, position) {
+  const calculatePositionOnCurve = (u, p, q, radius, position) => {
     const cu = Math.cos(u)
     const su = Math.sin(u)
     const quOverP = (q / p) * u
@@ -18,16 +21,38 @@ const Mode1 = () => {
     position.z = radius * Math.sin(quOverP) * 0.5
   }
 
-  useFrame(() => {
-    // update torus attributes
+  const getTimbreSum = () => {
+    return Math.ceil(spotifyAnalyzer.timbre.reduce((acc, curr) => acc + curr))
+  }
+
+  const getSegments = () => {
+    const pitchConfidence = 0.5
+    const chords = spotifyAnalyzer.pitches.filter(
+      (pitch) => pitch > pitchConfidence
+    )
+    return chords.reduce((acc, curr) => acc + curr)
+  }
+
+  const updateTorusAttributes = () => {
     const radius = audioAnalyzer.midsObject.average / 100
     const tube = audioAnalyzer.avFreq / 100
-    const tubularSegments = Math.floor(audioAnalyzer.avFreq)
-    const radialSegments = Math.floor(audioAnalyzer.avFreq)
-    const p = 2
-    const q = 3
+    const tubularSegments = Math.floor(audioAnalyzer.snareObject.average)
+    const radialSegments = Math.floor(audioAnalyzer.kickObject.average)
+    const p = Math.max(1, Math.round(getSegments() * 4))
+    const q = getTimbreSum() / (spotifyFeatures.energy * 30)
 
-    // generate torus buffer //
+    return [radius, tube, tubularSegments, radialSegments, p, q]
+  }
+
+  const getTorusBufferAttributes = (
+    radius,
+    tube,
+    tubularSegments,
+    radialSegments,
+    p,
+    q
+  ) => {
+    /* generate torus buffer */
 
     // buffers
     const indices = []
@@ -96,29 +121,42 @@ const Mode1 = () => {
         normals.push(normal.x, normal.y, normal.z)
 
         // uv
-
         uvs.push(i / tubularSegments)
         uvs.push(j / radialSegments)
       }
     }
 
     // generate indices
-
     for (let j = 1; j <= tubularSegments; j++) {
       for (let i = 1; i <= radialSegments; i++) {
         // indices
-
         const a = (radialSegments + 1) * (j - 1) + (i - 1)
         const b = (radialSegments + 1) * j + (i - 1)
         const c = (radialSegments + 1) * j + i
         const d = (radialSegments + 1) * (j - 1) + i
 
         // faces
-
         indices.push(a, b, d)
         indices.push(b, c, d)
       }
     }
+
+    return [indices, vertices, normals, uvs]
+  }
+
+  useFrame(() => {
+    // update torus attributes
+    const [radius, tube, tubularSegments, radialSegments, p, q] =
+      updateTorusAttributes()
+
+    const [indices, vertices, normals, uvs] = getTorusBufferAttributes(
+      radius,
+      tube,
+      tubularSegments,
+      radialSegments,
+      p,
+      q
+    )
 
     mesh.current.geometry.setIndex(indices)
     mesh.current.geometry.setAttribute(
@@ -136,7 +174,7 @@ const Mode1 = () => {
     <>
       <points ref={mesh}>
         <bufferGeometry attach='geometry' />
-        <fireflyMaterial transparent depthWrite={false} />
+        <basicMaterial transparent depthWrite={false} />
       </points>
     </>
   )
