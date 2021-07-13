@@ -1,5 +1,6 @@
 import SpotifyWebApi from 'spotify-web-api-js'
 import useStore, { mutations } from '@/helpers/store'
+import { refreshToken } from './backendClient'
 
 const spotifyClient = new SpotifyWebApi()
 
@@ -8,8 +9,13 @@ export const setAccessToken = (accessToken) => {
 }
 
 export const getMyInfo = async () => {
-  const results = await spotifyClient.getMe()
-  return results
+  try {
+    const results = await spotifyClient.getMe()
+    return results
+  } catch (err) {
+    console.log(err)
+    refreshToken(useStore.getState().accessToken)
+  }
 }
 
 export const getUserPlaylists = async (userId) => {

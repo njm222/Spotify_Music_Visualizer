@@ -3,6 +3,7 @@ import { useThree, useFrame } from '@react-three/fiber'
 import { Stars } from '@react-three/drei'
 import * as THREE from 'three'
 import Text from './Text'
+import { login } from '../../backendClient'
 
 const LandingScene = () => {
   const camera = useThree((state) => state.camera)
@@ -21,12 +22,9 @@ const LandingScene = () => {
 
   const handleClick = () => {
     setClicked(true)
-    setTimeout(() => {
-      fetch('http://localhost:8888/login', { credentials: 'include' })
-        .then((response) => response.json())
-        .then(({ uri }) => {
-          window.location = uri
-        })
+    setTimeout(async () => {
+      const { uri } = await login()
+      window.location = uri
     }, 500)
   }
 
