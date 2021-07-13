@@ -23,6 +23,9 @@ const LandingScene = () => {
   const handleClick = () => {
     setClicked(true)
     setTimeout(async () => {
+      // check localStorage for refreshToken
+
+      // if no token present login normally
       const { uri } = await login()
       window.location = uri
     }, 500)
