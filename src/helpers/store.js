@@ -8,7 +8,6 @@ const useStore = create(
       set,
       router: {},
       dom: null,
-      orbitControls: false,
       accessToken: null,
       refreshToken: null,
       ready: false,
@@ -24,7 +23,8 @@ const useStore = create(
       },
     }),
     {
-      name: 'tessellator-storage',
+      name: 'tessellator-zustand',
+      version: 1,
     }
   )
 )

@@ -29,10 +29,6 @@ img {
   z-index: 10;
 }
 
-.orbitControls {
-  pointer-events: none;
-}
-
 .welcomeContainer {
   width: max-content;
   margin: auto;

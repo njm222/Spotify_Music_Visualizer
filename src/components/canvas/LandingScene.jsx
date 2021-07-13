@@ -2,12 +2,14 @@ import { useState, useEffect, memo, Suspense } from 'react'
 import { useThree, useFrame } from '@react-three/fiber'
 import { Stars } from '@react-three/drei'
 import * as THREE from 'three'
+import useStore from '@/helpers/store'
+import { updateToken } from '@/backendClient'
 import Text from './Text'
 import { login } from '../../backendClient'
 
 const LandingScene = () => {
   const camera = useThree((state) => state.camera)
-
+  const refreshToken = useStore((state) => state.refreshToken)
   const [clicked, setClicked] = useState(false)
 
   useEffect(() => {
@@ -20,10 +22,16 @@ const LandingScene = () => {
     }
   })
 
+  console.log(refreshToken)
   const handleClick = () => {
     setClicked(true)
     setTimeout(async () => {
-      // check localStorage for refreshToken
+      // check for refreshToken
+      if (refreshToken) {
+        await updateToken(refreshToken)
+        window.location = 'http://localhost:3000/dashboard'
+        return
+      }
 
       // if no token present login normally
       const { uri } = await login()

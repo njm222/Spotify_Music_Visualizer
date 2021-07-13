@@ -33,7 +33,7 @@ const Page = () => {
   ])
 
   useEffect(() => {
-    set({ title: 'Dashboard', orbitControls: true })
+    set({ title: 'Dashboard' })
     // get and store tokens from query string
     const searchParams = new URLSearchParams(window.location.search)
     setAccessToken(searchParams.get('access_token'))

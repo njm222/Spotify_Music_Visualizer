@@ -1,6 +1,6 @@
 import SpotifyWebApi from 'spotify-web-api-js'
 import useStore, { mutations } from '@/helpers/store'
-import { refreshToken } from './backendClient'
+import { updateToken } from './backendClient'
 
 const spotifyClient = new SpotifyWebApi()
 
@@ -14,7 +14,7 @@ export const getMyInfo = async () => {
     return results
   } catch (err) {
     console.log(err)
-    refreshToken(useStore.getState().accessToken)
+    updateToken(useStore.getState().accessToken)
   }
 }
 

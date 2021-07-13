@@ -64,7 +64,7 @@ function Portal({ children, ...props }) {
       } else if (time.current < 51) {
         // switch out of portal
         console.log('cams have been switched')
-        set({ isVisualizer: true, orbitControls: false })
+        set({ isVisualizer: true })
         return
       }
     }

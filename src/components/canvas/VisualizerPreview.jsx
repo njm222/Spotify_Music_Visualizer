@@ -1,5 +1,4 @@
 import { Suspense, memo } from 'react'
-import { OrbitControls } from '@react-three/drei'
 import useStore from '@/helpers/store'
 import Portal from './Portal'
 import Visualizer from './Visualizer'
@@ -9,7 +8,6 @@ const VisualizerPreview = () => {
   const ready = useStore((state) => state.ready)
   return (
     <>
-      <OrbitControls />
       <Suspense fallback={null}>
         {ready && (
           <>

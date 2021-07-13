@@ -6,7 +6,7 @@ const backendClient = axios.create({
   withCredentials: true,
 })
 
-export const refreshToken = async (refreshToken) => {
+export const updateToken = async (refreshToken) => {
   try {
     const { data } = await backendClient.post('/refreshToken', { refreshToken })
     setAccessToken(data?.access_token)
