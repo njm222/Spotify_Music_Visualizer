@@ -22,18 +22,16 @@ const LandingScene = () => {
     }
   })
 
-  console.log(refreshToken)
-  const handleClick = () => {
+  const handleClick = async () => {
     setClicked(true)
+    // check for refreshToken
+    if (refreshToken) {
+      await updateToken(refreshToken)
+      window.location = 'http://localhost:3000/dashboard'
+      return
+    }
+    // if no token present login normally
     setTimeout(async () => {
-      // check for refreshToken
-      if (refreshToken) {
-        await updateToken(refreshToken)
-        window.location = 'http://localhost:3000/dashboard'
-        return
-      }
-
-      // if no token present login normally
       const { uri } = await login()
       window.location = uri
     }, 500)
