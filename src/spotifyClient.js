@@ -14,7 +14,10 @@ export const getMyInfo = async () => {
     return results
   } catch (err) {
     console.log(err)
-    updateToken(useStore.getState().accessToken)
+    const token = useStore.getState().accessToken
+    if (token) {
+      updateToken(token)
+    }
   }
 }
 
@@ -71,15 +74,20 @@ const addPlayerListeners = (player) => {
       .transferMyPlayback([data.device_id])
       .then(() => spotifyClient.play({ device_id: data.device_id }))
   })
-  player.addListener('player_state_changed', async (data) => {
+  player.addListener('player_state_changed', async (playerState) => {
     console.log('player state changed')
-    const playerState = data
-    const trackId = data?.track_window.current_track.id
+
+    // update track position
+    mutations.position = playerState.position
+
+    const trackId = playerState?.track_window.current_track.id
     if (trackId !== useStore.getState().player.lastPlayed) {
       const analysis = await getTrackAnalysis(trackId)
       const features = await getTrackFeatures(trackId)
 
+      // update spotifyAnalyzer
       useStore.getState().spotifyAnalyzer.setData(analysis)
+      // update store with new track data
       useStore.setState({
         ready: true,
         spotifyFeatures: features,
@@ -88,18 +96,17 @@ const addPlayerListeners = (player) => {
           lastPlayed: trackId,
         },
       })
-      mutations.position = playerState.position
       // send trackId and artistsId to firestore
       // send trackId as lastPlayed under /users/{uid} (should this be there for this release?)
       return
     }
+    // update playerState
     useStore.setState((state) => ({
       player: {
         ...state.player,
         playerState,
       },
     }))
-    mutations.position = playerState.position
   })
 }
 
