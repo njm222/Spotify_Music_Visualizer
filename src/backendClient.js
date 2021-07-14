@@ -4,6 +4,11 @@ import { setAccessToken } from './spotifyClient'
 const backendClient = axios.create({
   baseURL: process.env.BACKEND_URL || 'http://localhost:8888',
   withCredentials: true,
+  headers: {
+    'Access-Control-Allow-Credentials': true,
+    'Access-Control-Allow-Origin':
+      process.env.FRONTEND_URL || 'http://localhost:3000',
+  },
 })
 
 export const updateToken = async (refreshToken) => {

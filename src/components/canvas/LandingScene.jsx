@@ -26,6 +26,7 @@ const LandingScene = () => {
     setClicked(true)
     // check for refreshToken
     if (refreshToken) {
+      console.log(refreshToken)
       await updateToken(refreshToken)
       window.location = 'http://localhost:3000/dashboard'
       return
