@@ -25,6 +25,7 @@ const useStore = create(
     {
       name: 'tessellator-zustand',
       version: 1,
+      whitelist: ['accessToken', 'refreshToken'],
     }
   )
 )
