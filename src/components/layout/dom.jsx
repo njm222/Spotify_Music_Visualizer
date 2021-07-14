@@ -1,9 +1,11 @@
 import useStore from '@/helpers/store'
-import { useRef } from 'react'
+import { useRef, useEffect } from 'react'
 
 const Dom = ({ children }) => {
   const ref = useRef(null)
-  useStore.setState({ dom: ref })
+  useEffect(() => {
+    useStore.setState({ dom: ref })
+  }, [])
 
   return (
     <div className={'domContainer'} ref={ref}>
