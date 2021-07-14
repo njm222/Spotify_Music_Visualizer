@@ -3,13 +3,15 @@ import { useThree, useFrame } from '@react-three/fiber'
 import { Stars } from '@react-three/drei'
 import * as THREE from 'three'
 import useStore from '@/helpers/store'
-import { updateToken } from '@/backendClient'
 import Text from './Text'
 import { login } from '../../backendClient'
 
 const LandingScene = () => {
   const camera = useThree((state) => state.camera)
-  const refreshToken = useStore((state) => state.refreshToken)
+  const [refreshToken, router] = useStore((state) => [
+    state.refreshToken,
+    state.router,
+  ])
   const [clicked, setClicked] = useState(false)
 
   useEffect(() => {
@@ -26,9 +28,7 @@ const LandingScene = () => {
     setClicked(true)
     // check for refreshToken
     if (refreshToken) {
-      console.log(refreshToken)
-      await updateToken(refreshToken)
-      window.location = 'http://localhost:3000/dashboard'
+      router.push('/dashboard')
       return
     }
     // if no token present login normally
