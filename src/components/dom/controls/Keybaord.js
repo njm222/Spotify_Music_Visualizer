@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, memo } from 'react'
 import useStore from '@/helpers/store'
 
 const modeMap = [
@@ -59,4 +59,4 @@ const Keyboard = () => {
   return null
 }
 
-export default Keyboard
+export default memo(Keyboard)
