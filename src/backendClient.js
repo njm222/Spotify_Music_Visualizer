@@ -1,4 +1,5 @@
 import axios from 'axios'
+import useStore from './helpers/store'
 import { setAccessToken } from './spotifyClient'
 
 const backendClient = axios.create({
@@ -13,19 +14,25 @@ const backendClient = axios.create({
 
 export const updateToken = async (refreshToken) => {
   try {
-    const { data } = await backendClient.post('/refreshToken', { refreshToken })
+    const { data } = await backendClient.post('/refresh-token', {
+      refreshToken,
+    })
+    useStore.setState({
+      accessToken: data?.access_token,
+      refreshToken: data?.refresh_token,
+    })
     setAccessToken(data?.access_token)
     return data
   } catch (err) {
-    console.log(err)
-    // TODO: toast messages
+    console.log(err) // TODO: toast messages
+    useStore.setState({ refreshToken: null }) // reset refresh token just incase
+    window.location = 'http://localhost:3000' // temp solution
   }
 }
 
 export const login = async () => {
   try {
     const { data } = await backendClient.get('/login')
-    console.log(data)
     return data
   } catch (err) {
     console.error(err)

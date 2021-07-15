@@ -1,8 +1,9 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import useStore from '@/helpers/store'
 import dynamic from 'next/dynamic'
 import { setAccessToken } from '@/spotifyClient'
 import Keyboard from '@/components/dom/controls/Keybaord'
+import { updateToken } from '@/backendClient'
 
 const WelcomeUser = dynamic(() => import('@/components/dom/WelcomeUser'), {
   ssr: false,
@@ -27,31 +28,47 @@ const Player = dynamic(() => import('@/components/dom/player/Player'), {
 })
 
 const Page = () => {
-  const [set, isVisualizer] = useStore((state) => [
+  const [set, isVisualizer, refreshToken, router] = useStore((state) => [
     state.set,
     state.isVisualizer,
+    state.refreshToken,
+    state.router,
   ])
+
+  const [tokenReady, setTokenReady] = useState(false)
 
   useEffect(() => {
     set({ title: 'Dashboard' })
-    // get and store tokens from query string
     const searchParams = new URLSearchParams(window.location.search)
-    setAccessToken(searchParams.get('access_token'))
-    set({
-      accessToken: searchParams.get('access_token'),
-      refreshToken: searchParams.get('refresh_token'),
-    })
-  }, [set])
+    if (searchParams.has('access_token') && searchParams.has('refresh_token')) {
+      // get and store tokens from query string
+      setAccessToken(searchParams.get('access_token'))
+      set({
+        accessToken: searchParams.get('access_token'),
+        refreshToken: searchParams.get('refresh_token'),
+      })
+      setTokenReady(true)
+    } else if (refreshToken) {
+      // if refreshToken is present update accessToken
+      ;(async () => {
+        await updateToken(refreshToken)
+        setTokenReady(true)
+      })()
+    } else {
+      // redirect home for all edge cases
+      router.push('/')
+    }
+  }, [])
 
   return (
     <>
-      {!isVisualizer && (
+      {tokenReady && !isVisualizer && (
         <>
           <WelcomeUser />
           {/* <Playlists /> */}
         </>
       )}
-      <Player />
+      {tokenReady && <Player />}
       <Keyboard />
       <VisualizerPreview r3f />
     </>
