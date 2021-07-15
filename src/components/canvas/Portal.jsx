@@ -21,6 +21,10 @@ function Portal({ children, ...props }) {
   useFrame((state, delta) => {
     // !Visualizer state
     if (!isVisualizer) {
+      if (state.camera.position.distanceTo(mesh.current.position) > 5) {
+        // reset camera if moved / rotated
+        state.camera.position.lerp(new THREE.Vector3(0, 0, 10), delta)
+      }
       // if camera is close lerp closer
       if (
         !portalCamRef.current &&
@@ -65,6 +69,7 @@ function Portal({ children, ...props }) {
           // switch into portal
           console.log('cams have been switched')
           set({ isVisualizer: true })
+          return
         }
         time.current += 1
       }
