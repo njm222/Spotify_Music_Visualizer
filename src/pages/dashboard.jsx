@@ -9,8 +9,8 @@ const WelcomeUser = dynamic(() => import('@/components/dom/WelcomeUser'), {
   ssr: false,
 })
 
-const VisualizerPreview = dynamic(
-  () => import('@/components/canvas/VisualizerPreview'),
+const DashboardScene = dynamic(
+  () => import('@/components/canvas/DashboardScene'),
   {
     ssr: false,
   }
@@ -70,7 +70,7 @@ const Page = () => {
       )}
       {tokenReady && <Player />}
       <Keyboard />
-      <VisualizerPreview r3f />
+      <DashboardScene r3f />
     </>
   )
 }
