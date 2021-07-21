@@ -23,6 +23,9 @@ const Visualizer = () => {
   const modeKey = useStore((state) => state.modeKey)
 
   useEffect(() => {
+    if (useStore.getState().audioAnalyzer) {
+      return
+    }
     set({ audioAnalyzer: new AudioAnalyzer() })
   }, [])
 

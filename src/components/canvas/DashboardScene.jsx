@@ -46,7 +46,10 @@ const DashboardScene = () => {
                   saturation={0}
                   fade
                 />
-                <Bridge />
+                <Bridge
+                  position={[0, -2.5, 5]}
+                  rotation={[0, Math.PI / 2, 0]}
+                />
                 <SceneLighting />
               </>
             )}

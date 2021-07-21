@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { memo, useState, useRef, useEffect } from 'react'
+import { memo, useState, useRef } from 'react'
 import { useFrame, createPortal } from '@react-three/fiber'
 import { useFBO, PerspectiveCamera } from '@react-three/drei'
 import useStore from '@/helpers/store'
@@ -9,7 +9,6 @@ function Portal({ children, ...props }) {
   const set = useStore((state) => state.set)
   const isVisualizer = useStore((state) => state.isVisualizer)
 
-  const time = useRef(0)
   const mesh = useRef()
   const cam = useRef()
   // useFBO creates a WebGL2 buffer for us, it's a helper from the "drei" library
@@ -55,6 +54,7 @@ function Portal({ children, ...props }) {
         set({ isVisualizer: true })
         portalCamRef.current = true
         console.log('switching into portal cam')
+        return
       }
 
       // Our portal has its own camera, but we copy the originals world matrix
@@ -78,14 +78,12 @@ function Portal({ children, ...props }) {
         // rotate camera center
         state.camera.quaternion.slerp(
           new THREE.Quaternion(-Math.PI * 2, 0, 0, 1),
-          delta * 10
+          delta * 5
         )
         // position camera center
-        state.camera.position.lerp(new THREE.Vector3(0, 0, 10), delta * 20)
+        state.camera.position.lerp(new THREE.Vector3(0, 0, 10), delta * 10)
         state.camera.updateProjectionMatrix()
         state.camera.updateMatrixWorld()
-
-        time.current = 0
       }
       // if cam is very far switch cams
       if (state.camera.position.z > 8) {
@@ -95,11 +93,6 @@ function Portal({ children, ...props }) {
       }
     }
   })
-
-  // reset time
-  useEffect(() => {
-    time.current = 0
-  }, [isVisualizer])
 
   return isVisualizer ? (
     children

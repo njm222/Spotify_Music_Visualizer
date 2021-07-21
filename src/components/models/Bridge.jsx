@@ -14,8 +14,6 @@ export default function Model(props) {
         geometry={nodes.Bridge01.geometry}
         material={materials.Base_Material}
         scale={[bridgeScale, bridgeScale, bridgeScale]}
-        position={[0, -2.5, 3]}
-        rotation={[0, Math.PI / 2, 0]}
       />
     </group>
   )
