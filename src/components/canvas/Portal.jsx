@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { memo, useState, useRef } from 'react'
+import { memo, useState, useRef, useEffect } from 'react'
 import { useFrame, createPortal } from '@react-three/fiber'
 import { useFBO, PerspectiveCamera } from '@react-three/drei'
 import useStore from '@/helpers/store'
@@ -23,7 +23,7 @@ function Portal({ children, ...props }) {
     if (!isVisualizer) {
       if (state.camera.position.distanceTo(mesh.current.position) > 5) {
         // reset camera if moved / rotated
-        state.camera.position.lerp(new THREE.Vector3(0, 0, 10), delta)
+        state.camera.position.lerp(new THREE.Vector3(0, 0, 10), delta * 2)
       }
       // if camera is close lerp closer
       if (
@@ -34,10 +34,10 @@ function Portal({ children, ...props }) {
         // rotate camera center
         state.camera.quaternion.slerp(
           new THREE.Quaternion(-Math.PI * 2, 0, 0, 1),
-          delta
+          delta * 10
         )
         // position camera center
-        state.camera.position.lerp(new THREE.Vector3(0, 0, 2), delta)
+        state.camera.position.lerp(new THREE.Vector3(0, 0, 2), delta * 20)
         state.camera.updateProjectionMatrix()
         state.camera.updateMatrixWorld()
         if (cam.current.zoom > 0.3) {
@@ -52,26 +52,9 @@ function Portal({ children, ...props }) {
         !portalCamRef.current &&
         state.camera.position.distanceTo(mesh.current.position) <= 2.1
       ) {
-        console.log('switching into portal cam')
+        set({ isVisualizer: true })
         portalCamRef.current = true
-      }
-      // bounce if cam has been switched
-      if (portalCamRef.current) {
-        if (time.current < 50) {
-          state.camera.fov =
-            50 +
-            10 *
-              Math.sin((8 * Math.PI * time.current) / 100) *
-              (1 - time.current / 100)
-          state.camera.updateProjectionMatrix()
-          state.camera.updateMatrixWorld()
-        } else if (time.current < 51) {
-          // switch into portal
-          console.log('cams have been switched')
-          set({ isVisualizer: true })
-          return
-        }
-        time.current += 1
+        console.log('switching into portal cam')
       }
 
       // Our portal has its own camera, but we copy the originals world matrix
@@ -82,24 +65,23 @@ function Portal({ children, ...props }) {
       state.gl.render(scene, cam.current)
       // And flip the render-target to the default again
       state.gl.setRenderTarget(null)
-
       return
     }
 
     // Visualizer state
     if (portalCamRef.current) {
       // reset camera if moved / rotated
-      state.camera.position.lerp(new THREE.Vector3(0, 0, 3), delta)
+      state.camera.position.lerp(new THREE.Vector3(0, 0, 3), delta * 2)
       // if cam is far lerp further
       if (state.camera.position.z > 5) {
         console.log('lerping from portal to dashboardScene')
         // rotate camera center
         state.camera.quaternion.slerp(
           new THREE.Quaternion(-Math.PI * 2, 0, 0, 1),
-          delta
+          delta * 10
         )
         // position camera center
-        state.camera.position.lerp(new THREE.Vector3(0, 0, 10), delta * 2)
+        state.camera.position.lerp(new THREE.Vector3(0, 0, 10), delta * 20)
         state.camera.updateProjectionMatrix()
         state.camera.updateMatrixWorld()
 
@@ -111,9 +93,13 @@ function Portal({ children, ...props }) {
         portalCamRef.current = false
         console.log('switch out of portal cam')
       }
-      // bounce if cam has been switched
     }
   })
+
+  // reset time
+  useEffect(() => {
+    time.current = 0
+  }, [isVisualizer])
 
   return isVisualizer ? (
     children
