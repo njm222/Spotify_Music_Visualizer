@@ -1,5 +1,6 @@
 import { Suspense, memo, useEffect } from 'react'
 import { useThree } from '@react-three/fiber'
+import { Stars } from '@react-three/drei'
 import useStore from '@/helpers/store'
 import Portal from './Portal'
 import Visualizer from './Visualizer'
@@ -37,6 +38,14 @@ const DashboardScene = () => {
             </Portal>
             {!isVisualizer && (
               <>
+                <Stars
+                  radius={10}
+                  depth={50}
+                  count={1000}
+                  factor={4}
+                  saturation={0}
+                  fade
+                />
                 <Bridge />
                 <SceneLighting />
               </>
