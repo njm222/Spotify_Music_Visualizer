@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 import { extend } from '@react-three/fiber'
 
-export default class BasicMaterial extends THREE.ShaderMaterial {
+export default class ParticleMaterial extends THREE.ShaderMaterial {
   constructor() {
     super({
       uniforms: {
@@ -37,4 +37,4 @@ export default class BasicMaterial extends THREE.ShaderMaterial {
   }
 }
 
-extend({ BasicMaterial })
+extend({ ParticleMaterial })
