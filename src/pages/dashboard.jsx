@@ -3,6 +3,8 @@ import useStore from '@/helpers/store'
 import dynamic from 'next/dynamic'
 import { setAccessToken } from '@/spotifyClient'
 import Keyboard from '@/components/dom/controls/Keybaord'
+import IconButton from '@/components/dom/IconButton'
+import SettingsIcon from '@/components/dom/SettingsIcon'
 import { updateToken } from '@/backendClient'
 
 const WelcomeUser = dynamic(() => import('@/components/dom/WelcomeUser'), {
@@ -27,6 +29,10 @@ const Player = dynamic(() => import('@/components/dom/player/Player'), {
   ssr: false,
 })
 
+const Settings = dynamic(() => import('@/components/dom/Settings'), {
+  ssr: false,
+})
+
 const Page = () => {
   const [set, isVisualizer, refreshToken, router] = useStore((state) => [
     state.set,
@@ -36,9 +42,9 @@ const Page = () => {
   ])
 
   const [tokenReady, setTokenReady] = useState(false)
+  const [showSettings, setShowSettings] = useState(false)
 
-  useEffect(() => {
-    set({ title: 'Dashboard' })
+  const handleTokens = () => {
     const searchParams = new URLSearchParams(window.location.search)
     if (searchParams.has('access_token') && searchParams.has('refresh_token')) {
       // get and store tokens from query string
@@ -58,6 +64,11 @@ const Page = () => {
       // redirect home for all edge cases
       router.push('/')
     }
+  }
+
+  useEffect(() => {
+    set({ title: 'Dashboard' })
+    handleTokens()
   }, [])
 
   return (
@@ -70,6 +81,15 @@ const Page = () => {
       )}
       {tokenReady && <Player />}
       <Keyboard />
+      {showSettings ? (
+        <Settings close={() => setTokenReady(false)} />
+      ) : (
+        <IconButton
+          title='settings'
+          onClick={() => setShowSettings(true)}
+          icon={<SettingsIcon />}
+        />
+      )}
       <DashboardScene r3f />
     </>
   )

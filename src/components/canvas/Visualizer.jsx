@@ -26,7 +26,11 @@ const Visualizer = () => {
     if (useStore.getState().audioAnalyzer) {
       return
     }
-    set({ audioAnalyzer: new AudioAnalyzer() })
+    set({
+      audioAnalyzer: new AudioAnalyzer(
+        useStore.getState().audioAnalyzerOptions
+      ),
+    })
   }, [])
 
   useFrame(() => {
