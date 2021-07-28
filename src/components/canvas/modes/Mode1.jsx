@@ -2,7 +2,7 @@ import { useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Vector3, Float32BufferAttribute } from 'three'
 import useStore from '@/helpers/store'
-import '../shaders/BasicMaterial'
+import '../shaders/ParticleMaterial'
 
 const Mode1 = () => {
   const mesh = useRef()
@@ -174,7 +174,7 @@ const Mode1 = () => {
     <>
       <points ref={mesh}>
         <bufferGeometry attach='geometry' />
-        <basicMaterial transparent depthWrite={false} />
+        <particleMaterial transparent depthWrite={false} />
       </points>
     </>
   )
