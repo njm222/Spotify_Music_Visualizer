@@ -5,6 +5,7 @@ import useStore from '@/helpers/store'
 import Portal from './Portal'
 import Visualizer from './Visualizer'
 import Bridge from '../models/Bridge'
+import Main from './Main'
 
 const SceneLighting = () => {
   return (
@@ -16,6 +17,7 @@ const SceneLighting = () => {
     </>
   )
 }
+
 const DashboardScene = () => {
   console.log('dashboardScene')
   const [ready, isVisualizer] = useStore((state) => [
@@ -37,7 +39,7 @@ const DashboardScene = () => {
               <Visualizer />
             </Portal>
             {!isVisualizer && (
-              <>
+              <Main>
                 <Stars
                   radius={10}
                   depth={50}
@@ -51,7 +53,7 @@ const DashboardScene = () => {
                   rotation={[0, Math.PI / 2, 0]}
                 />
                 <SceneLighting />
-              </>
+              </Main>
             )}
           </>
         )}

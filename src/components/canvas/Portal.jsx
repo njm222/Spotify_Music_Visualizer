@@ -3,6 +3,9 @@ import { memo, useState, useRef } from 'react'
 import { useFrame, createPortal } from '@react-three/fiber'
 import { useFBO, PerspectiveCamera } from '@react-three/drei'
 import useStore from '@/helpers/store'
+import './shaders/GlowMaterial'
+import Bloom from './Bloom'
+import Main from './Main'
 
 function Portal({ children, ...props }) {
   console.log('portal')
@@ -87,8 +90,8 @@ function Portal({ children, ...props }) {
       }
       // if cam is very far switch cams
       if (state.camera.position.z > 8) {
-        set({ isVisualizer: false })
         portalCamRef.current = false
+        set({ isVisualizer: false })
         console.log('switch out of portal cam')
       }
     }
@@ -98,11 +101,20 @@ function Portal({ children, ...props }) {
     children
   ) : (
     <>
-      <mesh ref={mesh} {...props}>
-        <planeGeometry args={[2.5, 5]} />
-        {/* The "mirror" is just a boring plane, but it receives the buffer texture */}
-        <meshBasicMaterial map={fbo.texture} />
-      </mesh>
+      <Main>
+        <mesh ref={mesh}>
+          <planeGeometry args={[2.5, 5]} />
+          {/* The "mirror" is just a boring plane, but it receives the buffer texture */}
+          <meshBasicMaterial map={fbo.texture} />
+        </mesh>
+      </Main>
+      <Bloom>
+        <mesh position={[0, 0, -0.02]}>
+          <planeGeometry args={[2.6, 5.1]} attach='geometry' />
+          <meshBasicMaterial color='red' />
+        </mesh>
+        <ambientLight />
+      </Bloom>
       <PerspectiveCamera
         manual
         ref={cam}
