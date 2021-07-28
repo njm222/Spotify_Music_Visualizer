@@ -1,5 +1,5 @@
 export default class AudioAnalyser {
-  constructor(options) {
+  constructor(props) {
     this.bassObject = {
       deviation: 0,
       average: 0,
@@ -57,10 +57,11 @@ export default class AudioAnalyser {
     this.context = new AudioContext()
     // create analyser
     this.analyser = this.context.createAnalyser()
-    this.analyser.fftSize = options.fftSize
-    this.analyser.smoothingTimeConstant = options.smoothingTimeConstant
-    this.analyser.minDecibels = options.minDecibels
-    this.analyser.maxDecibels = options.maxDecibels
+    this.analyser.fftSize = props.fftSize
+    this.analyser.smoothingTimeConstant = props.smoothingTimeConstant
+    this.analyser.minDecibels = props.minDecibels
+    this.analyser.maxDecibels = props.maxDecibels
+    console.log(props)
     this.frequencyData = new Uint8Array(this.analyser.frequencyBinCount)
     this.bufferLength = this.analyser.frequencyBinCount
     this.source = null
@@ -85,6 +86,13 @@ export default class AudioAnalyser {
     } else {
       console.log('getUserMedia not supported on your browser!')
     }
+  }
+
+  updateAnalyser(options) {
+    this.analyser.fftSize = options.fftSize
+    this.analyser.smoothingTimeConstant = options.smoothingTimeConstant
+    this.analyser.minDecibels = options.minDecibels
+    this.analyser.maxDecibels = options.maxDecibels
   }
 
   resetData() {
