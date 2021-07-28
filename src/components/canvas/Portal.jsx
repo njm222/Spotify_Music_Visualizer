@@ -3,7 +3,6 @@ import { memo, useState, useRef } from 'react'
 import { useFrame, createPortal } from '@react-three/fiber'
 import { useFBO, PerspectiveCamera } from '@react-three/drei'
 import useStore from '@/helpers/store'
-import './shaders/GlowMaterial'
 import Bloom from './Bloom'
 import Main from './Main'
 
