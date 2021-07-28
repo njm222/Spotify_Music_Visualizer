@@ -1,5 +1,5 @@
 export default class AudioAnalyser {
-  constructor() {
+  constructor(options) {
     this.bassObject = {
       deviation: 0,
       average: 0,
@@ -57,10 +57,10 @@ export default class AudioAnalyser {
     this.context = new AudioContext()
     // create analyser
     this.analyser = this.context.createAnalyser()
-    this.analyser.fftSize = 128
-    // this.analyser.smoothingTimeConstant = 0.8
-    // this.analyser.minDecibels = -90
-    // this.analyser.maxDecibels = -25 TODO: make this user adjustable
+    this.analyser.fftSize = options.fftSize
+    this.analyser.smoothingTimeConstant = options.smoothingTimeConstant
+    this.analyser.minDecibels = options.minDecibels
+    this.analyser.maxDecibels = options.maxDecibels
     this.frequencyData = new Uint8Array(this.analyser.frequencyBinCount)
     this.bufferLength = this.analyser.frequencyBinCount
     this.source = null
