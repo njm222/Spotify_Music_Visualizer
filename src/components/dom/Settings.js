@@ -3,7 +3,7 @@ import useStore from '@/helpers/store'
 import { useEffect } from 'react'
 import { defaultAnalyzerOptions } from '@/constants'
 
-const Settings = () => {
+const Settings = ({ handleClose }) => {
   const audioAnalyzerOptions = useStore((state) => state.audioAnalyzerOptions)
   const set = useStore((state) => state.set)
   const { fftSize, smoothingTimeConstant, minDecibels, maxDecibels } =
@@ -65,6 +65,7 @@ const Settings = () => {
       reset: button(() =>
         set({ audioAnalyzerOptions: defaultAnalyzerOptions })
       ),
+      close: button(() => handleClose()),
     },
     [audioAnalyzerOptions]
   )

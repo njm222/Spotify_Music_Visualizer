@@ -74,6 +74,14 @@ img {
   }
 }
 
+/* ---------- Settings ---------- */
+.settings { 
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  color: #292929;
+  cursor: pointer;
+}
 
 /* ---------- Playlists ---------- */
 
@@ -148,7 +156,7 @@ img {
   transition: all 0.2s
 }
 
-.playerControls .iconButton.hover {
+.iconButton.hover {
   color: #FFF;
 }
 

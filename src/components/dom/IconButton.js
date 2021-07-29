@@ -5,7 +5,7 @@ export default function IconButton({ title, icon, onClick }) {
   return (
     <button
       title={title}
-      className={`iconButton ${hover ? 'hover' : ''}`}
+      className={`iconButton ${title} ${hover ? 'hover' : ''}`}
       onClick={onClick}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}

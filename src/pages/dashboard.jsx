@@ -82,7 +82,7 @@ const Page = () => {
       {tokenReady && <Player />}
       <Keyboard />
       {showSettings ? (
-        <Settings close={() => setTokenReady(false)} />
+        <Settings handleClose={() => setShowSettings(false)} />
       ) : (
         <IconButton
           title='settings'
