@@ -8,7 +8,10 @@ const Settings = ({ handleClose }) => {
   const set = useStore((state) => state.set)
   const { fftSize, smoothingTimeConstant, minDecibels, maxDecibels } =
     audioAnalyzerOptions
-  const options = useControls(
+
+  const values = useControls({ close: button(() => handleClose()) })
+  const analyzerValues = useControls(
+    'Analyzer Options',
     {
       fftSize: {
         value: fftSize,
@@ -65,7 +68,6 @@ const Settings = ({ handleClose }) => {
       reset: button(() =>
         set({ audioAnalyzerOptions: defaultAnalyzerOptions })
       ),
-      close: button(() => handleClose()),
     },
     [audioAnalyzerOptions]
   )
