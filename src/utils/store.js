@@ -1,6 +1,6 @@
 import create from 'zustand'
 import { persist } from 'zustand/middleware'
-import SpotifyAnalyzer from '@/helpers/SpotifyAnalyzer'
+import SpotifyAnalyzer from '@/utils/SpotifyAnalyzer'
 import { defaultAnalyzerOptions } from '@/constants'
 
 const useStore = create(

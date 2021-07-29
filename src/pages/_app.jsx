@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router'
-import useStore from '@/helpers/store'
+import useStore from '@/utils/store'
 import { useEffect, Children, Component } from 'react'
 import Header from '@/config'
 import dynamic from 'next/dynamic'

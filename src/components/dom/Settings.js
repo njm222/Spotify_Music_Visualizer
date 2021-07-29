@@ -1,5 +1,5 @@
 import { button, useControls } from 'leva'
-import useStore from '@/helpers/store'
+import useStore from '@/utils/store'
 import { useEffect } from 'react'
 import { defaultAnalyzerOptions } from '@/constants'
 
@@ -12,8 +12,8 @@ const Settings = ({ handleClose }) => {
     {
       fftSize: {
         value: fftSize,
-        min: 128,
-        max: 1028,
+        min: 64,
+        max: 2048,
         step: fftSize,
         onChange: (v) =>
           set({

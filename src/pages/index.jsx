@@ -1,4 +1,4 @@
-import useStore from '@/helpers/store'
+import useStore from '@/utils/store'
 import dynamic from 'next/dynamic'
 
 const LandingScene = dynamic(() => import('@/components/canvas/LandingScene'), {

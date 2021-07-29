@@ -1,5 +1,5 @@
 import { useEffect, memo } from 'react'
-import useStore from '@/helpers/store'
+import useStore from '@/utils/store'
 
 const modeMap = [
   { key: '0', value: 0 },

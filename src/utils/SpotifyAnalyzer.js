@@ -1,4 +1,4 @@
-import useStore, { mutations } from '@/helpers/store'
+import useStore, { mutations } from '@/utils/store'
 
 export default class SpotifyAnalyzer {
   constructor() {

@@ -1,7 +1,7 @@
 import { useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Vector3, Float32BufferAttribute } from 'three'
-import useStore from '@/helpers/store'
+import useStore from '@/utils/store'
 import '../shaders/ParticleMaterial'
 
 const Mode1 = () => {

@@ -1,7 +1,7 @@
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls, Preload } from '@react-three/drei'
 import { A11yUserPreferences } from '@react-three/a11y'
-import useStore from '@/helpers/store'
+import useStore from '@/utils/store'
 import { useEffect, useRef } from 'react'
 
 const LControl = () => {

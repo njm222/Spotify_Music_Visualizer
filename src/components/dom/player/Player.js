@@ -1,6 +1,6 @@
 import { memo, useEffect, useMemo, useRef } from 'react'
 import Image from 'next/image'
-import useStore, { mutations } from '@/helpers/store'
+import useStore, { mutations } from '@/utils/store'
 import { sdkInit } from '@/spotifyClient'
 import PlayerControls from './PlayerControls'
 

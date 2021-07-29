@@ -3,7 +3,7 @@ import { useFrame } from '@react-three/fiber'
 import simplex from 'simplex-noise'
 import * as THREE from 'three'
 import getColour from '@/helpers/getColour'
-import useStore from '@/helpers/store'
+import useStore from '@/utils/store'
 
 let simplexNoise = new simplex(Math.round(Math.random() * 1000))
 

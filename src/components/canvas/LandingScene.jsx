@@ -2,7 +2,7 @@ import { useState, useEffect, memo, Suspense } from 'react'
 import { useThree, useFrame } from '@react-three/fiber'
 import { Stars } from '@react-three/drei'
 import * as THREE from 'three'
-import useStore from '@/helpers/store'
+import useStore from '@/utils/store'
 import Text from './Text'
 import { login } from '../../backendClient'
 

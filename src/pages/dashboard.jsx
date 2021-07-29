@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import useStore from '@/helpers/store'
+import useStore from '@/utils/store'
 import dynamic from 'next/dynamic'
 import { setAccessToken } from '@/spotifyClient'
 import Keyboard from '@/components/dom/controls/Keybaord'

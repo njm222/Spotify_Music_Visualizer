@@ -1,7 +1,7 @@
 import { Suspense, memo, useEffect } from 'react'
 import { useThree } from '@react-three/fiber'
 import { Stars } from '@react-three/drei'
-import useStore from '@/helpers/store'
+import useStore from '@/utils/store'
 import Portal from './Portal'
 import Visualizer from './Visualizer'
 import Bridge from '../models/Bridge'

@@ -2,7 +2,7 @@ import * as THREE from 'three'
 import { memo, useState, useRef } from 'react'
 import { useFrame, createPortal } from '@react-three/fiber'
 import { useFBO, PerspectiveCamera } from '@react-three/drei'
-import useStore from '@/helpers/store'
+import useStore from '@/utils/store'
 import Bloom from './Bloom'
 import Main from './Main'
 

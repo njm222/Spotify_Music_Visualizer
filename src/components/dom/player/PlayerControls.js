@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import useStore from '@/helpers/store'
+import useStore from '@/utils/store'
 import { prevTrack, playTrack, pausePlayer, nextTrack } from '@/spotifyClient'
 import { PlayIcon, PauseIcon, NextIcon, PrevIcon } from './PlayerIcons'
 import IconButton from '../IconButton'
