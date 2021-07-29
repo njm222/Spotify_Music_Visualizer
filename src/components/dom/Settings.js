@@ -1,6 +1,7 @@
-import { Leva, useControls } from 'leva'
+import { button, useControls } from 'leva'
 import useStore from '@/helpers/store'
 import { useEffect } from 'react'
+import { defaultAnalyzerOptions } from '@/constants'
 
 const Settings = () => {
   const audioAnalyzerOptions = useStore((state) => state.audioAnalyzerOptions)
@@ -13,7 +14,7 @@ const Settings = () => {
         value: fftSize,
         min: 128,
         max: 1028,
-        step: 128,
+        step: fftSize,
         onChange: (v) =>
           set({
             audioAnalyzerOptions: {
@@ -61,6 +62,9 @@ const Settings = () => {
             },
           }),
       },
+      reset: button(() =>
+        set({ audioAnalyzerOptions: defaultAnalyzerOptions })
+      ),
     },
     [audioAnalyzerOptions]
   )
