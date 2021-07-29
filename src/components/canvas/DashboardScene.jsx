@@ -10,10 +10,9 @@ import Main from './Main'
 const SceneLighting = () => {
   return (
     <>
-      <ambientLight intensity={0.8} />
-      <directionalLight castShadow position={[2.5, 12, 12]} intensity={4} />
-      <pointLight position={[20, 20, 20]} />
-      <pointLight position={[-20, -20, -20]} intensity={5} />
+      <directionalLight castShadow position={[2.5, 12, 12]} intensity={0.5} />
+      <pointLight castShadow position={[20, 20, 20]} intensity={1} />
+      <pointLight castShadow position={[-20, -20, -20]} intensity={1} />
     </>
   )
 }
@@ -34,28 +33,21 @@ const DashboardScene = () => {
     <>
       <Suspense fallback={null}>
         {ready && (
-          <>
+          <Main>
             <Portal>
               <Visualizer />
             </Portal>
             {!isVisualizer && (
-              <Main>
-                <Stars
-                  radius={10}
-                  depth={50}
-                  count={1000}
-                  factor={4}
-                  saturation={0}
-                  fade
-                />
+              <>
+                <Stars radius={10} depth={50} count={5000} factor={2} fade />
                 <Bridge
                   position={[0, -2.5, 5]}
                   rotation={[0, Math.PI / 2, 0]}
                 />
                 <SceneLighting />
-              </Main>
+              </>
             )}
-          </>
+          </Main>
         )}
       </Suspense>
     </>

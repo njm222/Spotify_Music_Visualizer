@@ -48,14 +48,7 @@ const LandingScene = () => {
       <directionalLight castShadow position={[2.5, 12, 12]} intensity={4} />
       <pointLight position={[20, 20, 20]} />
       <pointLight position={[-20, -20, -20]} intensity={5} />
-      <Stars
-        radius={10}
-        depth={50}
-        count={1000}
-        factor={4}
-        saturation={0}
-        fade
-      />
+      <Stars radius={10} depth={50} count={10000} factor={1} fade />
       <Text
         onPointerDown={() => handleClick()}
         onPointerEnter={() => setPointer(true)}

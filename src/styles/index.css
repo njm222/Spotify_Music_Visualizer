@@ -80,7 +80,6 @@ img {
   top: 1rem;
   right: 1rem;
   color: #292929;
-  cursor: pointer;
 }
 
 /* ---------- Playlists ---------- */
@@ -158,6 +157,7 @@ img {
 
 .iconButton.hover {
   color: #FFF;
+  cursor: pointer;
 }
 
 /** Progress **/
