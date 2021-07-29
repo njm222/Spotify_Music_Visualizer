@@ -15,9 +15,7 @@ const Settings = ({ handleClose }) => {
     {
       fftSize: {
         value: fftSize,
-        min: 64,
-        max: 2048,
-        step: fftSize,
+        options: [64, 128, 256, 512, 1024, 2048],
         onChange: (v) =>
           set({
             audioAnalyzerOptions: {
