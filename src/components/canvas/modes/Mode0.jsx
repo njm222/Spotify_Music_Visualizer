@@ -15,7 +15,7 @@ const Terrain = () => {
 
   // Set the grid size and resolution
   const size = [10, 10]
-  const res = [256, 256]
+  const res = [128, 128]
 
   const { tempo } = useStore((state) => state.spotifyAnalyzer?.section)
 
