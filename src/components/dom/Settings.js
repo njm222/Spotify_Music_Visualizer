@@ -59,6 +59,7 @@ const Settings = ({ handleClose }) => {
         max: 0,
         step: 1,
         onChange: (v) => handleChange(v, 'maxDecibels'),
+        transient: true,
       },
       reset: button(
         () => set({ audioAnalyzerOptions: defaultAnalyzerOptions }) // TODO: reset bug
