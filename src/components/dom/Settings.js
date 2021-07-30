@@ -1,15 +1,31 @@
 import { button, useControls } from 'leva'
-import { useStore } from '@/utils/store'
+import { useStore, setState } from '@/utils/store'
 import { useEffect } from 'react'
 import { defaultAnalyzerOptions } from '@/constants'
 
 const Settings = ({ handleClose }) => {
   console.log('settings')
   const audioAnalyzerOptions = useStore((state) => state.audioAnalyzerOptions)
-  const set = useStore.getState().set
+  const set = useStore((state) => state.set)
 
   const { fftSize, smoothingTimeConstant, minDecibels, maxDecibels } =
     audioAnalyzerOptions
+
+  const handleChange = (value, key) => {
+    if (value === audioAnalyzerOptions[key]) {
+      return
+    }
+    set((state) => ({
+      audioAnalyzerOptions: {
+        ...state.audioAnalyzerOptions,
+        [key]: value,
+      },
+    }))
+  }
+
+  useEffect(() => {
+    useStore.getState().audioAnalyzer?.updateAnalyser(audioAnalyzerOptions)
+  }, [audioAnalyzerOptions])
 
   const values = useControls({ close: button(() => handleClose()) }, [])
   const analyzerValues = useControls(
@@ -18,63 +34,38 @@ const Settings = ({ handleClose }) => {
       fftSize: {
         value: fftSize,
         options: [64, 128, 256, 512, 1024, 2048],
-        onChange: (v) =>
-          set({
-            audioAnalyzerOptions: {
-              ...audioAnalyzerOptions,
-              fftSize: v,
-            },
-          }),
+        onChange: (v) => handleChange(v, 'fftSize'),
+        transient: true,
       },
       smoothingTimeConstant: {
         value: smoothingTimeConstant,
         min: 0.1,
         max: 1,
         step: 0.01,
-        onChange: (v) =>
-          set({
-            audioAnalyzerOptions: {
-              ...audioAnalyzerOptions,
-              smoothingTimeConstant: v,
-            },
-          }),
+        onChange: (v) => handleChange(v, 'smoothingTimeConstant'),
+        transient: true,
       },
       minDecibels: {
         value: minDecibels,
         min: -200,
         max: maxDecibels - 1,
         step: 1,
-        onChange: (v) =>
-          set({
-            audioAnalyzerOptions: {
-              ...audioAnalyzerOptions,
-              minDecibels: v,
-            },
-          }),
+        onChange: (v) => handleChange(v, 'minDecibels'),
+        transient: true,
       },
       maxDecibels: {
         value: maxDecibels,
         min: minDecibels + 1,
         max: 0,
         step: 1,
-        onChange: (v) =>
-          set({
-            audioAnalyzerOptions: {
-              ...audioAnalyzerOptions,
-              maxDecibels: v,
-            },
-          }),
+        onChange: (v) => handleChange(v, 'maxDecibels'),
       },
-      reset: button(() =>
-        set({ audioAnalyzerOptions: defaultAnalyzerOptions })
+      reset: button(
+        () => set({ audioAnalyzerOptions: defaultAnalyzerOptions }) // TODO: reset bug
       ),
     },
     [audioAnalyzerOptions]
   )
-
-  useEffect(() => {
-    useStore.getState().audioAnalyzer?.updateAnalyser(audioAnalyzerOptions)
-  }, [audioAnalyzerOptions])
 
   return null
 }
