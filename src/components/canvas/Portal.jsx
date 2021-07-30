@@ -1,11 +1,16 @@
 import * as THREE from 'three'
+import dynamic from 'next/dynamic'
 import { memo, useState, useRef } from 'react'
 import { useFrame, createPortal } from '@react-three/fiber'
 import { useFBO, PerspectiveCamera } from '@react-three/drei'
 import { useStore } from '@/utils/store'
-import Bloom from './effects/Bloom'
 
-function Portal({ children, ...props }) {
+// dynamic imported needed for ts default export workaround
+const Bloom = dynamic(() => import('@/components/canvas/effects/Bloom'), {
+  ssr: false,
+})
+
+function Portal({ children }) {
   console.log('portal')
   const isVisualizer = useStore((state) => state.isVisualizer)
 
