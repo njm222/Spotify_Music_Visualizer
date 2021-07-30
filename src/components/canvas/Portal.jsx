@@ -100,13 +100,6 @@ function Portal({ children, ...props }) {
     children
   ) : (
     <>
-      <Main>
-        <mesh ref={mesh}>
-          <planeGeometry args={[2.5, 5]} />
-          {/* The "mirror" is just a boring plane, but it receives the buffer texture */}
-          <meshBasicMaterial map={fbo.texture} />
-        </mesh>
-      </Main>
       <Bloom>
         <mesh position={[0, 0, -0.02]}>
           <planeGeometry args={[2.6, 5.1]} attach='geometry' />
@@ -114,6 +107,11 @@ function Portal({ children, ...props }) {
         </mesh>
         <ambientLight />
       </Bloom>
+      <mesh ref={mesh}>
+        <planeGeometry args={[2.5, 5]} />
+        {/* The "mirror" is just a boring plane, but it receives the buffer texture */}
+        <meshBasicMaterial map={fbo.texture} />
+      </mesh>
       <PerspectiveCamera
         manual
         ref={cam}
