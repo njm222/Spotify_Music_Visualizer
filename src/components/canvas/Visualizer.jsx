@@ -1,7 +1,7 @@
 import { memo, useEffect, useMemo } from 'react'
 import { useFrame } from '@react-three/fiber'
 import AudioAnalyzer from '@/utils/AudioAnalyzer'
-import useStore from '@/utils/store'
+import { useStore } from '@/utils/store'
 import Mode0 from './modes/Mode0'
 import Mode1 from './modes/Mode1'
 import Mode2 from './modes/Mode2'

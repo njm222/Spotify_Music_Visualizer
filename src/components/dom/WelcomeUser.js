@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import useStore from '@/utils/store'
+import { useStore } from '@/utils/store'
 import { getMyInfo } from '@/spotifyClient'
 
 export default function WelcomeUser() {

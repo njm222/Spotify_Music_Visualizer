@@ -1,4 +1,4 @@
-import useStore from '@/utils/store'
+import { useStore } from '@/utils/store'
 import { useRef, useEffect } from 'react'
 
 const Dom = ({ children }) => {

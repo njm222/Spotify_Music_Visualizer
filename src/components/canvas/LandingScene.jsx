@@ -2,7 +2,7 @@ import { useState, useEffect, memo, Suspense } from 'react'
 import { useThree, useFrame } from '@react-three/fiber'
 import { Stars } from '@react-three/drei'
 import * as THREE from 'three'
-import useStore from '@/utils/store'
+import { useStore } from '@/utils/store'
 import Text from './Text'
 import { login } from '../../backendClient'
 
@@ -16,11 +16,16 @@ const LandingScene = () => {
 
   useEffect(() => {
     camera.position.z = 40
+    return () => {
+      document.documentElement.style.cursor = 'unset'
+    }
   }, [])
 
   useFrame((state, delta) => {
     if (clicked) {
       camera.position.lerp(new THREE.Vector3(0, 0, -40), delta) // TODO: lerp camera position
+    } else {
+      camera.position.lerp(new THREE.Vector3(0, 0, 40), delta * 2)
     }
   })
 

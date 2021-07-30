@@ -1,23 +1,16 @@
 import { useEffect, useState } from 'react'
-import useStore from '@/utils/store'
+import { useStore } from '@/utils/store'
 import dynamic from 'next/dynamic'
 import { setAccessToken } from '@/spotifyClient'
 import Keyboard from '@/components/dom/controls/Keybaord'
 import IconButton from '@/components/dom/IconButton'
+import Settings from '@/components/dom/Settings'
 import SettingsIcon from '@/components/dom/SettingsIcon'
+import Player from '@/components/dom/player/Player'
+import WelcomeUser from '@/components/dom/WelcomeUser'
+import DashboardScene from '@/components/canvas/DashboardScene'
 import { updateToken } from '@/backendClient'
 import { Stats } from '@react-three/drei'
-
-const WelcomeUser = dynamic(() => import('@/components/dom/WelcomeUser'), {
-  ssr: false,
-})
-
-const DashboardScene = dynamic(
-  () => import('@/components/canvas/DashboardScene'),
-  {
-    ssr: false,
-  }
-)
 
 const Playlists = dynamic(
   () => import('@/components/dom/playlists/Playlists'),
@@ -26,21 +19,10 @@ const Playlists = dynamic(
   }
 )
 
-const Player = dynamic(() => import('@/components/dom/player/Player'), {
-  ssr: false,
-})
-
-const Settings = dynamic(() => import('@/components/dom/Settings'), {
-  ssr: false,
-})
-
 const Page = () => {
-  const [set, isVisualizer, refreshToken, router] = useStore((state) => [
-    state.set,
-    state.isVisualizer,
-    state.refreshToken,
-    state.router,
-  ])
+  console.log('dashboard')
+  const refreshToken = useStore.getState().refreshToken
+  const router = useStore.getState().router
 
   const [tokenReady, setTokenReady] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
@@ -50,7 +32,7 @@ const Page = () => {
     if (searchParams.has('access_token') && searchParams.has('refresh_token')) {
       // get and store tokens from query string
       setAccessToken(searchParams.get('access_token'))
-      set({
+      useStore.getState().set({
         accessToken: searchParams.get('access_token'),
         refreshToken: searchParams.get('refresh_token'),
       })
@@ -68,13 +50,13 @@ const Page = () => {
   }
 
   useEffect(() => {
-    set({ title: 'Dashboard' })
+    useStore.getState().set({ title: 'Dashboard' })
     handleTokens()
   }, [])
 
   return (
     <>
-      {tokenReady && !isVisualizer && (
+      {tokenReady && (
         <>
           <WelcomeUser />
           {/* <Playlists /> */}

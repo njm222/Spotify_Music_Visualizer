@@ -1,5 +1,5 @@
 import SpotifyWebApi from 'spotify-web-api-js'
-import useStore, { mutations } from '@/utils/store'
+import { useStore, mutations } from '@/utils/store'
 import { updateToken } from './backendClient'
 
 const spotifyClient = new SpotifyWebApi()

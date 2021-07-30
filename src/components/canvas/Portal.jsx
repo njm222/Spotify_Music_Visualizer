@@ -2,13 +2,11 @@ import * as THREE from 'three'
 import { memo, useState, useRef } from 'react'
 import { useFrame, createPortal } from '@react-three/fiber'
 import { useFBO, PerspectiveCamera } from '@react-three/drei'
-import useStore from '@/utils/store'
+import { useStore } from '@/utils/store'
 import Bloom from './effects/Bloom'
-import Main from './effects/Main'
 
 function Portal({ children, ...props }) {
   console.log('portal')
-  const set = useStore((state) => state.set)
   const isVisualizer = useStore((state) => state.isVisualizer)
 
   const mesh = useRef()
@@ -53,7 +51,7 @@ function Portal({ children, ...props }) {
         !portalCamRef.current &&
         state.camera.position.distanceTo(mesh.current.position) <= 2.1
       ) {
-        set({ isVisualizer: true })
+        useStore.getState().set({ isVisualizer: true })
         portalCamRef.current = true
         console.log('switching into portal cam')
         return
@@ -90,7 +88,7 @@ function Portal({ children, ...props }) {
       // if cam is very far switch cams
       if (state.camera.position.z > 8) {
         portalCamRef.current = false
-        set({ isVisualizer: false })
+        useStore.getState().set({ isVisualizer: false })
         console.log('switch out of portal cam')
       }
     }

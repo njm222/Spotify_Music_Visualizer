@@ -1,4 +1,4 @@
-import useStore from '@/utils/store'
+import { useStore } from '@/utils/store'
 import { Stats } from '@react-three/drei'
 import dynamic from 'next/dynamic'
 

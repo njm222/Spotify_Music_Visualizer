@@ -1,4 +1,4 @@
-import useStore from '@/utils/store'
+import { useStore } from '@/utils/store'
 import { A11y } from '@react-three/a11y'
 import { useFrame } from '@react-three/fiber'
 import { useRef, useState } from 'react'

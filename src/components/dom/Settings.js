@@ -1,15 +1,17 @@
 import { button, useControls } from 'leva'
-import useStore from '@/utils/store'
+import { useStore } from '@/utils/store'
 import { useEffect } from 'react'
 import { defaultAnalyzerOptions } from '@/constants'
 
 const Settings = ({ handleClose }) => {
+  console.log('settings')
   const audioAnalyzerOptions = useStore((state) => state.audioAnalyzerOptions)
-  const set = useStore((state) => state.set)
+  const set = useStore.getState().set
+
   const { fftSize, smoothingTimeConstant, minDecibels, maxDecibels } =
     audioAnalyzerOptions
 
-  const values = useControls({ close: button(() => handleClose()) })
+  const values = useControls({ close: button(() => handleClose()) }, [])
   const analyzerValues = useControls(
     'Analyzer Options',
     {

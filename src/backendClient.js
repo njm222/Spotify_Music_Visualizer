@@ -1,5 +1,5 @@
 import axios from 'axios'
-import useStore from './utils/store'
+import { useStore } from './utils/store'
 import { setAccessToken } from './spotifyClient'
 
 const backendClient = axios.create({

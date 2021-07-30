@@ -1,9 +1,10 @@
 import create from 'zustand'
+import shallow from 'zustand/shallow'
 import { persist } from 'zustand/middleware'
 import SpotifyAnalyzer from '@/utils/SpotifyAnalyzer'
 import { defaultAnalyzerOptions } from '@/constants'
 
-const useStore = create(
+const useStoreImpl = create(
   persist(
     (set) => ({
       set,
@@ -38,8 +39,14 @@ const useStore = create(
   )
 )
 
-export const mutations = {
+const mutations = {
   position: 0,
 }
 
-export default useStore
+// shallow compare store
+const useStore = (sel) => useStoreImpl(sel, shallow)
+Object.assign(useStore, useStoreImpl)
+
+const { getState, setState } = useStoreImpl
+
+export { getState, setState, useStore, mutations }
