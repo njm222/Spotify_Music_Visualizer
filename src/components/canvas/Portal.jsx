@@ -3,8 +3,8 @@ import { memo, useState, useRef } from 'react'
 import { useFrame, createPortal } from '@react-three/fiber'
 import { useFBO, PerspectiveCamera } from '@react-three/drei'
 import useStore from '@/utils/store'
-import Bloom from './Bloom'
-import Main from './Main'
+import Bloom from './effects/Bloom'
+import Main from './effects/Main'
 
 function Portal({ children, ...props }) {
   console.log('portal')

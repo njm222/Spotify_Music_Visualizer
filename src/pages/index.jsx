@@ -1,4 +1,5 @@
 import useStore from '@/utils/store'
+import { Stats } from '@react-three/drei'
 import dynamic from 'next/dynamic'
 
 const LandingScene = dynamic(() => import('@/components/canvas/LandingScene'), {
@@ -10,6 +11,7 @@ const Page = ({ title }) => {
   return (
     <>
       <LandingScene r3f />
+      <Stats />
     </>
   )
 }

@@ -6,6 +6,7 @@ import Keyboard from '@/components/dom/controls/Keybaord'
 import IconButton from '@/components/dom/IconButton'
 import SettingsIcon from '@/components/dom/SettingsIcon'
 import { updateToken } from '@/backendClient'
+import { Stats } from '@react-three/drei'
 
 const WelcomeUser = dynamic(() => import('@/components/dom/WelcomeUser'), {
   ssr: false,
@@ -91,6 +92,7 @@ const Page = () => {
         />
       )}
       <DashboardScene r3f />
+      <Stats />
     </>
   )
 }

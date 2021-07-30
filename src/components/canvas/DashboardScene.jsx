@@ -5,7 +5,7 @@ import useStore from '@/utils/store'
 import Portal from './Portal'
 import Visualizer from './Visualizer'
 import Bridge from '../models/Bridge'
-import Main from './Main'
+import Main from './effects/Main'
 
 const SceneLighting = () => {
   return (
