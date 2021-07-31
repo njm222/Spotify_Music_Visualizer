@@ -89,7 +89,7 @@ const addPlayerListeners = (player) => {
       useStore.getState().spotifyAnalyzer.setData(analysis)
       // update store with new track data
       useStore.setState({
-        ready: true,
+        playerReady: true,
         spotifyFeatures: features,
         player: {
           playerState,
