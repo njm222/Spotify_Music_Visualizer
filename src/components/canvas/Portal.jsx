@@ -4,7 +4,7 @@ import { memo, useState, useRef } from 'react'
 import { useFrame, createPortal } from '@react-three/fiber'
 import { useFBO, PerspectiveCamera } from '@react-three/drei'
 import { useStore } from '@/utils/store'
-
+import { useToggle } from '@/components/useToggle'
 // dynamic imported needed for ts default export workaround
 const Bloom = dynamic(() => import('@/components/canvas/effects/Bloom'), {
   ssr: false,
@@ -99,31 +99,45 @@ function Portal({ children }) {
     }
   })
 
-  return isVisualizer ? (
-    children
-  ) : (
-    <>
-      <Bloom>
-        <mesh position={[0, 0, -0.02]}>
-          <planeGeometry args={[2.6, 5.1]} attach='geometry' />
-          <meshBasicMaterial color='red' />
+  const PortalScene = () => {
+    return (
+      <>
+        <Bloom>
+          <mesh position={[0, 0, -0.02]}>
+            <planeGeometry args={[2.6, 5.1]} attach='geometry' />
+            <meshBasicMaterial color='red' />
+          </mesh>
+          <ambientLight />
+        </Bloom>
+        <mesh ref={mesh}>
+          <planeGeometry args={[2.5, 5]} />
+          {/* The "mirror" is just a boring plane, but it receives the buffer texture */}
+          <meshBasicMaterial map={fbo.texture} />
         </mesh>
-        <ambientLight />
-      </Bloom>
-      <mesh ref={mesh}>
-        <planeGeometry args={[2.5, 5]} />
-        {/* The "mirror" is just a boring plane, but it receives the buffer texture */}
-        <meshBasicMaterial map={fbo.texture} />
-      </mesh>
-      <PerspectiveCamera
-        manual
-        ref={cam}
-        fov={50}
-        aspect={2.5 / 5}
-        onUpdate={(c) => c.updateProjectionMatrix()}
-      />
-      {/* This is React being awesome, we portal this components children into the separate scene above */}
-      {createPortal(children, scene)}
+        <PerspectiveCamera
+          manual
+          ref={cam}
+          fov={50}
+          aspect={2.5 / 5}
+          onUpdate={(c) => c.updateProjectionMatrix()}
+        />
+        {/* This is React being awesome, we portal this components children into the separate scene above */}
+        {createPortal(children, scene)}
+      </>
+    )
+  }
+
+  const VisualizerScene = () => {
+    return children
+  }
+
+  const ToggledPortal = useToggle(PortalScene, '!isVisualizer')
+  const ToggledVisualizer = useToggle(VisualizerScene, 'isVisualizer')
+
+  return (
+    <>
+      <ToggledPortal />
+      <ToggledVisualizer />
     </>
   )
 }
