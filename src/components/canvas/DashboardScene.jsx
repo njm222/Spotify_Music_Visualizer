@@ -1,7 +1,7 @@
 import { Suspense, memo, useEffect } from 'react'
 import { useThree } from '@react-three/fiber'
 import { Stars } from '@react-three/drei'
-import { useStore } from '@/utils/store'
+import { useToggle } from '@/components/useToggle'
 import Portal from './Portal'
 import Visualizer from './Visualizer'
 import Bridge from '../models/Bridge'
@@ -17,13 +17,20 @@ const SceneLighting = () => {
   )
 }
 
+const OuterScene = () => {
+  return (
+    <>
+      <Stars radius={10} depth={50} count={5000} factor={2} fade />
+      <Bridge position={[0, -2.5, 5]} rotation={[0, Math.PI / 2, 0]} />
+      <SceneLighting />
+    </>
+  )
+}
+
 const DashboardScene = () => {
   console.log('dashboardScene')
-  const [ready, isVisualizer] = useStore((state) => [
-    state.ready,
-    state.isVisualizer,
-  ])
   const camera = useThree((state) => state.camera)
+  const ToggledOuterScene = useToggle(OuterScene, '!isVisualizer')
 
   useEffect(() => {
     camera.position.z = 10
@@ -32,23 +39,12 @@ const DashboardScene = () => {
   return (
     <>
       <Suspense fallback={null}>
-        {ready && (
-          <Main>
-            <Portal>
-              <Visualizer />
-            </Portal>
-            {!isVisualizer && (
-              <>
-                <Stars radius={10} depth={50} count={5000} factor={2} fade />
-                <Bridge
-                  position={[0, -2.5, 5]}
-                  rotation={[0, Math.PI / 2, 0]}
-                />
-                <SceneLighting />
-              </>
-            )}
-          </Main>
-        )}
+        <Main>
+          <Portal>
+            <Visualizer />
+          </Portal>
+          <ToggledOuterScene />
+        </Main>
       </Suspense>
     </>
   )
