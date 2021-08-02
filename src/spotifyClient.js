@@ -78,7 +78,7 @@ const addPlayerListeners = (player) => {
     console.log('player state changed')
 
     // update track position
-    mutations.position = playerState.position
+    mutations.position = playerState?.position
 
     const trackId = playerState?.track_window.current_track.id
     if (trackId !== useStore.getState().player.lastPlayed) {
