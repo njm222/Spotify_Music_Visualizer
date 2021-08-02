@@ -1,6 +1,7 @@
 import { Suspense, memo, useEffect } from 'react'
-import { useThree } from '@react-three/fiber'
+import { useFrame, useThree } from '@react-three/fiber'
 import { Stars } from '@react-three/drei'
+import { useStore } from '@/utils/store'
 import { useToggle } from '@/components/useToggle'
 import Portal from './Portal'
 import Visualizer from './Visualizer'
@@ -30,11 +31,18 @@ const OuterScene = () => {
 const DashboardScene = () => {
   console.log('dashboardScene')
   const camera = useThree((state) => state.camera)
+  const router = useStore((state) => state.router)
   const ToggledOuterScene = useToggle(OuterScene, '!isVisualizer')
 
   useEffect(() => {
-    camera.position.z = 10
+    camera.position.set(-50, 50, 150)
   }, [])
+
+  useFrame(() => {
+    if (camera.position.z > 175) {
+      router.push('/about')
+    }
+  })
 
   return (
     <>

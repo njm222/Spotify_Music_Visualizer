@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { setState, useStore } from '@/utils/store'
 import { setAccessToken } from '@/spotifyClient'
 import Keyboard from '@/components/dom/controls/Keybaord'
