@@ -146,8 +146,14 @@ const Mode1 = () => {
 
   useFrame(() => {
     // update torus attributes
-    const [radius, tube, tubularSegments, radialSegments, p, q] =
-      updateTorusAttributes()
+    const [
+      radius = 10,
+      tube = 5,
+      tubularSegments = 5,
+      radialSegments = 5,
+      p = 2,
+      q = 3,
+    ] = updateTorusAttributes()
 
     const [indices, vertices, normals, uvs] = getTorusBufferAttributes(
       radius,

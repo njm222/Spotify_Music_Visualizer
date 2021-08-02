@@ -11,7 +11,8 @@ const Terrain = () => {
   // Get reference of the terrain
   const terrainGeometryRef = useRef()
   const terrainMaterialRef = useRef()
-  const sectionChangeRef = useRef()
+  const barChangeRef = useRef()
+  const time = useRef(0)
 
   // Set the grid size and resolution
   const size = [10, 10]
@@ -42,7 +43,10 @@ const Terrain = () => {
     const { position } = terrainGeometry.attributes
 
     // Get the current time
-    const time = state.clock.getElapsedTime() * (tempo / 500)
+    time.current +=
+      (useStore.getState().audioAnalyzer?.highsObject.average +
+        useStore.getState().audioAnalyzer?.highsObject.energy) /
+      7500
 
     // For each vertex set the position on the z-axis based on the noise function
     for (let i = 0; i < position.count; i++) {
@@ -52,9 +56,9 @@ const Terrain = () => {
         position.getY(i) /
           (nScale -
             useStore.getState().audioAnalyzer?.snareObject.energy / 300),
-        time
+        time.current
       )
-      position.setZ(i, z * nAmplitude)
+      position.setZ(i, Number.isNaN(z) ? 0 : z * nAmplitude)
     }
 
     // Update the vertices
@@ -65,13 +69,14 @@ const Terrain = () => {
     // Update the material colour
     terrainMaterialRef.current.color.lerp(
       new THREE.Color(getColour()),
-      delta * 2
+      delta * 5
     )
 
+    const barStart = useStore.getState().spotifyAnalyzer?.bar.start
     // Update simplex seed on every section change
-    if (sectionChangeRef.current !== tempo) {
+    if (barChangeRef.current !== barStart) {
       simplexNoise = new simplex(Math.round(Math.random() * 1000))
-      sectionChangeRef.current = tempo
+      barChangeRef.current = barStart
     }
 
     // Switch wireframe on every bar change
