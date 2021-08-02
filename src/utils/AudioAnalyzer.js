@@ -61,9 +61,7 @@ export default class AudioAnalyser {
     this.analyser.smoothingTimeConstant = props.smoothingTimeConstant
     this.analyser.minDecibels = props.minDecibels
     this.analyser.maxDecibels = props.maxDecibels
-    console.log(props)
     this.frequencyData = new Uint8Array(this.analyser.frequencyBinCount)
-    this.bufferLength = this.analyser.frequencyBinCount
     this.source = null
 
     if (navigator.mediaDevices.getUserMedia) {
@@ -78,6 +76,12 @@ export default class AudioAnalyser {
             this.source = this.context.createMediaStreamSource(stream)
             // connect source to the analyser
             this.source.connect(this.analyser)
+            // update object limits
+            this.updateObjectLimits(
+              this.context.sampleRate,
+              this.analyser.fftSize,
+              props
+            )
           })
         })
         .catch(function (err) {
@@ -88,7 +92,46 @@ export default class AudioAnalyser {
     }
   }
 
+  updateObjectLimits(sampleRate, fftSize, options) {
+    const stepSize = sampleRate / fftSize
+
+    this.bassObject.lower = 0
+    this.bassObject.upper = Math.round(options.bassUpperLimit / stepSize)
+    if (this.bassObject.lower === this.bassObject.upper) {
+      this.bassObject.upper += 1
+    }
+
+    this.kickObject.lower = Math.round(options.kickLowerLimit / stepSize)
+    this.kickObject.upper = Math.round(options.kickUpperLimit / stepSize)
+    if (this.kickObject.lower === this.kickObject.upper) {
+      this.kickObject.upper += 1
+    }
+
+    this.snareObject.lower = Math.round(options.snareLowerLimit / stepSize)
+    this.snareObject.upper = Math.round(options.snareUpperLimit / stepSize)
+    if (this.snareObject.lower === this.snareObject.upper) {
+      this.snareObject.upper += 1
+    }
+
+    this.midsObject.lower = Math.round(options.midsLowerLimit / stepSize)
+    this.midsObject.upper = Math.round(options.midsUpperLimit / stepSize)
+    if (this.midsObject.lower === this.midsObject.upper) {
+      this.midsObject.upper += 1
+    }
+
+    this.highsObject.lower = Math.round(options.highsLowerLimit / stepSize)
+    this.highsObject.upper = fftSize / 2
+  }
+
   updateAnalyser(options) {
+    if (this.analyser.fftSize !== options.fftSize) {
+      this.updateObjectLimits(
+        this.context.sampleRate,
+        this.analyser.fftSize,
+        options
+      )
+      this.frequencyData = new Uint8Array(options.fftSize / 2)
+    }
     this.analyser.fftSize = options.fftSize
     this.analyser.smoothingTimeConstant = options.smoothingTimeConstant
     this.analyser.minDecibels = options.minDecibels
@@ -117,7 +160,6 @@ export default class AudioAnalyser {
   }
 
   updateData() {
-    this.resetData()
     this.analyser.getByteFrequencyData(this.frequencyData)
     this.getFreqSection(this.bassObject)
     this.getFreqSection(this.kickObject)
@@ -129,22 +171,29 @@ export default class AudioAnalyser {
   }
 
   getFreqSection(sectionObject) {
+    let energy = 0
+    let average = 0
+    let deviation = 0
+    const data = [...this.frequencyData]
+    let sectionLength = 0
     for (let i = sectionObject.lower; i < sectionObject.upper; i++) {
-      sectionObject.energy += this.frequencyData[i]
+      if (data[i]) {
+        energy += data[i]
+        sectionLength += 1
+      }
     }
-    sectionObject.energy =
-      sectionObject.energy / (sectionObject.upper - sectionObject.lower)
+    sectionObject.energy = energy / Math.max(sectionLength, 1)
     sectionObject.arr[sectionObject.counter++] = sectionObject.energy
 
     for (let i = 0; i < sectionObject.arr.length; i++) {
-      sectionObject.average += sectionObject.arr[i]
-      sectionObject.deviation += Math.pow(sectionObject.arr[i], 2)
+      average += sectionObject.arr[i]
+      deviation += Math.pow(sectionObject.arr[i], 2)
     }
 
-    sectionObject.average = sectionObject.average / sectionObject.arr.length
+    sectionObject.average = average / Math.max(sectionObject.arr.length, 1)
     sectionObject.deviation =
-      Math.sqrt(sectionObject.deviation / sectionObject.arr.length) -
-      sectionObject.average * sectionObject.average
+      Math.sqrt(Math.max(deviation / sectionObject.arr.length, 0)) -
+      average * average
 
     if (sectionObject.counter >= sectionObject.counterLimit) {
       sectionObject.counter = 0
@@ -152,14 +201,19 @@ export default class AudioAnalyser {
   }
 
   getAvFreq() {
-    for (let i = 0; i < this.bufferLength; i++) {
-      this.avFreq += this.frequencyData[i]
-      this.rms += this.frequencyData[i] * this.frequencyData[i]
-      if (this.frequencyData[i] > this.peak) {
-        this.peak = this.frequencyData[i]
+    let average = 0
+    let localRms = 0
+    let localPeak = 0
+    const data = [...this.frequencyData]
+    for (let i = 0; i < data.length; i++) {
+      average += data[i]
+      localRms += data[i] * data[i]
+      if (data[i] > localPeak) {
+        localPeak = data[i]
       }
     }
-    this.avFreq = this.avFreq / this.bufferLength
-    this.rms = Math.sqrt(this.rms / this.bufferLength)
+    this.avFreq = average / Math.max(data.length, 1)
+    this.rms = Math.sqrt(Math.max(localRms / data.length, 0))
+    this.peak = localPeak
   }
 }
