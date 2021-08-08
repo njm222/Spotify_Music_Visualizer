@@ -3,7 +3,7 @@ import { useFrame } from '@react-three/fiber'
 import simplex from 'simplex-noise'
 import * as THREE from 'three'
 import getColour from '@/helpers/getColour'
-import { useStore } from '@/utils/store'
+import { setState, useStore } from '@/utils/store'
 
 let simplexNoise = new simplex(Math.round(Math.random() * 1000))
 
@@ -76,6 +76,7 @@ const Terrain = () => {
     // Update simplex seed on every section change
     if (barChangeRef.current !== barStart) {
       simplexNoise = new simplex(Math.round(Math.random() * 1000))
+      setState({ colourKey: Math.floor(Math.random() * 3) })
       barChangeRef.current = barStart
     }
 

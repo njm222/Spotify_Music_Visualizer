@@ -1,4 +1,4 @@
-import { memo, useEffect, useMemo } from 'react'
+import { memo, useEffect, useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import AudioAnalyzer from '@/utils/AudioAnalyzer'
 import { useStore } from '@/utils/store'
@@ -21,7 +21,7 @@ const Visualizer = () => {
   console.log('visualizer')
   const set = useStore((state) => state.set)
   const modeKey = useStore((state) => state.modeKey)
-
+  const sectionChangeRef = useRef(-1)
   useEffect(() => {
     if (useStore.getState().audioAnalyzer) {
       return
@@ -36,6 +36,14 @@ const Visualizer = () => {
   useFrame(() => {
     useStore.getState().audioAnalyzer?.updateData()
     useStore.getState().spotifyAnalyzer?.updateData()
+    // change mode on section change
+    const sectionStart = useStore.getState().spotifyAnalyzer?.section.start
+    if (sectionChangeRef.current !== sectionStart) {
+      sectionChangeRef.current = sectionStart
+      set({
+        modeKey: Math.floor(Math.random() * 2),
+      })
+    }
   })
 
   const Mode = useMemo(() => {
