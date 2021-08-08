@@ -119,10 +119,9 @@ export default class SpotifyAnalyzer {
     }
 
     const end = data.start + data.duration
-
     if (position >= end && this.sectionCounter < this.sections.length) {
       this.section = this.sections[this.sectionCounter]
-      this.beatCounter += 1
+      this.sectionCounter += 1
     }
   }
 }
