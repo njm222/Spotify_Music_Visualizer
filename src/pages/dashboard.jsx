@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { setState, useStore } from '@/utils/store'
 import { setAccessToken } from '@/spotifyClient'
 import Keyboard from '@/components/dom/controls/Keybaord'
+import MouseActivity from '@/components/dom/controls/MouseActivity'
 import IconButton from '@/components/dom/IconButton'
 import Settings from '@/components/dom/Settings'
 import SettingsIcon from '@/components/dom/SettingsIcon'
@@ -46,13 +47,16 @@ const Page = () => {
     handleTokens()
   }, [])
 
-  const ToggledPlayer = useToggle(Player, 'tokenReady')
+  const ToggledPlayer = useToggle(Player, ['tokenReady', 'mouseActive'])
   const ToggledWelcomeUser = useToggle(WelcomeUser, [
     'tokenReady',
     '!isVisualizer',
   ])
-  const ToggledSettings = useToggle(Settings, 'settings')
-  const ToggledSettingsIcon = useToggle(IconButton, '!settings')
+  const ToggledSettings = useToggle(Settings, ['mouseActive', 'settings'])
+  const ToggledSettingsIcon = useToggle(IconButton, [
+    'mouseActive',
+    '!settings',
+  ])
   const ToggledScene = useToggle(DashboardScene, 'playerReady')
   const ToggledStats = useToggle(Stats, 'stats')
   const ToggledLoader = useToggle(Loader, 'sceneReady')
@@ -69,6 +73,7 @@ const Page = () => {
         icon={<SettingsIcon />}
       />
       <Keyboard />
+      <MouseActivity />
       <ToggledScene r3f />
       <ToggledStats />
       <ToggledLoader />
