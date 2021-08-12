@@ -5,7 +5,10 @@ import { sdkInit } from '@/spotifyClient'
 import PlayerControls from './PlayerControls'
 
 const Player = () => {
-  const playerState = useStore((state) => state.player.playerState)
+  const [playerState, mouseActive] = useStore((state) => [
+    state.player.playerState,
+    state.mouseActive,
+  ])
 
   const initialTime = useRef()
   const timerRef = useRef(null)
@@ -48,7 +51,7 @@ const Player = () => {
   }, [playerState])
 
   return playerState ? (
-    <div className='playerContainer'>
+    <div className={`playerContainer ${!mouseActive && 'hidden'}`}>
       <div className='playerLeft'>
         <Image
           width={'50px'}

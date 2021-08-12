@@ -47,7 +47,7 @@ const Page = () => {
     handleTokens()
   }, [])
 
-  const ToggledPlayer = useToggle(Player, ['tokenReady', 'mouseActive'])
+  const ToggledPlayer = useToggle(Player, 'tokenReady')
   const ToggledWelcomeUser = useToggle(WelcomeUser, [
     'tokenReady',
     '!isVisualizer',

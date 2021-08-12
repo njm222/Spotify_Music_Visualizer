@@ -15,6 +15,7 @@ const useStoreImpl = create(
       tokenReady: false,
       playerReady: false,
       sceneReady: false,
+      mouseActive: true,
       stats: true,
       settings: false,
       isVisualizer: false,

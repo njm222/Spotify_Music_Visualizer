@@ -29,6 +29,10 @@ img {
   z-index: 10;
 }
 
+.hidden { 
+  visibility: hidden;
+}
+
 .loader { 
   position: absolute;
   width: 100%;
