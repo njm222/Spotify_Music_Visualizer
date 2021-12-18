@@ -26,7 +26,7 @@ export const updateToken = async (refreshToken) => {
   } catch (err) {
     console.log(err) // TODO: toast messages
     useStore.setState({ refreshToken: null }) // reset refresh token just incase
-    window.location = 'http://localhost:3000' // temp solution
+    window.location = 'http://localhost:3000' // TODO: resolve temp solution
   }
 }
 

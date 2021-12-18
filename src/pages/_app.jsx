@@ -1,59 +1,44 @@
 import { useRouter } from 'next/router'
-import { useStore } from '@/utils/store'
-import { useEffect, Children, Component } from 'react'
+import { setState } from '@/utils/store'
+import { useEffect } from 'react'
 import Header from '@/config'
-import dynamic from 'next/dynamic'
 import Dom from '@/components/layout/dom'
-
+import partition from '@/helpers/partition'
 import '@/styles/index.css'
+import dynamic from 'next/dynamic'
 
-let LCanvas = null
-if (process.env.NODE_ENV === 'production') {
-  LCanvas = dynamic(() => import('@/components/layout/canvas'), {
-    ssr: false,
-  })
-} else {
-  LCanvas = require('@/components/layout/canvas').default
+const LCanvas = dynamic(() => import('@/components/layout/canvas'), {
+  ssr: false,
+})
+
+const Balance = ({ child }) => {
+  const [r3f, dom] = partition(child, (c) => c.props.r3f === true)
+
+  return (
+    <>
+      <Dom>{dom}</Dom>
+      <LCanvas>{r3f}</LCanvas>
+    </>
+  )
 }
 
-function Layout({ dom }) {
-  return <>{dom && <Dom>{dom}</Dom>}</>
-}
-
-const ForwardPropsToR3fComponent = ({ comp, pageProps }) => {
-  let r3fArr = []
-  let compArr = []
-
-  try {
-    Children.forEach(comp(pageProps).props.children, (child) => {
-      if (child?.props && child.props.r3f) {
-        r3fArr.push(child)
-      } else {
-        compArr.push(child)
-      }
-    })
-
-    return (
-      <>
-        {compArr && <Layout dom={compArr} />}
-        {r3fArr && <LCanvas>{r3fArr}</LCanvas>}
-      </>
-    )
-  } catch (error) {
-    // fallback security for SSG
-    return <comp {...pageProps} />
-  }
-}
-
-function App({ Component, pageProps = {} }) {
+function App({ Component, pageProps = { title: 'index' } }) {
   const router = useRouter()
+
   useEffect(() => {
-    useStore.setState({ router })
+    setState({ router })
   }, [router])
+
+  const child = Component(pageProps).props.children
+
   return (
     <>
       <Header title={pageProps.title} />
-      <ForwardPropsToR3fComponent comp={Component} pageProps={pageProps} />
+      {child && child.length > 1 ? (
+        <Balance child={Component(pageProps).props.children} />
+      ) : (
+        <Component {...pageProps} />
+      )}
     </>
   )
 }

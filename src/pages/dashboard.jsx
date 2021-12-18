@@ -43,7 +43,7 @@ const Page = () => {
   }
 
   useEffect(() => {
-    useStore.getState().set({ title: 'Dashboard' })
+    setState({ title: 'Dashboard' })
     handleTokens()
   }, [])
 
@@ -59,7 +59,7 @@ const Page = () => {
   ])
   const ToggledScene = useToggle(DashboardScene, 'playerReady')
   const ToggledStats = useToggle(Stats, 'stats')
-  const ToggledLoader = useToggle(Loader, 'sceneReady')
+  const ToggledLoader = useToggle(Loader, ['sceneReady', '!playerReady'])
   return (
     <>
       <ToggledWelcomeUser />

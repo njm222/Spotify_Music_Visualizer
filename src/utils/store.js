@@ -8,7 +8,7 @@ const useStoreImpl = create(
   persist(
     (set) => ({
       set,
-      router: {},
+      router: null,
       dom: null,
       accessToken: null,
       refreshToken: null,
