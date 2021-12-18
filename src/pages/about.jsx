@@ -21,7 +21,7 @@ export default Page
 export async function getStaticProps() {
   return {
     props: {
-      title: 'Tessellator',
+      title: 'Tessellator - About',
     },
   }
 }

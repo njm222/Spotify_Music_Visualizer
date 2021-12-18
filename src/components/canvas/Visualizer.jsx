@@ -21,7 +21,9 @@ const Visualizer = () => {
   console.log('visualizer')
   const set = useStore((state) => state.set)
   const modeKey = useStore((state) => state.modeKey)
-  const sectionChangeRef = useRef(-1)
+  const sectionChangeRef = useRef(
+    useStore.getState().spotifyAnalyzer?.section.start
+  )
   useEffect(() => {
     if (useStore.getState().audioAnalyzer) {
       return
