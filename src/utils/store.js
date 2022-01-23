@@ -32,7 +32,7 @@ const useStoreImpl = create(
     }),
     {
       name: 'tessellator-zustand',
-      version: 1,
+      version: 1.0,
       whitelist: ['accessToken', 'refreshToken', 'audioAnalyzerOptions'],
       merge: (persistedState, currentState) => {
         if (currentState?.refreshToken) {

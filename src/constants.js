@@ -1,5 +1,5 @@
 export const defaultAnalyzerOptions = {
-  fftSize: 512,
+  fftSize: 1024,
   smoothingTimeConstant: 0.8,
   minDecibels: -90,
   maxDecibels: -25,

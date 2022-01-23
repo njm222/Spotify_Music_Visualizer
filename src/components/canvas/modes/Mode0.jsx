@@ -8,7 +8,7 @@ import { setState, getState } from '@/utils/store'
 
 let simplexNoise = new simplex(Math.round(Math.random() * 1000))
 
-const Terrain = () => {
+function Terrain() {
   // Get reference of the terrain
   const terrainGeometryRef = useRef()
   const terrainMaterialRef = useRef()
@@ -18,27 +18,33 @@ const Terrain = () => {
   const [vpWidth, vpHeight] = useAspect(size.width, size.height)
 
   // Set the grid size and resolution
-  const gridSize = [vpWidth * 1.5, vpHeight * 1.5]
-  const gridRes = [128, 128]
+  const gridSize = [vpWidth * 1.5, vpHeight * 3]
+  const gridRes = [128, 256]
 
   useFrame((state, delta) => {
-    const audioAnalyzer = getState().audioAnalyzer
+    if (!getState().audioAnalyzer || !getState().spotifyAnalyzer || !getState().spotifyFeatures) { return }
+    const { avFreq, snareObject, bassObject, midsObject, highsObject } = getState().audioAnalyzer
+    const { section, barCounter, bar } = getState().spotifyAnalyzer
+    const { energy, danceability } = getState().spotifyFeatures
 
     // Set the variables for simplex
     const nAmplitude = Math.max(
-      (audioAnalyzer?.avFreq + audioAnalyzer?.snareObject.energy) / 510,
+      (avFreq + snareObject?.energy) / 510,
       0.1
     )
-    const nScale =
-      (getState().spotifyFeatures?.energy +
-        getState().spotifyFeatures?.danceability) *
-      (getState().spotifyAnalyzer?.section.tempo * 0.02)
+    const nXScale =
+      (energy) *
+      (section?.tempo * 0.025)
+
+    const nYScale =
+      (danceability) *
+      (section?.tempo * 0.025)
 
     // Get a reference of the terrain grid's geometry
     const terrainGeometry = terrainGeometryRef.current
 
     // Wait for Spotify to load
-    if (!nScale || !nAmplitude || !terrainGeometry) {
+    if (!nXScale || !nYScale || !nAmplitude || !terrainGeometry) {
       return
     }
 
@@ -47,14 +53,14 @@ const Terrain = () => {
 
     // Get the current time
     time.current +=
-      (audioAnalyzer?.midsObject.energy + audioAnalyzer?.highsObject.average) /
+      (midsObject?.energy + highsObject?.average) /
       10000
 
     // For each vertex set the position on the z-axis based on the noise function
     for (let i = 0; i < position.count; i++) {
       const z = simplexNoise.noise3D(
-        position.getX(i) / (nScale - audioAnalyzer?.bassObject.energy / 255),
-        position.getY(i) / (nScale - audioAnalyzer?.snareObject.energy / 255),
+        position.getX(i) / (nXScale - bassObject?.energy / 255) - (highsObject?.average / 10),
+        position.getY(i) / (nYScale - snareObject?.energy / 255) - (highsObject?.average / 10),
         time.current
       )
       position.setZ(i, Number.isNaN(z) ? 0 : z * nAmplitude)
@@ -71,21 +77,20 @@ const Terrain = () => {
       delta * 5
     )
 
-    const barStart = getState().spotifyAnalyzer?.bar.start
     // Update simplex seed on every section change
-    if (barChangeRef.current !== barStart) {
+    if (barChangeRef.current !== bar.start) {
       simplexNoise = new simplex(Math.round(Math.random() * 1000))
       setState({ colourKey: Math.floor(Math.random() * 3) })
-      barChangeRef.current = barStart
+      barChangeRef.current = bar.start
     }
 
     // Switch wireframe on every bar change
     terrainMaterialRef.current.wireframe =
-      getState().spotifyAnalyzer?.barCounter % 2 === 0
+      barCounter % 2 === 0
   })
 
   return (
-    <mesh receiveShadow rotation={[-Math.PI / 6, 0, 0]} position={[0, 1, 0]}>
+    <mesh receiveShadow position={[0, 4, -3]} rotation={[-Math.PI / 5, 0, 0]}>
       <planeBufferGeometry
         attach='geometry'
         args={[...gridSize, ...gridRes]}

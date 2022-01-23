@@ -1,8 +1,8 @@
 import { Canvas } from '@react-three/fiber'
-import { OrbitControls, Preload } from '@react-three/drei'
+import { OrbitControls, Preload, Loader } from '@react-three/drei'
 import { A11yUserPreferences } from '@react-three/a11y'
 import { useStore } from '@/utils/store'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, Suspense } from 'react'
 
 const LControl = () => {
   const dom = useStore((state) => state.dom)
@@ -29,11 +29,13 @@ const LCanvas = ({ children }) => {
       }}
       onCreated={(state) => state.events.connect(dom.current)}
     >
+      <Suspense fallback={Loader}>
       <LControl />
       <A11yUserPreferences>
         <Preload all />
         {children}
       </A11yUserPreferences>
+      </Suspense>
     </Canvas>
   )
 }

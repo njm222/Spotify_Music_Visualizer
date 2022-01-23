@@ -1,5 +1,6 @@
 import { useStore } from '@/utils/store'
 
+// eslint-disable-next-line react/display-name
 export const useToggle = (ToggledComponent, toggle) => (props) => {
   const keys = Array.isArray(toggle) ? toggle : [toggle]
   // eslint-disable-next-line react-hooks/rules-of-hooks

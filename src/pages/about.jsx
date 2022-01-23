@@ -1,4 +1,4 @@
-import { useStore } from '@/utils/store'
+import { setState } from '@/utils/store'
 import { Stats } from '@react-three/drei'
 import dynamic from 'next/dynamic'
 
@@ -7,7 +7,7 @@ const AboutScene = dynamic(() => import('@/components/canvas/AboutScene'), {
 })
 
 const Page = ({ title }) => {
-  useStore.setState({ title })
+  setState({ title })
   return (
     <>
       <AboutScene r3f />

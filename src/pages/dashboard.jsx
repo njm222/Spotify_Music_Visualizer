@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { setState, useStore } from '@/utils/store'
+import { setState, getState } from '@/utils/store'
 import { setAccessToken } from '@/spotifyClient'
 import Keyboard from '@/components/dom/controls/Keybaord'
 import MouseActivity from '@/components/dom/controls/MouseActivity'
@@ -12,40 +12,35 @@ import Loader from '@/components/dom/Loader'
 import DashboardScene from '@/components/canvas/DashboardScene'
 import { updateToken } from '@/backendClient'
 import { Stats } from '@react-three/drei'
-import { useToggle } from '@/components/useToggle'
+import {useToggle} from '@/components/useToggle'
 
 const Page = () => {
-  console.log('dashboard')
-  const refreshToken = useStore.getState().refreshToken
-  const router = useStore.getState().router
+  const refreshToken = getState().refreshToken
+  const router = getState().router
 
-  const handleTokens = () => {
+  useEffect(() => {
+    setState({ title: 'Dashboard' })
     const searchParams = new URLSearchParams(window.location.search)
     if (searchParams.has('access_token') && searchParams.has('refresh_token')) {
       // get and store tokens from query string
       setAccessToken(searchParams.get('access_token'))
-      useStore.getState().set({
+      setState({
         accessToken: searchParams.get('access_token'),
         refreshToken: searchParams.get('refresh_token'),
       })
-      useStore.getState().set({ tokenReady: true })
+      setState({ tokenReady: true })
     } else if (refreshToken) {
       // if refreshToken is present update accessToken
       ;(async () => {
         await updateToken(refreshToken)
-        useStore.getState().set({ tokenReady: true })
+        setState({ tokenReady: true })
       })()
     } else {
-      useStore.getState().set({ tokenReady: false })
+      setState({ tokenReady: false })
       // redirect home for all edge cases
       router.push('/')
     }
-  }
-
-  useEffect(() => {
-    setState({ title: 'Dashboard' })
-    handleTokens()
-  }, [])
+  }, [refreshToken, router])
 
   const ToggledPlayer = useToggle(Player, 'tokenReady')
   const ToggledWelcomeUser = useToggle(WelcomeUser, [
@@ -57,24 +52,23 @@ const Page = () => {
     'mouseActive',
     '!settings',
   ])
-  const ToggledScene = useToggle(DashboardScene, 'playerReady')
   const ToggledStats = useToggle(Stats, 'stats')
-  const ToggledLoader = useToggle(Loader, ['sceneReady', '!playerReady'])
+  const ToggledLoader = useToggle(Loader, '!playerReady')
   return (
     <>
       <ToggledWelcomeUser />
       <ToggledPlayer />
       <ToggledSettings
-        handleClose={() => useStore.getState().set({ settings: false })}
+        handleClose={() => setState({ settings: false })}
       />
       <ToggledSettingsIcon
         title='settings'
-        onClick={() => useStore.getState().set({ settings: true })}
+        onClick={() => setState({ settings: true })}
         icon={<SettingsIcon />}
       />
       <Keyboard />
       <MouseActivity />
-      <ToggledScene r3f />
+      <DashboardScene r3f />
       <ToggledStats />
       <ToggledLoader />
     </>

@@ -34,11 +34,11 @@ const Mode1 = () => {
   }
 
   const updateTorusAttributes = () => {
-    const radius = audioAnalyzer.midsObject.average / 100
-    const tube = audioAnalyzer.avFreq / 100
-    const tubularSegments = Math.floor(audioAnalyzer.snareObject.average)
-    const radialSegments = Math.floor(audioAnalyzer.kickObject.average)
-    const p = Math.max(1, Math.round(getSegments() * 4))
+    const radius = audioAnalyzer.snareObject.energy / 100
+    const tube = (audioAnalyzer.bassObject.energy - audioAnalyzer.kickObject.energy) / 5
+    const tubularSegments = Math.ceil(audioAnalyzer.midsObject.average)
+    const radialSegments = Math.ceil(audioAnalyzer.midsObject.energy)
+    const p = Math.ceil(getSegments() * 4)
     const q = getTimbreSum() / (spotifyFeatures.energy * 30)
 
     return [radius, tube, tubularSegments, radialSegments, p, q]
@@ -163,7 +163,8 @@ const Mode1 = () => {
       p,
       q
     )
-
+    mesh.current.rotation.z -= audioAnalyzer.snareObject.energy / 2000;
+    // mesh.current.rotation.set(new Vector3( 0, 0, 0));
     mesh.current.geometry.setIndex(indices)
     mesh.current.geometry.setAttribute(
       'position',

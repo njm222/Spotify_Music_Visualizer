@@ -62,7 +62,7 @@ export default class SpotifyAnalyzer {
 
     const end = data.start + data.duration
 
-    if (position >= end && this.segmentCounter < this.segments.length) {
+    while (position >= end && this.segmentCounter < this.segments.length) {
       this.timbre = this.segments[this.segmentCounter]?.timbre
       this.pitches = this.segments[this.segmentCounter]?.pitches
       this.segment = this.segments[this.segmentCounter]
@@ -78,7 +78,7 @@ export default class SpotifyAnalyzer {
 
     const end = data.start + data.duration
 
-    if (position >= end && this.tatumCounter < this.tatums.length) {
+    while (position >= end && this.tatumCounter < this.tatums.length) {
       this.tatum = this.tatums[this.tatumCounter]
       this.tatumCounter += 1
     }
@@ -92,7 +92,7 @@ export default class SpotifyAnalyzer {
 
     const end = data.start + data.duration
 
-    if (position >= end && this.beatCounter < this.beats.length) {
+    while (position >= end && this.beatCounter < this.beats.length) {
       this.beat = this.beats[this.beatCounter]
       this.beatCounter += 1
     }
@@ -106,7 +106,7 @@ export default class SpotifyAnalyzer {
 
     const end = data.start + data.duration
 
-    if (position >= end && this.barCounter < this.bars.length) {
+    while (position >= end && this.barCounter < this.bars.length) {
       this.bar = this.bars[this.barCounter]
       this.barCounter += 1
     }
@@ -119,7 +119,7 @@ export default class SpotifyAnalyzer {
     }
 
     const end = data.start + data.duration
-    if (position >= end && this.sectionCounter < this.sections.length) {
+    while (position >= end && this.sectionCounter < this.sections.length) {
       this.section = this.sections[this.sectionCounter]
       this.sectionCounter += 1
     }
