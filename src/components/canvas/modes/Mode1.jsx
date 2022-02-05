@@ -164,8 +164,11 @@ const Mode1 = () => {
       p,
       q
     )
-    mesh.current.rotation.z -= audioAnalyzer.snareObject.energy / 2000
-    // mesh.current.rotation.set(new Vector3( 0, 0, 0));
+
+    spotifyAnalyzer.barCounter % 2 === 0
+      ? (mesh.current.rotation.z -= audioAnalyzer.snareObject.energy / 2000)
+      : (mesh.current.rotation.z += audioAnalyzer.snareObject.energy / 2000)
+
     mesh.current.geometry.setIndex(indices)
     mesh.current.geometry.setAttribute(
       'position',
