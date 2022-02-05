@@ -1,4 +1,3 @@
-
 const Loader = () => {
   return <div className='loader'>loading player</div>
 }

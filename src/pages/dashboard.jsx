@@ -12,37 +12,36 @@ import Loader from '@/components/dom/Loader'
 import DashboardScene from '@/components/canvas/DashboardScene'
 import { updateToken } from '@/backendClient'
 import { Stats } from '@react-three/drei'
-import {useToggle} from '@/components/useToggle'
+import { useToggle } from '@/components/useToggle'
 
-const Page = () => {
+const Dashboard = () => {
   const refreshToken = getState().refreshToken
   const router = getState().router
 
-  useEffect(() => {
-    setState({ title: 'Dashboard' })
-    const searchParams = new URLSearchParams(window.location.search)
-    if (searchParams.has('access_token') && searchParams.has('refresh_token')) {
-      // get and store tokens from query string
-      setAccessToken(searchParams.get('access_token'))
-      setState({
-        accessToken: searchParams.get('access_token'),
-        refreshToken: searchParams.get('refresh_token'),
-      })
-      setState({ tokenReady: true })
-    } else if (refreshToken) {
-      // if refreshToken is present update accessToken
-      ;(async () => {
-        await updateToken(refreshToken)
-        setState({ tokenReady: true })
-      })()
-    } else {
-      setState({ tokenReady: false })
-      // redirect home for all edge cases
-      router.push('/')
-    }
-  }, [refreshToken, router])
+  // move to get authorized / unauth app
+  // useEffect(() => {
+  //   setState({ title: 'Dashboard' })
+  //   const searchParams = new URLSearchParams(window.location.search)
+  //   if (searchParams.has('access_token') && searchParams.has('refresh_token')) {
+  //     // get and store tokens from query string
+  //     setAccessToken(searchParams.get('access_token'))
+  //     setState({
+  //       accessToken: searchParams.get('access_token'),
+  //       refreshToken: searchParams.get('refresh_token'),
+  //     })
+  //     setState({ tokenReady: true })
+  //   } else if (refreshToken) {
+  //     // if refreshToken is present update accessToken
+  //     ;(async () => {
+  //       updateToken(refreshToken).then(() => setState({ tokenReady: true }))
+  //     })()
+  //   } else {
+  //     setState({ tokenReady: false })
+  //     // redirect home for all edge cases
+  //     router.push('/')
+  //   }
+  // }, [refreshToken, router])
 
-  const ToggledPlayer = useToggle(Player, 'tokenReady')
   const ToggledWelcomeUser = useToggle(WelcomeUser, [
     'tokenReady',
     '!isVisualizer',
@@ -57,10 +56,8 @@ const Page = () => {
   return (
     <>
       <ToggledWelcomeUser />
-      <ToggledPlayer />
-      <ToggledSettings
-        handleClose={() => setState({ settings: false })}
-      />
+      <Player />
+      <ToggledSettings handleClose={() => setState({ settings: false })} />
       <ToggledSettingsIcon
         title='settings'
         onClick={() => setState({ settings: true })}
@@ -75,4 +72,17 @@ const Page = () => {
   )
 }
 
-export default Page
+export default Dashboard
+
+export async function getServerSideProps({ query }) {
+  // get and store tokens from query string
+  const { access_token: accessToken, refresh_token: refreshToken } = query
+
+  return {
+    props: {
+      title: 'Dashboard',
+      accessToken,
+      refreshToken,
+    },
+  }
+}

@@ -12,7 +12,7 @@
   "scripts": {
     "lint": "yarn prettier && yarn eslint",
     "eslint": "next lint --fix --dir src",
-    "prettier": "prettier -l \"./src/**/*.{js,jsx,md}\"",
+    "prettier": "prettier --write -l \"./src/**/*.{js,jsx,md}\"",
     "dev": "next dev",
     "build": "next build",
     "export": "EXPORT=true next build && EXPORT=true next export",
@@ -21,13 +21,14 @@
   },
   "dependencies": {
     "@babel/plugin-transform-runtime": "^7.16.4",
-    "babel-plugin-glsl": "^1.0.0",
-    "babel-plugin-styled-components": "^2.0.2",
     "@react-three/a11y": "^2.2.3",
     "@react-three/drei": "^8.3.1",
     "@react-three/fiber": "^7.0.21",
     "@react-three/flex": "^0.6.0",
     "axios": "^0.21.2",
+    "babel-plugin-glsl": "^1.0.0",
+    "babel-plugin-styled-components": "^2.0.2",
+    "js-cookie": "^3.0.1",
     "leva": "^0.9.18",
     "next": "^12.0.9",
     "react": "^17.0.2",
@@ -36,15 +37,14 @@
     "spotify-web-api-js": "^1.5.1",
     "three": "^0.135.0",
     "three-stdlib": "^2.6.1",
-    "zustand": "^3.6.7"
+    "zustand": "^3.6.9"
   },
   "devDependencies": {
-    "@next/bundle-analyzer": "^11.1.2",
+    "@next/bundle-analyzer": "^12.0.9",
     "autoprefixer": "^10.4.0",
     "eslint": "^7.32.0",
     "eslint-config-next": "^12.0.4",
     "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-tailwind": "^0.2.1",
     "file-loader": "^6.2.0",
     "glslify": "^7.1.1",
     "glslify-loader": "^2.0.0",

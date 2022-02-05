@@ -1,5 +1,5 @@
 {
-  "extends": ["next", "prettier", "plugin:tailwind/recommended"],
+  "extends": ["next", "prettier"],
   "rules": {
     "import/first": "error",
     "import/newline-after-import": "error",

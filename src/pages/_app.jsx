@@ -6,6 +6,7 @@ import Dom from '@/components/layout/dom'
 import partition from '@/helpers/partition'
 import '@/styles/index.css'
 import dynamic from 'next/dynamic'
+import { AuthProvider, ProtectRoute } from '@/utils/authContext'
 
 const LCanvas = dynamic(() => import('@/components/layout/canvas'), {
   ssr: false,
@@ -34,11 +35,15 @@ function App({ Component, pageProps = { title: 'index' } }) {
   return (
     <>
       <Header title={pageProps.title} />
-      {child && child.length > 1 ? (
-        <Balance child={Component(pageProps).props.children} />
-      ) : (
-        <Component {...pageProps} />
-      )}
+      <AuthProvider router={router}>
+        <ProtectRoute router={router}>
+          {child && child.length > 1 ? (
+            <Balance child={Component(pageProps).props.children} />
+          ) : (
+            <Component {...pageProps} />
+          )}
+        </ProtectRoute>
+      </AuthProvider>
     </>
   )
 }

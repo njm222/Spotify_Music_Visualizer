@@ -8,6 +8,7 @@ const useStoreImpl = create(
   persist(
     (set) => ({
       set,
+      title: 'Tessellator',
       router: null,
       dom: null,
       accessToken: null,
@@ -33,7 +34,11 @@ const useStoreImpl = create(
     {
       name: 'tessellator-zustand',
       version: 1.0,
-      whitelist: ['accessToken', 'refreshToken', 'audioAnalyzerOptions'],
+      partialize: (state) => ({
+        accessToken: state.accessToken,
+        refreshToken: state.refreshToken,
+        audioAnalyzerOptions: state.audioAnalyzerOptions,
+      }),
       merge: (persistedState, currentState) => {
         if (currentState?.refreshToken) {
           return currentState

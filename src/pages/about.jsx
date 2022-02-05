@@ -6,7 +6,7 @@ const AboutScene = dynamic(() => import('@/components/canvas/AboutScene'), {
   ssr: false,
 })
 
-const Page = ({ title }) => {
+function Page({ title }) {
   setState({ title })
   return (
     <>

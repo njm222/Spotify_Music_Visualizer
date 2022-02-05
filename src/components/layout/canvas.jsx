@@ -30,11 +30,11 @@ const LCanvas = ({ children }) => {
       onCreated={(state) => state.events.connect(dom.current)}
     >
       <Suspense fallback={Loader}>
-      <LControl />
-      <A11yUserPreferences>
-        <Preload all />
-        {children}
-      </A11yUserPreferences>
+        <LControl />
+        <A11yUserPreferences>
+          <Preload all />
+          {children}
+        </A11yUserPreferences>
       </Suspense>
     </Canvas>
   )

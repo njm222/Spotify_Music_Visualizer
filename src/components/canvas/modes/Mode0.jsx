@@ -22,23 +22,23 @@ function Terrain() {
   const gridRes = [128, 256]
 
   useFrame((state, delta) => {
-    if (!getState().audioAnalyzer || !getState().spotifyAnalyzer || !getState().spotifyFeatures) { return }
-    const { avFreq, snareObject, bassObject, midsObject, highsObject } = getState().audioAnalyzer
+    if (
+      !getState().audioAnalyzer ||
+      !getState().spotifyAnalyzer ||
+      !getState().spotifyFeatures
+    ) {
+      return
+    }
+    const { avFreq, snareObject, bassObject, midsObject, highsObject } =
+      getState().audioAnalyzer
     const { section, barCounter, bar } = getState().spotifyAnalyzer
     const { energy, danceability } = getState().spotifyFeatures
 
     // Set the variables for simplex
-    const nAmplitude = Math.max(
-      (avFreq + snareObject?.energy) / 510,
-      0.1
-    )
-    const nXScale =
-      (energy) *
-      (section?.tempo * 0.025)
+    const nAmplitude = Math.max((avFreq + snareObject?.energy) / 510, 0.1)
+    const nXScale = energy * (section?.tempo * 0.025)
 
-    const nYScale =
-      (danceability) *
-      (section?.tempo * 0.025)
+    const nYScale = danceability * (section?.tempo * 0.025)
 
     // Get a reference of the terrain grid's geometry
     const terrainGeometry = terrainGeometryRef.current
@@ -52,15 +52,15 @@ function Terrain() {
     const { position } = terrainGeometry.attributes
 
     // Get the current time
-    time.current +=
-      (midsObject?.energy + highsObject?.average) /
-      10000
+    time.current += (midsObject?.energy + highsObject?.average) / 10000
 
     // For each vertex set the position on the z-axis based on the noise function
     for (let i = 0; i < position.count; i++) {
       const z = simplexNoise.noise3D(
-        position.getX(i) / (nXScale - bassObject?.energy / 255) - (highsObject?.average / 10),
-        position.getY(i) / (nYScale - snareObject?.energy / 255) - (highsObject?.average / 10),
+        position.getX(i) / (nXScale - bassObject?.energy / 255) -
+          highsObject?.average / 10,
+        position.getY(i) / (nYScale - snareObject?.energy / 255) -
+          highsObject?.average / 10,
         time.current
       )
       position.setZ(i, Number.isNaN(z) ? 0 : z * nAmplitude)
@@ -85,8 +85,7 @@ function Terrain() {
     }
 
     // Switch wireframe on every bar change
-    terrainMaterialRef.current.wireframe =
-      barCounter % 2 === 0
+    terrainMaterialRef.current.wireframe = barCounter % 2 === 0
   })
 
   return (
