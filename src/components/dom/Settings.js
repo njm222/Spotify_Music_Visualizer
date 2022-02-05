@@ -28,7 +28,7 @@ const Settings = ({ handleClose }) => {
   const values = useControls({ close: button(() => handleClose()) }, [])
   const [analyzerValues, setAnalyzerValues] = useControls(
     () => ({
-      "Analyzer Options": folder({
+      'Analyzer Options': folder({
         fftSize: {
           value: fftSize,
           options: [64, 128, 256, 512, 1024, 2048],
@@ -59,9 +59,7 @@ const Settings = ({ handleClose }) => {
           onChange: (v) => handleChange(v, 'maxDecibels'),
           transient: true,
         },
-        reset: button(
-          () => setAnalyzerValues(defaultAnalyzerOptions)
-        ),
+        reset: button(() => setAnalyzerValues(defaultAnalyzerOptions)),
       }),
     }),
     [audioAnalyzerOptions]

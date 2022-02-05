@@ -5,6 +5,7 @@ import * as THREE from 'three'
 import { useStore } from '@/utils/store'
 import Text from './Text'
 import { login } from '../../backendClient'
+import Particles from './Particles'
 
 const LandingScene = () => {
   const camera = useThree((state) => state.camera)
@@ -12,17 +13,17 @@ const LandingScene = () => {
     state.refreshToken,
     state.router,
   ])
-  const [clicked, setClicked] = useState(false)
+  const [isNavigating, setIsNavigating] = useState(false)
 
   useEffect(() => {
-    camera.position.z = 40
+    camera.position.z = 80
     return () => {
       document.documentElement.style.cursor = 'unset'
     }
   }, [])
 
   useFrame((state, delta) => {
-    if (clicked) {
+    if (isNavigating) {
       camera.position.lerp(new THREE.Vector3(0, 0, -40), delta) // TODO: lerp camera position
     } else {
       camera.position.lerp(new THREE.Vector3(0, 0, 40), delta * 2)
@@ -30,7 +31,7 @@ const LandingScene = () => {
   })
 
   const handleClick = async () => {
-    setClicked(true)
+    setIsNavigating(true)
     // check for refreshToken
     if (refreshToken) {
       router.push('/dashboard')
@@ -51,9 +52,8 @@ const LandingScene = () => {
     <Suspense fallback={null}>
       <ambientLight intensity={0.8} />
       <directionalLight castShadow position={[2.5, 12, 12]} intensity={4} />
-      <pointLight position={[20, 20, 20]} />
       <pointLight position={[-20, -20, -20]} intensity={5} />
-      <Stars radius={10} depth={50} count={10000} factor={1} fade />
+      {/* <Stars radius={10} depth={50} count={10000} factor={1} fade /> */}
       <Text
         onPointerDown={() => handleClick()}
         onPointerEnter={() => setPointer(true)}
@@ -61,6 +61,7 @@ const LandingScene = () => {
       >
         tessellator
       </Text>
+      <Particles count={10000} isNavigating={isNavigating} />
     </Suspense>
   )
 }
