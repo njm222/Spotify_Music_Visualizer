@@ -18,8 +18,8 @@ function Terrain() {
   const [vpWidth, vpHeight] = useAspect(size.width, size.height)
 
   // Set the grid size and resolution
-  const gridSize = [vpWidth * 1.5, vpHeight * 3]
-  const gridRes = [128, 256]
+  const gridSize = [vpWidth * 1.5, vpHeight * 1.5]
+  const gridRes = [64, 64]
 
   useFrame((state, delta) => {
     if (
@@ -89,7 +89,7 @@ function Terrain() {
   })
 
   return (
-    <mesh receiveShadow position={[0, 4, -3]} rotation={[-Math.PI / 5, 0, 0]}>
+    <mesh receiveShadow position={[0, 2.5, -2.5]} rotation={[-Math.PI / 5, 0, 0]}>
       <planeBufferGeometry
         attach='geometry'
         args={[...gridSize, ...gridRes]}
