@@ -1,9 +1,11 @@
-import { Object3D, Vector3 } from 'three'
+import { Object3D, Color } from 'three'
 import React, { useRef, useMemo } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
+import hslToHex from '../../helpers/hslToHex'
 
 export default function Particles({ count, isNavigating }) {
   const mesh = useRef()
+  const material = useRef()
   const light = useRef()
   const { size, viewport } = useThree()
   const aspect = size.width / viewport.width
@@ -15,16 +17,22 @@ export default function Particles({ count, isNavigating }) {
     for (let i = 0; i < count; i++) {
       const t = Math.random() * 1000
       const factor = 10 + Math.random() * 1000
-      const speed = 0.001 + Math.random() / 200
+      const speed = 0.001 + Math.random() / 5000
       const xFactor = -2 + Math.random() * 4
-      const yFactor = -1 + Math.random() * 2
-      const zFactor = -5 + Math.random() * 10
+      let yFactor = -10 + Math.random() * 20
+
+      // makes a gap in the center
+      while (yFactor < 19 && yFactor > -19) {
+        yFactor = -20 + Math.random() * 40
+      }
+
+      const zFactor = Math.random() * 2
       temp.push({ t, factor, speed, xFactor, yFactor, zFactor, mx: 0, my: 0 })
     }
     return temp
   }, [count])
   // The innards of this hook will run every frame
-  useFrame((state) => {
+  useFrame((state, delta) => {
     // Makes the light follow the mouse
     light.current.position.set(
       state.mouse.x / aspect,
@@ -36,20 +44,26 @@ export default function Particles({ count, isNavigating }) {
     particles.forEach((particle, i) => {
       let { t, factor, speed, xFactor, yFactor, zFactor } = particle
       // There is no sense or reason to any of this, just messing around with trigonometric functions
-      t = particle.t += speed / 3
+      t = particle.t += speed
       const a = Math.cos(t) + Math.sin(t * 1) / 10
       const b = Math.sin(t) + Math.cos(t * 2) / 10
       const s = Math.cos(t)
 
       if (isNavigating) {
-        const factor = 0.1
+        const factor = 0.05
 
         particle.mx += particle.mx * factor
         particle.my += particle.my * factor
         particle.mz += particle.mz * factor
       } else {
+        const offset = -0.25
+        const limit = 0.5
         particle.mx +=
-          (Math.min(Math.max(state.mouse.x, -0.5), 0.5) * size.width -
+          (Math.min(
+            Math.max(state.mouse.x + offset, -limit + offset),
+            limit + offset
+          ) *
+            size.width -
             particle.mx) *
           0.01
         particle.my += (state.mouse.y * -size.height - particle.my) * 0.01
@@ -76,14 +90,24 @@ export default function Particles({ count, isNavigating }) {
       mesh.current.setMatrixAt(i, dummy.matrix)
     })
     mesh.current.instanceMatrix.needsUpdate = true
+
+    // update color
+    material.current.color.lerp(
+      new Color(getColour(state.mouse.x, state.mouse.y)),
+      delta * 5
+    )
   })
   return (
     <>
       <pointLight ref={light} distance={100} intensity={10} color='darkblue' />
       <instancedMesh ref={mesh} args={[null, null, count]}>
         <dodecahedronGeometry args={[0.1, 0]} />
-        <meshPhongMaterial color='#FFF' />
+        <meshPhongMaterial ref={material} color='#FFF' />
       </instancedMesh>
     </>
   )
+}
+
+function getColour(x, y) {
+  return hslToHex(((x + 1) / 2) * 360, ((y + 1) / 2) * 50, 50)
 }

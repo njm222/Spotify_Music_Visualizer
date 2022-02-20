@@ -30,7 +30,7 @@ const LCanvas = ({ children }) => {
       onCreated={(state) => state.events.connect(dom.current)}
     >
       <Suspense fallback={Loader}>
-        <LControl />
+        {location.pathname === '/' ? null : <LControl />}
         <A11yUserPreferences>
           <Preload all />
           {children}
