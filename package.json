@@ -55,6 +55,6 @@
     "raw-loader": "^4.0.2",
     "tailwindcss": "^2.2.19",
     "url-loader": "^4.1.1",
-    "webpack": "^5.64.4"
+    "webpack": "^5.76.0"
   }
 }
